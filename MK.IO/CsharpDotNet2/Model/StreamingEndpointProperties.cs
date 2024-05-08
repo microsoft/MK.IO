@@ -24,7 +24,7 @@ namespace MK.IO.Models
         /// <value>If CDN is enabled, the path that must be inserted after the hostname and before the locator, e.g. https://<hostName>/<cdnBasePath>/<locator>.</value>
         [DataMember(Name = "cdnBasePath", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "cdnBasePath")]
-        public string CdnBasePath { get; private set; }
+        public string? CdnBasePath { get; private set; }
 
         /// <summary>
         /// Indicates if CDN is enabled for the streaming endpoint.
@@ -40,7 +40,7 @@ namespace MK.IO.Models
         /// <value>If CDN is enabled, the optional CDN profile name for the streaming endpoint.</value>
         [DataMember(Name = "cdnProfile", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "cdnProfile")]
-        public string CdnProfile { get; set; }
+        public string? CdnProfile { get; set; }
 
         /// <summary>
         /// If CDN is enabled, the CDN provider name for the streaming endpoint.

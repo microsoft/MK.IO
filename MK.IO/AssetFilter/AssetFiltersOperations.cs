@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Net;
 #if NET462
 using System.Net.Http;
+using System.Threading;
 #endif
 
 namespace MK.IO.Operations
@@ -38,25 +39,33 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public List<AssetFilterSchema> List(string assetName, string? orderBy = null, string? filter = null, int? top = null)
+        public IEnumerable<AssetFilterSchema> List(string assetName, string? orderBy = null, string? filter = null, int? top = null)
         {
-            Task<List<AssetFilterSchema>> task = Task.Run(async () => await ListAsync(assetName, orderBy, filter, top));
+            Task<IEnumerable<AssetFilterSchema>> task = Task.Run(async () => await ListAsync(assetName, orderBy, filter, top));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<List<AssetFilterSchema>> ListAsync(string assetName, string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<IEnumerable<AssetFilterSchema>> ListAsync(string assetName, string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(assetName, nameof(assetName));
 
-            var url = Client.GenerateApiUrl(_assetFiltersApiUrl, assetName);
-            url = MKIOClient.AddParametersToUrl(url, "$orderby", orderBy);
-            url = MKIOClient.AddParametersToUrl(url, "$filter", filter);
-            url = MKIOClient.AddParametersToUrl(url, "$top", top != null ? ((int)top).ToString() : null);
+            List<AssetFilterSchema> objectsSchema = [];
+            var objectsResult = await ListAsPageAsync(assetName, orderBy, filter, top, cancellationToken);
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                objectsSchema.AddRange(objectsResult.Results);
+                if (objectsResult.NextPageLink == null || (top != null && objectsSchema.Count >= top)) break;
+                objectsResult = await ListAsPageNextAsync(objectsResult.NextPageLink, cancellationToken);
+            }
 
-            string responseContent = await Client.GetObjectContentAsync(url);
-            var objectToReturn = JsonConvert.DeserializeObject<AssetFilterListResponseSchema>(responseContent, ConverterLE.Settings);
-            return objectToReturn != null ? objectToReturn.Value : throw new Exception($"Error with asset filter list deserialization");
+            if (top != null && top < objectsSchema.Count)
+            {
+                return objectsSchema.Take((int)top);
+            }
+
+            return objectsSchema;
         }
 
         /// <inheritdoc/>
@@ -67,10 +76,10 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<AssetFilterSchema>> ListAsPageAsync(string assetName, string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<PagedResult<AssetFilterSchema>> ListAsPageAsync(string assetName, string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
             var url = Client.GenerateApiUrl(_assetFiltersApiUrl, assetName);
-            return await Client.ListAsPageGenericAsync<AssetFilterSchema>(url, typeof(AssetFilterListResponseSchema), "asset filter", orderBy, filter, top);
+            return await Client.ListAsPageGenericAsync<AssetFilterSchema>(url, typeof(AssetFilterListResponseSchema), "asset filter", cancellationToken, orderBy, filter, top);
         }
 
         /// <inheritdoc/>
@@ -81,9 +90,9 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<AssetFilterSchema>> ListAsPageNextAsync(string? nextPageLink)
+        public async Task<PagedResult<AssetFilterSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default)
         {
-            return await Client.ListAsPageNextGenericAsync<AssetFilterSchema>(nextPageLink, typeof(AssetFilterListResponseSchema), "asset filter");
+            return await Client.ListAsPageNextGenericAsync<AssetFilterSchema>(nextPageLink, typeof(AssetFilterListResponseSchema), "asset filter", cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -93,13 +102,13 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<AssetFilterSchema> GetAsync(string assetName, string filterName)
+        public async Task<AssetFilterSchema> GetAsync(string assetName, string filterName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(assetName, nameof(assetName));
             Argument.AssertNotNullOrEmpty(filterName, nameof(filterName));
 
             var url = Client.GenerateApiUrl(_assetFilterApiUrl, assetName, filterName);
-            string responseContent = await Client.GetObjectContentAsync(url);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return JsonConvert.DeserializeObject<AssetFilterSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with asset filter deserialization");
         }
 
@@ -111,7 +120,7 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<AssetFilterSchema> CreateOrUpdateAsync(string assetName, string filterName, MediaFilterProperties properties)
+        public async Task<AssetFilterSchema> CreateOrUpdateAsync(string assetName, string filterName, MediaFilterProperties properties, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(assetName, nameof(assetName));
             Argument.AssertNotNullOrEmpty(filterName, nameof(filterName));
@@ -123,11 +132,10 @@ namespace MK.IO.Operations
             var url = Client.GenerateApiUrl(_assetFilterApiUrl, assetName, filterName);
             AssetFilterSchema content = new()
             {
-                //Name = assetFilterName,
                 Properties = properties
             };
 
-            string responseContent = await Client.CreateObjectPutAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings));
+            string responseContent = await Client.CreateObjectPutAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings), cancellationToken);
             return JsonConvert.DeserializeObject<AssetFilterSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with asset filter deserialization");
         }
 
@@ -138,13 +146,13 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(string assetName, string filterName)
+        public async Task DeleteAsync(string assetName, string filterName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(assetName, nameof(assetName));
             Argument.AssertNotNullOrEmpty(filterName, nameof(filterName));
 
             var url = Client.GenerateApiUrl(_assetFilterApiUrl, assetName, filterName);
-            await Client.ObjectContentAsync(url, HttpMethod.Delete);
+            await Client.ObjectContentAsync(url, HttpMethod.Delete, cancellationToken);
         }
     }
 }

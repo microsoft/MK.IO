@@ -12,7 +12,7 @@ namespace MK.IO.Operations
 {
     /// <summary>
     /// REST Client for MKIO
-    /// https://io.mediakind.com
+    /// https://mk.io/
     /// 
     /// </summary>
     internal class ContentKeyPoliciesOperations : IContentKeyPoliciesOperations
@@ -43,23 +43,31 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public List<ContentKeyPolicySchema> List(string? orderBy = null, string? filter = null, int? top = null)
+        public IEnumerable<ContentKeyPolicySchema> List(string? orderBy = null, string? filter = null, int? top = null)
         {
-            Task<List<ContentKeyPolicySchema>> task = Task.Run(async () => await ListAsync(orderBy, filter, top));
+            Task<IEnumerable<ContentKeyPolicySchema>> task = Task.Run(async () => await ListAsync(orderBy, filter, top));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<List<ContentKeyPolicySchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<IEnumerable<ContentKeyPolicySchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
-            var url = Client.GenerateApiUrl(_contentKeyPoliciesApiUrl);
-            url = MKIOClient.AddParametersToUrl(url, "$orderby", orderBy);
-            url = MKIOClient.AddParametersToUrl(url, "$filter", filter);
-            url = MKIOClient.AddParametersToUrl(url, "$top", top != null ? ((int)top).ToString() : null);
+            List<ContentKeyPolicySchema> objectsSchema = [];
+            var objectsResult = await ListAsPageAsync(orderBy, filter, top, cancellationToken);
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                objectsSchema.AddRange(objectsResult.Results);
+                if (objectsResult.NextPageLink == null || (top != null && objectsSchema.Count >= top)) break;
+                objectsResult = await ListAsPageNextAsync(objectsResult.NextPageLink, cancellationToken);
+            }
 
-            string responseContent = await Client.GetObjectContentAsync(url);
-            var objectToReturn = JsonConvert.DeserializeObject<ContentKeyPolicyListResponseSchema>(responseContent, ConverterLE.Settings);
-            return objectToReturn != null ? objectToReturn.Value : throw new Exception($"Error with content key list deserialization");
+            if (top != null && top < objectsSchema.Count)
+            {
+                return objectsSchema.Take((int)top);
+            }
+
+            return objectsSchema;
         }
 
         /// <inheritdoc/>
@@ -70,10 +78,10 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<ContentKeyPolicySchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<PagedResult<ContentKeyPolicySchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
             var url = Client.GenerateApiUrl(_contentKeyPoliciesApiUrl);
-            return await Client.ListAsPageGenericAsync<ContentKeyPolicySchema>(url, typeof(ContentKeyPolicyListResponseSchema), "content key", orderBy, filter, top);
+            return await Client.ListAsPageGenericAsync<ContentKeyPolicySchema>(url, typeof(ContentKeyPolicyListResponseSchema), "content key", cancellationToken, orderBy, filter, top);
         }
 
         /// <inheritdoc/>
@@ -84,9 +92,9 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<ContentKeyPolicySchema>> ListAsPageNextAsync(string? nextPageLink)
+        public async Task<PagedResult<ContentKeyPolicySchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default)
         {
-            return await Client.ListAsPageNextGenericAsync<ContentKeyPolicySchema>(nextPageLink, typeof(ContentKeyPolicyListResponseSchema), "content key");
+            return await Client.ListAsPageNextGenericAsync<ContentKeyPolicySchema>(nextPageLink, typeof(ContentKeyPolicyListResponseSchema), "content key", cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -97,12 +105,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<ContentKeyPolicySchema> GetAsync(string contentKeyPolicyName)
+        public async Task<ContentKeyPolicySchema> GetAsync(string contentKeyPolicyName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(contentKeyPolicyName, nameof(contentKeyPolicyName));
 
             var url = Client.GenerateApiUrl(_contentKeyPolicyApiUrl, contentKeyPolicyName);
-            string responseContent = await Client.GetObjectContentAsync(url);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return JsonConvert.DeserializeObject<ContentKeyPolicySchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with content key policy deserialization");
         }
 
@@ -113,12 +121,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(string contentKeyPolicyName)
+        public async Task DeleteAsync(string contentKeyPolicyName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(contentKeyPolicyName, nameof(contentKeyPolicyName));
 
             var url = Client.GenerateApiUrl(_contentKeyPolicyApiUrl, contentKeyPolicyName);
-            await Client.ObjectContentAsync(url, HttpMethod.Delete);
+            await Client.ObjectContentAsync(url, HttpMethod.Delete, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -129,7 +137,7 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<ContentKeyPolicySchema> CreateAsync(string contentKeyPolicyName, ContentKeyPolicyProperties properties)
+        public async Task<ContentKeyPolicySchema> CreateAsync(string contentKeyPolicyName, ContentKeyPolicyProperties properties, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(contentKeyPolicyName, nameof(contentKeyPolicyName));
             Argument.AssertNotContainsSpace(contentKeyPolicyName, nameof(contentKeyPolicyName));
@@ -137,7 +145,7 @@ namespace MK.IO.Operations
 
             var url = Client.GenerateApiUrl(_contentKeyPolicyApiUrl, contentKeyPolicyName);
             var content = new ContentKeyPolicySchema { Properties = properties };
-            string responseContent = await Client.CreateObjectPutAsync(url, content.ToJson());
+            string responseContent = await Client.CreateObjectPutAsync(url, content.ToJson(), cancellationToken);
             return JsonConvert.DeserializeObject<ContentKeyPolicySchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with content key policy deserialization");
         }
 
@@ -149,12 +157,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<ContentKeyPolicyProperties> GetPolicyPropertiesWithSecretsAsync(string contentKeyPolicyName)
+        public async Task<ContentKeyPolicyProperties> GetPolicyPropertiesWithSecretsAsync(string contentKeyPolicyName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(contentKeyPolicyName, nameof(contentKeyPolicyName));
 
             var url = Client.GenerateApiUrl(_contentKeyPolicyApiUrl + "/getPolicyPropertiesWithSecrets", contentKeyPolicyName);
-            string responseContent = await Client.GetObjectPostContentAsync(url);
+            string responseContent = await Client.GetObjectPostContentAsync(url, cancellationToken);
             //return ContentKeyPolicy.FromJson(responseContent).Properties;
             return JsonConvert.DeserializeObject<ContentKeyPolicySchema>(responseContent, ConverterLE.Settings).Properties ?? throw new Exception("Error with content key policy deserialization");
         }

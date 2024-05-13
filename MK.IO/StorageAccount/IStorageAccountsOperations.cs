@@ -12,13 +12,14 @@ namespace MK.IO.Operations
         /// List Storage Accounts
         /// </summary>
         /// <returns></returns>
-        List<StorageResponseSchema> List();
+        IEnumerable<StorageResponseSchema> List();
 
         /// <summary>
         /// List Storage Accounts
         /// </summary>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<StorageResponseSchema>> ListAsync();
+        Task<IEnumerable<StorageResponseSchema>> ListAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Create a Storage Account.
@@ -35,8 +36,9 @@ namespace MK.IO.Operations
         /// The SAS token in the spec.azureStorageConfiguration.url field will be used to create a related Storage Credential object for you.
         /// </summary>
         /// <param name="storage">The specification of the Storage Account to be created.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StorageResponseSchema> CreateAsync(StorageSchema storage);
+        Task<StorageResponseSchema> CreateAsync(StorageSchema storage, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete our record of your Storage Account. This operation does not delete the Storage Account itself.
@@ -50,7 +52,9 @@ namespace MK.IO.Operations
         /// This operation will not complete successfully if any assets are associated with the Storage Account.
         /// </summary>
         /// <param name="storageAccountId">The Storage Account Id.</param>
-        Task DeleteAsync(Guid storageAccountId);
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task DeleteAsync(Guid storageAccountId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns details on a single Storage Account
@@ -63,8 +67,9 @@ namespace MK.IO.Operations
         /// Returns details on a single Storage Account
         /// </summary>
         /// <param name="storageAccountId">The Storage Account Id.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StorageResponseSchema> GetAsync(Guid storageAccountId);
+        Task<StorageResponseSchema> GetAsync(Guid storageAccountId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update a Storage Account.
@@ -81,8 +86,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="storageAccountId">The Storage Account Id.</param>
         /// <param name="storage">The specification of the Storage Account to be updated.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StorageResponseSchema> UpdateAsync(Guid storageAccountId, StorageSchema storage);
+        Task<StorageResponseSchema> UpdateAsync(Guid storageAccountId, StorageSchema storage, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a list of Storage Credentials
@@ -95,8 +101,9 @@ namespace MK.IO.Operations
         /// Returns a list of Storage Credentials
         /// </summary>
         /// <param name="storageAccountId">The Storage Account Id.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<CredentialResponseSchema>> ListCredentialsAsync(Guid storageAccountId);
+        Task<List<CredentialResponseSchema>> ListCredentialsAsync(Guid storageAccountId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a single Storage Credential. Any secret data will be sanitized in the response.
@@ -111,8 +118,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="storageAccountId">The Storage Account Id.</param>
         /// <param name="credentialId">The Credential Id.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<CredentialResponseSchema> GetCredentialAsync(Guid storageAccountId, Guid credentialId);
+        Task<CredentialResponseSchema> GetCredentialAsync(Guid storageAccountId, Guid credentialId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// <para>Creates a Storage Credential.</para>
@@ -133,8 +141,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="storageAccountId">The Storage Account Id.</param>
         /// <param name="credential">The Credential data.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<CredentialResponseSchema> CreateCredentialAsync(Guid storageAccountId, CredentialSchema credential);
+        Task<CredentialResponseSchema> CreateCredentialAsync(Guid storageAccountId, CredentialSchema credential, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// <para>Removes a Storage Credential from the Storage Account.</para>
@@ -151,7 +160,8 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="storageAccountId">The Storage Account Id.</param>
         /// <param name="credentialId">The Credential Id.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task DeleteCredentialAsync(Guid storageAccountId, Guid credentialId);
+        Task DeleteCredentialAsync(Guid storageAccountId, Guid credentialId, CancellationToken cancellationToken = default);
     }
 }

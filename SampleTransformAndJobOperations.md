@@ -23,7 +23,7 @@ var transform = client.Transforms.CreateOrUpdate("simpletransform", new Transfor
                     new TransformOutput
                     {
                         Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264SingleBitrate720p),
-                        RelativePriority = "Normal"
+                        RelativePriority = TransformOutputPriorityType.Normal
                     }
                 }
             });
@@ -63,7 +63,7 @@ var newJob = client.Jobs.Create(transform.Name, MKIOClient.GenerateUniqueName("j
 var newJobH = client.Jobs.Create(transform.Name, MKIOClient.GenerateUniqueName("job"), new JobProperties
     {
         Description = $"My job using a https source with transform {transform.Name}",
-        Priority = "Normal",
+        Priority = TransformOutputPriorityType.Normal,
         Input = new JobInputHttp(
             null,
             new List<string> {

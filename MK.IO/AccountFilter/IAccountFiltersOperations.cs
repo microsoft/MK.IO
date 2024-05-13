@@ -14,7 +14,7 @@ namespace MK.IO.Operations
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
-        List<AccountFilterSchema> List(string? orderBy = null, string? filter = null, int? top = null);
+        IEnumerable<AccountFilterSchema> List(string? orderBy = null, string? filter = null, int? top = null);
 
         /// <summary>
         /// Retrieves a list of account filters in the subscription.
@@ -22,8 +22,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<AccountFilterSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<IEnumerable<AccountFilterSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves a list of account filters in the subscription using pages.
@@ -40,8 +41,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Restricts the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<AccountFilterSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<PagedResult<AccountFilterSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves a list of account filters in the subscription using pages.
@@ -54,8 +56,9 @@ namespace MK.IO.Operations
         /// Retrieves a list of account filters in the subscription using pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<AccountFilterSchema>> ListAsPageNextAsync(string? nextPageLink);
+        Task<PagedResult<AccountFilterSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete the account filter.
@@ -68,8 +71,9 @@ namespace MK.IO.Operations
         /// Delete the account filter.
         /// </summary>
         /// <param name="accountFilterName"></param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task DeleteAsync(string accountFilterName);
+        Task DeleteAsync(string accountFilterName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get an account filter by name.
@@ -82,8 +86,9 @@ namespace MK.IO.Operations
         /// Get an account filter by name.
         /// </summary>
         /// <param name="accountFilterName"></param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<AccountFilterSchema> GetAsync(string accountFilterName);
+        Task<AccountFilterSchema> GetAsync(string accountFilterName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Create or Update an account filter.
@@ -98,8 +103,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="accountFilterName"></param>
         /// <param name="properties"></param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<AccountFilterSchema> CreateOrUpdateAsync(string accountFilterName, MediaFilterProperties properties);
+        Task<AccountFilterSchema> CreateOrUpdateAsync(string accountFilterName, MediaFilterProperties properties, CancellationToken cancellationToken = default);
 
     }
 }

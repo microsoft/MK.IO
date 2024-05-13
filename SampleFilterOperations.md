@@ -23,7 +23,7 @@ var assetFilter = client.AssetFilters.CreateOrUpdate("liveoutput-c4debfe5", MKIO
 {
     PresentationTimeRange = new PresentationTimeRange
     {
-        Timescale = 10000000,
+        Timescale = 10000000
     },
     Tracks = new List<FilterTrackSelection>()
     {
@@ -80,7 +80,7 @@ var accountFilter = client.AccountFilters.CreateOrUpdate("filter123", new MediaF
 {
     PresentationTimeRange = new PresentationTimeRange
     {
-        Timescale = 10000000,
+        Timescale = 10000000
     },
     Tracks = new List<FilterTrackSelection>()
     {

@@ -14,7 +14,7 @@ namespace MK.IO.Operations
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
-        List<ContentKeyPolicySchema> List(string? orderBy = null, string? filter = null, int? top = null);
+        IEnumerable<ContentKeyPolicySchema> List(string? orderBy = null, string? filter = null, int? top = null);
 
         /// <summary>
         /// List Content Key Policies
@@ -22,8 +22,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<ContentKeyPolicySchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<IEnumerable<ContentKeyPolicySchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// List Content Key Policies using pages.
@@ -40,8 +41,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Restricts the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<ContentKeyPolicySchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<PagedResult<ContentKeyPolicySchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// List Content Key Policies using pages.
@@ -54,8 +56,9 @@ namespace MK.IO.Operations
         /// List Content Key Policies using pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<ContentKeyPolicySchema>> ListAsPageNextAsync(string? nextPageLink);
+        Task<PagedResult<ContentKeyPolicySchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete a Content Key Policy. If the policy does not exist, this will return a 204.
@@ -67,7 +70,9 @@ namespace MK.IO.Operations
         /// Delete a Content Key Policy. If the policy does not exist, this will return a 204.
         /// </summary>
         /// <param name="contentKeyPolicyName"></param>
-        Task DeleteAsync(string contentKeyPolicyName);
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task DeleteAsync(string contentKeyPolicyName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get one Content Key Policy
@@ -80,8 +85,9 @@ namespace MK.IO.Operations
         /// Get one Content Key Policy
         /// </summary>
         /// <param name="contentKeyPolicyName"></param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<ContentKeyPolicySchema> GetAsync(string contentKeyPolicyName);
+        Task<ContentKeyPolicySchema> GetAsync(string contentKeyPolicyName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Create a Content Key Policy
@@ -96,8 +102,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="contentKeyPolicyName"></param>
         /// <param name="properties"></param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<ContentKeyPolicySchema> CreateAsync(string contentKeyPolicyName, ContentKeyPolicyProperties properties);
+        Task<ContentKeyPolicySchema> CreateAsync(string contentKeyPolicyName, ContentKeyPolicyProperties properties, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get the properties of a Content Key Policy including secret values
@@ -110,7 +117,8 @@ namespace MK.IO.Operations
         /// Get the properties of a Content Key Policy including secret values
         /// </summary>
         /// <param name="contentKeyPolicyName"></param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<ContentKeyPolicyProperties> GetPolicyPropertiesWithSecretsAsync(string contentKeyPolicyName);
+        Task<ContentKeyPolicyProperties> GetPolicyPropertiesWithSecretsAsync(string contentKeyPolicyName, CancellationToken cancellationToken = default);
     }
 }

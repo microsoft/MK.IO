@@ -11,7 +11,7 @@ namespace MK.IO.Operations
 {
     /// <summary>
     /// REST Client for MKIO
-    /// https://io.mediakind.com
+    /// https://mk.io/
     /// 
     /// </summary>
     internal class LiveEventsOperations : ILiveEventsOperations
@@ -42,23 +42,31 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public List<LiveEventSchema> List(string? orderBy = null, string? filter = null, int? top = null)
+        public IEnumerable<LiveEventSchema> List(string? orderBy = null, string? filter = null, int? top = null)
         {
-            var task = Task.Run<List<LiveEventSchema>>(async () => await ListAsync(orderBy, filter, top));
+            var task = Task.Run<IEnumerable<LiveEventSchema>>(async () => await ListAsync(orderBy, filter, top));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<List<LiveEventSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<IEnumerable<LiveEventSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
-            var url = Client.GenerateApiUrl(_liveEventsApiUrl);
-            url = MKIOClient.AddParametersToUrl(url, "$orderby", orderBy);
-            url = MKIOClient.AddParametersToUrl(url, "$filter", filter);
-            url = MKIOClient.AddParametersToUrl(url, "$top", top != null ? ((int)top).ToString() : null);
+            List<LiveEventSchema> objectsSchema = [];
+            var objectsResult = await ListAsPageAsync(orderBy, filter, top, cancellationToken);
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                objectsSchema.AddRange(objectsResult.Results);
+                if (objectsResult.NextPageLink == null || (top != null && objectsSchema.Count >= top)) break;
+                objectsResult = await ListAsPageNextAsync(objectsResult.NextPageLink, cancellationToken);
+            }
 
-            string responseContent = await Client.GetObjectContentAsync(url);
-            var objectToReturn = JsonConvert.DeserializeObject<LiveEventListResponseSchema>(responseContent, ConverterLE.Settings);
-            return objectToReturn != null ? objectToReturn.Value : throw new Exception($"Error with live event list deserialization");
+            if (top != null && top < objectsSchema.Count)
+            {
+                return objectsSchema.Take((int)top);
+            }
+
+            return objectsSchema;
         }
 
         /// <inheritdoc/>
@@ -69,10 +77,10 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<LiveEventSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<PagedResult<LiveEventSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
             var url = Client.GenerateApiUrl(_liveEventsApiUrl);
-            return await Client.ListAsPageGenericAsync<LiveEventSchema>(url, typeof(LiveEventListResponseSchema), "live event", orderBy, filter, top);
+            return await Client.ListAsPageGenericAsync<LiveEventSchema>(url, typeof(LiveEventListResponseSchema), "live event", cancellationToken, orderBy, filter, top);
         }
 
         /// <inheritdoc/>
@@ -83,9 +91,9 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<LiveEventSchema>> ListAsPageNextAsync(string? nextPageLink)
+        public async Task<PagedResult<LiveEventSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default)
         {
-            return await Client.ListAsPageNextGenericAsync<LiveEventSchema>(nextPageLink, typeof(LiveEventListResponseSchema), "live event");
+            return await Client.ListAsPageNextGenericAsync<LiveEventSchema>(nextPageLink, typeof(LiveEventListResponseSchema), "live event", cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -96,12 +104,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<LiveEventSchema> GetAsync(string liveEventName)
+        public async Task<LiveEventSchema> GetAsync(string liveEventName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
             var url = Client.GenerateApiUrl(_liveEventApiUrl, liveEventName);
-            string responseContent = await Client.GetObjectContentAsync(url);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return JsonConvert.DeserializeObject<LiveEventSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with live event deserialization");
         }
 
@@ -115,14 +123,14 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<LiveEventSchema> UpdateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags)
+        public async Task<LiveEventSchema> UpdateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
             Argument.AssertNotContainsSpace(liveEventName, nameof(liveEventName));
             Argument.AssertNotNullOrEmpty(location, nameof(location));
             Argument.AssertNotNull(properties, nameof(properties));
 
-            return await CreateOrUpdateAsync(liveEventName, location, properties, tags, Client.UpdateObjectPatchAsync);
+            return await CreateOrUpdateAsync(liveEventName, location, properties, tags, Client.UpdateObjectPatchAsync, cancellationToken);
         }
 #endif
         */
@@ -135,7 +143,7 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<LiveEventSchema> CreateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags)
+        public async Task<LiveEventSchema> CreateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
             Argument.AssertNotContainsSpace(liveEventName, nameof(liveEventName));
@@ -143,15 +151,15 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(location, nameof(location));
             Argument.AssertNotNull(properties, nameof(properties));
 
-            return await CreateOrUpdateAsync(liveEventName, location, properties, tags, Client.CreateObjectPutAsync);
+            return await CreateOrUpdateAsync(liveEventName, location, properties, tags, Client.CreateObjectPutAsync, cancellationToken);
         }
 
-        internal async Task<LiveEventSchema> CreateOrUpdateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags, Func<string, string, Task<string>> func)
+        internal async Task<LiveEventSchema> CreateOrUpdateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags, Func<string, string, CancellationToken, Task<string>> func, CancellationToken cancellationToken)
         {
             var url = Client.GenerateApiUrl(_liveEventApiUrl, liveEventName);
             tags ??= new Dictionary<string, string>();
             var content = new LiveEventSchema { Location = location, Tags = tags, Properties = properties };
-            string responseContent = await func(url, content.ToJson());
+            string responseContent = await func(url, content.ToJson(), cancellationToken);
             return JsonConvert.DeserializeObject<LiveEventSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with live event deserialization");
         }
 
@@ -162,12 +170,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(string liveEventName)
+        public async Task DeleteAsync(string liveEventName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
             var url = Client.GenerateApiUrl(_liveEventApiUrl, liveEventName);
-            await Client.ObjectContentAsync(url, HttpMethod.Delete);
+            await Client.ObjectContentAsync(url, HttpMethod.Delete, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -177,11 +185,11 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task StartAsync(string liveEventName)
+        public async Task StartAsync(string liveEventName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
-            await LiveEventOperationAsync(liveEventName, "start", HttpMethod.Post);
+            await LiveEventOperationAsync(liveEventName, "start", HttpMethod.Post, cancellationToken);
         }
 
         public void Stop(string liveEventName)
@@ -190,11 +198,11 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task StopAsync(string liveEventName)
+        public async Task StopAsync(string liveEventName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
-            await LiveEventOperationAsync(liveEventName, "stop", HttpMethod.Post);
+            await LiveEventOperationAsync(liveEventName, "stop", HttpMethod.Post, cancellationToken);
         }
 
         /*
@@ -205,11 +213,11 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task ResetAsync(string liveEventName)
+        public async Task ResetAsync(string liveEventName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
-            await LiveEventOperationAsync(liveEventName, "reset", HttpMethod.Post);
+            await LiveEventOperationAsync(liveEventName, "reset", HttpMethod.Post, cancellationToken);
         }
         
         /// <inheritdoc/>
@@ -219,18 +227,18 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task AllocateAsync(string liveEventName)
+        public async Task AllocateAsync(string liveEventName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
-            await LiveEventOperationAsync(liveEventName, "allocate", HttpMethod.Post);
+            await LiveEventOperationAsync(liveEventName, "allocate", HttpMethod.Post, cancellationToken);
         }
         */
 
-        private async Task LiveEventOperationAsync(string liveEventName, string? operation, HttpMethod httpMethod)
+        private async Task LiveEventOperationAsync(string liveEventName, string? operation, HttpMethod httpMethod, CancellationToken cancellationToken)
         {
             var url = Client.GenerateApiUrl(_liveEventApiUrl + (operation != null ? "/" + operation : string.Empty), liveEventName);
-            await Client.ObjectContentAsync(url, httpMethod);
+            await Client.ObjectContentAsync(url, httpMethod, cancellationToken);
         }
     }
 }

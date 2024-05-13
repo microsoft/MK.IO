@@ -15,7 +15,7 @@ namespace MK.IO.Operations
         /// <param name="filter">Restricts the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
-        List<LiveOutputSchema> List(string liveEventName, string? orderBy = null, string? filter = null, int? top = null);
+        IEnumerable<LiveOutputSchema> List(string liveEventName, string? orderBy = null, string? filter = null, int? top = null);
 
         /// <summary>
         /// Returns a list of Live Outputs for a Live Event.
@@ -24,8 +24,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Restricts the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<LiveOutputSchema>> ListAsync(string liveEventName, string? orderBy = null, string? filter = null, int? top = null);
+        Task<IEnumerable<LiveOutputSchema>> ListAsync(string liveEventName, string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a complete list of all live events using pages.
@@ -44,8 +45,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Restricts the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<LiveOutputSchema>> ListAsPageAsync(string liveEventName, string? orderBy = null, string? filter = null, int? top = null);
+        Task<PagedResult<LiveOutputSchema>> ListAsPageAsync(string liveEventName, string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a complete list of all live events using pages.
@@ -58,8 +60,9 @@ namespace MK.IO.Operations
         /// Returns a complete list of all live events using pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<LiveOutputSchema>> ListAsPageNextAsync(string? nextPageLink);
+        Task<PagedResult<LiveOutputSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes a Live Output.
@@ -73,8 +76,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="liveEventName">The name of the live event.</param>
         /// <param name="liveOutputName">The name of the live output.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task DeleteAsync(string liveEventName, string liveOutputName);
+        Task DeleteAsync(string liveEventName, string liveOutputName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a single Live Output.
@@ -89,8 +93,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="liveEventName">The name of the live event.</param>
         /// <param name="liveOutputName">The name of the live output.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<LiveOutputSchema> GetAsync(string liveEventName, string liveOutputName);
+        Task<LiveOutputSchema> GetAsync(string liveEventName, string liveOutputName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a Live Output
@@ -107,7 +112,8 @@ namespace MK.IO.Operations
         /// <param name="liveEventName">The name of the live event.</param>
         /// <param name="liveOutputName">The name of the live output.</param>
         /// <param name="properties">The properties of the live output.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<LiveOutputSchema> CreateAsync(string liveEventName, string liveOutputName, LiveOutputProperties properties);
+        Task<LiveOutputSchema> CreateAsync(string liveEventName, string liveOutputName, LiveOutputProperties properties, CancellationToken cancellationToken = default);
     }
 }

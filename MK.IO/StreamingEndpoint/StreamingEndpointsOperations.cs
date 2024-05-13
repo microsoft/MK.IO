@@ -6,13 +6,14 @@ using Newtonsoft.Json;
 using System.Net;
 #if NET462
 using System.Net.Http;
+using System.Threading;
 #endif
 
 namespace MK.IO.Operations
 {
     /// <summary>
     /// REST Client for MKIO
-    /// https://io.mediakind.com
+    /// https://mk.io/
     /// 
     /// </summary>
     internal class StreamingEndpointsOperations : IStreamingEndpointsOperations
@@ -43,23 +44,31 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public List<StreamingEndpointSchema> List(string? orderBy = null, string? filter = null, int? top = null)
+        public IEnumerable<StreamingEndpointSchema> List(string? orderBy = null, string? filter = null, int? top = null)
         {
-            var task = Task.Run<List<StreamingEndpointSchema>>(async () => await ListAsync(orderBy, filter, top));
+            var task = Task.Run<IEnumerable<StreamingEndpointSchema>>(async () => await ListAsync(orderBy, filter, top));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<List<StreamingEndpointSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<IEnumerable<StreamingEndpointSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
-            var url = Client.GenerateApiUrl(_streamingEndpointsApiUrl);
-            url = MKIOClient.AddParametersToUrl(url, "$orderby", orderBy);
-            url = MKIOClient.AddParametersToUrl(url, "$filter", filter);
-            url = MKIOClient.AddParametersToUrl(url, "$top", top != null ? ((int)top).ToString() : null);
+            List<StreamingEndpointSchema> objectsSchema = [];
+            var objectsResult = await ListAsPageAsync(orderBy, filter, top, cancellationToken);
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                objectsSchema.AddRange(objectsResult.Results);
+                if (objectsResult.NextPageLink == null || (top != null && objectsSchema.Count >= top)) break;
+                objectsResult = await ListAsPageNextAsync(objectsResult.NextPageLink, cancellationToken);
+            }
 
-            string responseContent = await Client.GetObjectContentAsync(url);
-            var objectToReturn = JsonConvert.DeserializeObject<StreamingEndpointListResponseSchema>(responseContent, ConverterLE.Settings);
-            return objectToReturn != null ? objectToReturn.Value : throw new Exception($"Error with streaming endpoint list deserialization");
+            if (top != null && top < objectsSchema.Count)
+            {
+                return objectsSchema.Take((int)top);
+            }
+
+            return objectsSchema;
         }
 
         /// <inheritdoc/>
@@ -70,10 +79,10 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<StreamingEndpointSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<PagedResult<StreamingEndpointSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
             var url = Client.GenerateApiUrl(_streamingEndpointsApiUrl);
-            return await Client.ListAsPageGenericAsync<StreamingEndpointSchema>(url, typeof(StreamingEndpointListResponseSchema), "streaming endpoint", orderBy, filter, top);
+            return await Client.ListAsPageGenericAsync<StreamingEndpointSchema>(url, typeof(StreamingEndpointListResponseSchema), "streaming endpoint", cancellationToken, orderBy, filter, top);
         }
 
         /// <inheritdoc/>
@@ -84,9 +93,9 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<StreamingEndpointSchema>> ListAsPageNextAsync(string? nextPageLink)
+        public async Task<PagedResult<StreamingEndpointSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default)
         {
-            return await Client.ListAsPageNextGenericAsync<StreamingEndpointSchema>(nextPageLink, typeof(StreamingEndpointListResponseSchema), "streaming endpoint");
+            return await Client.ListAsPageNextGenericAsync<StreamingEndpointSchema>(nextPageLink, typeof(StreamingEndpointListResponseSchema), "streaming endpoint", cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -97,12 +106,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<StreamingEndpointSchema> GetAsync(string streamingEndpointName)
+        public async Task<StreamingEndpointSchema> GetAsync(string streamingEndpointName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
 
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl, streamingEndpointName);
-            string responseContent = await Client.GetObjectContentAsync(url);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return JsonConvert.DeserializeObject<StreamingEndpointSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with streaming endpoint deserialization");
         }
 
@@ -115,7 +124,7 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<StreamingEndpointSchema> UpdateAsync(string streamingEndpointName, string location, StreamingEndpointProperties properties, Dictionary<string, string>? tags = null)
+        public async Task<StreamingEndpointSchema> UpdateAsync(string streamingEndpointName, string location, StreamingEndpointProperties properties, Dictionary<string, string>? tags = null, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotContainsSpace(streamingEndpointName, nameof(streamingEndpointName));
@@ -125,7 +134,7 @@ namespace MK.IO.Operations
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl, streamingEndpointName);
             tags ??= new Dictionary<string, string>();
             var content = new StreamingEndpointSchema { Location = location, Properties = properties, Tags = tags };
-            string responseContent = await Client.UpdateObjectPatchAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings));
+            string responseContent = await Client.UpdateObjectPatchAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings), cancellationToken);
             return JsonConvert.DeserializeObject<StreamingEndpointSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with streaming endpoint deserialization");
         }
 #endif
@@ -138,7 +147,7 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<StreamingEndpointSchema> CreateAsync(string streamingEndpointName, string location, StreamingEndpointProperties properties, bool autoStart = false, Dictionary<string, string>? tags = null)
+        public async Task<StreamingEndpointSchema> CreateAsync(string streamingEndpointName, string location, StreamingEndpointProperties properties, bool autoStart = false, Dictionary<string, string>? tags = null, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotContainsSpace(streamingEndpointName, nameof(streamingEndpointName));
@@ -155,7 +164,7 @@ namespace MK.IO.Operations
                 Properties = properties,
                 Tags = tags
             };
-            string responseContent = await Client.CreateObjectPutAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings));
+            string responseContent = await Client.CreateObjectPutAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings), cancellationToken);
             return JsonConvert.DeserializeObject<StreamingEndpointSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with streaming endpoint deserialization");
         }
 
@@ -166,12 +175,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task ScaleAsync(string streamingEndpointName, int scaleUnit)
+        public async Task ScaleAsync(string streamingEndpointName, int scaleUnit, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl + "/scale", streamingEndpointName);
             var content = new StreamingEndpointScaleSchema { ScaleUnit = scaleUnit };
-            await Client.CreateObjectPostAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings));
+            await Client.CreateObjectPostAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings), cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -181,11 +190,11 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task StopAsync(string streamingEndpointName)
+        public async Task StopAsync(string streamingEndpointName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
 
-            await StreamingEndpointOperationAsync(streamingEndpointName, "stop", HttpMethod.Post);
+            await StreamingEndpointOperationAsync(streamingEndpointName, "stop", HttpMethod.Post, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -195,11 +204,11 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task StartAsync(string streamingEndpointName)
+        public async Task StartAsync(string streamingEndpointName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
 
-            await StreamingEndpointOperationAsync(streamingEndpointName, "start", HttpMethod.Post);
+            await StreamingEndpointOperationAsync(streamingEndpointName, "start", HttpMethod.Post, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -209,17 +218,17 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(string streamingEndpointName)
+        public async Task DeleteAsync(string streamingEndpointName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
 
-            await StreamingEndpointOperationAsync(streamingEndpointName, null, HttpMethod.Delete);
+            await StreamingEndpointOperationAsync(streamingEndpointName, null, HttpMethod.Delete, cancellationToken);
         }
 
-        private async Task StreamingEndpointOperationAsync(string streamingEndpointName, string? operation, HttpMethod httpMethod)
+        private async Task StreamingEndpointOperationAsync(string streamingEndpointName, string? operation, HttpMethod httpMethod, CancellationToken cancellationToken)
         {
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl + (operation != null ? "/" + operation : string.Empty), streamingEndpointName);
-            await Client.ObjectContentAsync(url, httpMethod);
+            await Client.ObjectContentAsync(url, httpMethod, cancellationToken);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace MK.IO.Models
         /// <value>Sets the relative priority of the TransformOutputs within a Transform</value>
         [DataMember(Name = "relativePriority", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "relativePriority")]
-        public string RelativePriority { get; set; }
+        public TransformOutputPriorityType RelativePriority { get; set; } = TransformOutputPriorityType.Normal;
 
 
         /// <summary>

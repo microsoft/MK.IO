@@ -14,7 +14,7 @@ namespace MK.IO.Operations
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
-        List<StreamingLocatorSchema> List(string? orderBy = null, string? filter = null, int? top = null);
+        IEnumerable<StreamingLocatorSchema> List(string? orderBy = null, string? filter = null, int? top = null);
 
         /// <summary>
         /// Returns a list of Streaming Locators for the subscription.
@@ -22,8 +22,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<StreamingLocatorSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<IEnumerable<StreamingLocatorSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a list of Streaming Locators for the subscription using pages.
@@ -40,8 +41,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Restricts the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<StreamingLocatorSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<PagedResult<StreamingLocatorSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a list of Streaming Locators for the subscription using pages.
@@ -54,8 +56,9 @@ namespace MK.IO.Operations
         /// Returns a list of Streaming Locators for the subscription using pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<StreamingLocatorSchema>> ListAsPageNextAsync(string? nextPageLink);
+        Task<PagedResult<StreamingLocatorSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete a Streaming Locator.
@@ -74,8 +77,9 @@ namespace MK.IO.Operations
         /// cached in a CDN, playback may continue to work for some time until the cached content expires.
         /// </summary>
         /// <param name="streamingLocatorName">The name of the Streaming Locator.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task DeleteAsync(string streamingLocatorName);
+        Task DeleteAsync(string streamingLocatorName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get a Streaming Locator by name.
@@ -88,8 +92,9 @@ namespace MK.IO.Operations
         /// Get a Streaming Locator by name.
         /// </summary>
         /// <param name="streamingLocatorName">The name of the Streaming Locator.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StreamingLocatorSchema> GetAsync(string streamingLocatorName);
+        Task<StreamingLocatorSchema> GetAsync(string streamingLocatorName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Create a Streaming Locator.
@@ -104,8 +109,9 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="streamingLocatorName">The name of the Streaming Locator.</param>
         /// <param name="properties">Properties for Streaming Locator</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StreamingLocatorSchema> CreateAsync(string streamingLocatorName, StreamingLocatorProperties properties);
+        Task<StreamingLocatorSchema> CreateAsync(string streamingLocatorName, StreamingLocatorProperties properties, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// ListPaths returns the set of valid streaming paths for a given Streaming Locator. A distinct set of paths
@@ -120,7 +126,8 @@ namespace MK.IO.Operations
         /// is returned for each type of DRM configured, per the 'EnabledProtocols' property of the streaming policy.
         /// </summary>
         /// <param name="streamingLocatorName">The name of the Streaming Locator.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StreamingLocatorListPathsResponseSchema> ListUrlPathsAsync(string streamingLocatorName);
+        Task<StreamingLocatorListPathsResponseSchema> ListUrlPathsAsync(string streamingLocatorName, CancellationToken cancellationToken = default);
     }
 }

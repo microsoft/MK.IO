@@ -1,6 +1,6 @@
 # MK.IO Client Library
 
-A client library for [MediaKind MK.IO](https://io.mediakind.com/).
+A client library for [MediaKind MK.IO](https://mk.io).
 
 [Link to MK.IO Nuget package](https://www.nuget.org/packages/MK.IO).
 
@@ -12,13 +12,13 @@ You need the MK.IO API token `mkiotoken` to connect to the API.
 
 To do so,
 
-1. Open a web browser and log into https://io.mediakind.com (sign in with Microsoft SSO).
-1. Once you are logged in, open a second tab on the same browser and open this link in the new tab: https://api.io.mediakind.com/auth/token/
+1. Open a web browser and log into https://mk.io (sign in with Microsoft SSO).
+1. Once you are logged in, open a second tab on the same browser and open this link in the new tab: https://api.mk.io/auth/token/
 
 This should provide you with your user_id and token. Note that this token is valid for 1 year.
 
 Another way to get the token is to use [Fiddler](https://www.telerik.com/fiddler) when you connect to the MK.IO portal with your browser.
-It is displayed in the header as `x-mkio-token`. For example, you should see it on the second REST call to https://api.io.mediakind.com/api/ams/mkiosubscriptionname/stats/.
+It is displayed in the header as `x-mkio-token`. For example, you should see it on the second REST call to https://api.mk.io/api/ams/mkiosubscriptionname/stats/.
 
 For more information, please read this [article](https://support.mediakind.com/portal/en/kb/articles/how-to-use-mkio-apis-step-by-step).
 
@@ -65,10 +65,11 @@ var stats = client.Account.GetSubscriptionStats();
 var mkioAssets = client.Assets.List();
 
 // list assets with pages, 10 assets per page, sorted by creation date
-var mkioAssetsResult = client.Assets.ListAsPage("properties/created desc", null, 10);
+var mkioAssetsResult = client.Assets.ListAsPage("properties/created desc", null, null, null, 10);
 while (true)
 {
     // do stuff here using mkioAssetsResult.Results
+
     if (mkioAssetsResult.NextPageLink == null) break;
     mkioAssetsResult = client.Assets.ListAsPageNext(mkioAssetsResult.NextPageLink);
 }
@@ -150,13 +151,15 @@ Async operations are also supported. For example :
 // asset operations
 // *****************
 
-// Retrieve assets with pages for better performances
-var mkioAssetsResult = await client.Assets.ListAsPageAsync("name desc", 10);
-        do
-        {
-            mkioAssetsResult = await client.Assets.ListAsPageNextAsync(mkioAssetsResult.NextPageLink);
-            // do stuff
-        } while (mkioAssetsResult.NextPageLink != null);
+// Retrieve assets with pages for better performances, sorted by names, with a batch of 10 assets in each page
+var mkioAssetsResult = await client.Assets.ListAsPageAsync("name desc", null, null, null, 10);
+while (true)
+{
+    // do stuff here using mkioAssetsResult.Results
+
+    if (mkioAssetsResult.NextPageLink == null) break;
+    mkioAssetsResult = await client.Assets.ListAsPageNextAsync(mkioAssetsResult.NextPageLink);
+}
 
 
 // ******************************
@@ -177,8 +180,7 @@ var newSe = await client.StreamingEndpoints.CreateAsync("streamingendpoint2", "f
                 CdnEnabled = false,
                 Sku = new StreamingEndpointsCurrentSku
                 {
-                    Name = "Standard",
-                    Capacity = 600
+                    Name = StreamingEndpointSkuType.Standard
                 }
             });
 
@@ -188,3 +190,26 @@ await client.StreamingEndpoints.StopAsync("streamingendpoint1");
 await client.StreamingEndpoints.DeleteAsync("streamingendpoint2");
 
 ```
+
+## Contributing
+
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+
+When you submit a pull request, a CLA bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+## Trademarks
+
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
+trademarks or logos is subject to and must follow 
+[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
+Any use of third-party trademarks or logos are subject to those third-party's policies.
+

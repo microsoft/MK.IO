@@ -12,7 +12,7 @@ namespace MK.IO.Operations
 {
     /// <summary>
     /// REST Client for MKIO
-    /// https://io.mediakind.com
+    /// https://mk.io/
     /// 
     /// </summary>
     internal class TransformsOperations : ITransformsOperations
@@ -44,24 +44,31 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public List<TransformSchema> List(string? orderBy = null, string? filter = null, int? top = null)
+        public IEnumerable<TransformSchema> List(string? orderBy = null, string? filter = null, int? top = null)
         {
-            var task = Task.Run<List<TransformSchema>>(async () => await ListAsync(orderBy, filter, top));
+            var task = Task.Run<IEnumerable<TransformSchema>>(async () => await ListAsync(orderBy, filter, top));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<List<TransformSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<IEnumerable<TransformSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
-            var url = Client.GenerateApiUrl(_transformsApiUrl);
-            url = MKIOClient.AddParametersToUrl(url, "$orderby", orderBy);
-            url = MKIOClient.AddParametersToUrl(url, "$filter", filter);
-            url = MKIOClient.AddParametersToUrl(url, "$top", top != null ? ((int)top).ToString() : null);
+            List<TransformSchema> objectsSchema = [];
+            var objectsResult = await ListAsPageAsync(orderBy, filter, top, cancellationToken);
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                objectsSchema.AddRange(objectsResult.Results);
+                if (objectsResult.NextPageLink == null || (top != null && objectsSchema.Count >= top)) break;
+                objectsResult = await ListAsPageNextAsync(objectsResult.NextPageLink, cancellationToken);
+            }
 
-            string responseContent = await Client.GetObjectContentAsync(url);
+            if (top != null && top < objectsSchema.Count)
+            {
+                return objectsSchema.Take((int)top);
+            }
 
-            var objectToReturn = JsonConvert.DeserializeObject<TransformListResponseSchema>(responseContent, ConverterLE.Settings);
-            return objectToReturn != null ? objectToReturn.Value : throw new Exception($"Error with transforms list deserialization");
+            return objectsSchema;
         }
 
         /// <inheritdoc/>
@@ -72,14 +79,14 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<TransformSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<PagedResult<TransformSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
             var url = Client.GenerateApiUrl(_transformsApiUrl);
             url = MKIOClient.AddParametersToUrl(url, "$orderby", orderBy);
             url = MKIOClient.AddParametersToUrl(url, "$filter", filter);
             url = MKIOClient.AddParametersToUrl(url, "$top", top != null ? ((int)top).ToString() : null);
 
-            string responseContent = await Client.GetObjectContentAsync(url);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
 
             dynamic responseObject = JsonConvert.DeserializeObject(responseContent);
             string? nextPageLink = responseObject["@odata.nextLink"];
@@ -107,11 +114,10 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<TransformSchema>> ListAsPageNextAsync(string? nextPageLink)
+        public async Task<PagedResult<TransformSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default)
         {
-            return await Client.ListAsPageNextGenericAsync<TransformSchema> (nextPageLink, typeof(TransformListResponseSchema), "transform");
+            return await Client.ListAsPageNextGenericAsync<TransformSchema> (nextPageLink, typeof(TransformListResponseSchema), "transform", cancellationToken);
         }
-
 
         /// <inheritdoc/>
         public TransformSchema Get(string transformName)
@@ -121,12 +127,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<TransformSchema> GetAsync(string transformName)
+        public async Task<TransformSchema> GetAsync(string transformName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(transformName, nameof(transformName));
 
             var url = Client.GenerateApiUrl(_transformApiUrl, transformName);
-            string responseContent = await Client.GetObjectContentAsync(url);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return JsonConvert.DeserializeObject<TransformSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with transform deserialization");
         }
 
@@ -138,7 +144,7 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<TransformSchema> CreateOrUpdateAsync(string transformName, TransformProperties properties)
+        public async Task<TransformSchema> CreateOrUpdateAsync(string transformName, TransformProperties properties, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(transformName, nameof(transformName));
             Argument.AssertNotContainsSpace(transformName, nameof(transformName));
@@ -147,7 +153,7 @@ namespace MK.IO.Operations
 
             var url = Client.GenerateApiUrl(_transformApiUrl, transformName);
             var content = new TransformSchema { Properties = properties };
-            string responseContent = await Client.CreateObjectPutAsync(url, content.ToJson());
+            string responseContent = await Client.CreateObjectPutAsync(url, content.ToJson(), cancellationToken);
             return JsonConvert.DeserializeObject<TransformSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with transform deserialization");
         }
 
@@ -158,12 +164,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(string transformName)
+        public async Task DeleteAsync(string transformName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(transformName, nameof(transformName));
 
             var url = Client.GenerateApiUrl(_transformApiUrl, transformName);
-            await Client.ObjectContentAsync(url, HttpMethod.Delete);
+            await Client.ObjectContentAsync(url, HttpMethod.Delete, cancellationToken);
         }
     }
 }

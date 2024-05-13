@@ -14,7 +14,7 @@ namespace MK.IO.Operations
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
-        List<StreamingPolicySchema> List(string? orderBy = null, string? filter = null, int? top = null);
+        IEnumerable<StreamingPolicySchema> List(string? orderBy = null, string? filter = null, int? top = null);
 
         /// <summary>
         /// Returns a list of Streaming Policies for the subscription.
@@ -22,8 +22,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Filters the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<StreamingPolicySchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<IEnumerable<StreamingPolicySchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a list of Streaming Policies for the subscription using pages.
@@ -40,8 +41,9 @@ namespace MK.IO.Operations
         /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
         /// <param name="filter">Restricts the set of items returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<StreamingPolicySchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null);
+        Task<PagedResult<StreamingPolicySchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a list of Streaming Policies for the subscription using pages.
@@ -54,8 +56,9 @@ namespace MK.IO.Operations
         /// Returns a list of Streaming Policies for the subscription using pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<StreamingPolicySchema>> ListAsPageNextAsync(string? nextPageLink);
+        Task<PagedResult<StreamingPolicySchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete a Streaming Policy.
@@ -70,8 +73,9 @@ namespace MK.IO.Operations
         /// If the policy does not exist, this will return a 204.
         /// </summary>
         /// <param name="streamingPolicyName">The name of the Streaming Policy.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task DeleteAsync(string streamingPolicyName);
+        Task DeleteAsync(string streamingPolicyName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get a Streaming Policy by name.
@@ -84,8 +88,9 @@ namespace MK.IO.Operations
         /// Get a Streaming Policy by name.
         /// </summary>
         /// <param name="streamingPolicyName">The name of the Streaming Policy.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StreamingPolicySchema> GetAsync(string streamingPolicyName);
+        Task<StreamingPolicySchema> GetAsync(string streamingPolicyName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Create a Streaming Policy.
@@ -100,7 +105,8 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="streamingPolicyName">The name of the Streaming Policy.</param>
         /// <param name="properties">Properties for Streaming Policy</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<StreamingPolicySchema> CreateAsync(string streamingPolicyName, StreamingPolicyProperties properties);
+        Task<StreamingPolicySchema> CreateAsync(string streamingPolicyName, StreamingPolicyProperties properties, CancellationToken cancellationToken = default);
     }
 }

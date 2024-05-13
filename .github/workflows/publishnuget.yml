@@ -5,7 +5,7 @@ on:
   workflow_dispatch: # Allow running the workflow manually from the GitHub UI
   push:
     branches:
-      - 'master'       # Run the workflow when pushing to the main branch
+      - 'main'       # Run the workflow when pushing to the main branch
   release:
     types:
       - published    # Run the workflow when a new GitHub release is published
@@ -59,6 +59,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.x'
     - name: Run tests
       run: dotnet test --configuration Release
 

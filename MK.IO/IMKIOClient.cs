@@ -7,7 +7,7 @@ namespace MK.IO
 {
     /// <summary>
     /// REST Base Client for MKIO
-    /// https://io.mediakind.com
+    /// https://mk.io/
     /// 
     /// </summary>
     public interface IMKIOClient

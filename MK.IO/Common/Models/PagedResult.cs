@@ -5,7 +5,7 @@ namespace MK.IO.Operations
 {
     public class PagedResult<T>
     {
-        public List<T> Results { get; set; }
+        public IEnumerable<T> Results { get; set; }
         public string? NextPageLink { get; set; }
     }
 }

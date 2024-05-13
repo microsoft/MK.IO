@@ -68,6 +68,10 @@ namespace Sample
             // *****************
 
             // list assets
+
+
+            var mkioAssetsResult2 = client.Assets.List(null, "name gt 'ignite-t'", null, null);
+
             var mkioAssetsResult = client.Assets.ListAsPage("properties/created desc", null, null, null, 10);
             while (true)
             {
@@ -76,7 +80,6 @@ namespace Sample
                     Console.WriteLine(a.Name);
                 }
                 if (mkioAssetsResult.NextPageLink == null) break;
-
                 mkioAssetsResult = client.Assets.ListAsPageNext(mkioAssetsResult.NextPageLink);
             }
 
@@ -292,7 +295,7 @@ namespace Sample
 
             var assetFilters = client.AssetFilters.List("ignite-truncated-StandardEncoder-H264SingleBitrate720p-98b7c74252");
 
-            assetFilters.ForEach(af => client.AssetFilters.Delete("ignite-truncated-StandardEncoder-H264SingleBitrate720p-98b7c74252", af.Name));
+            assetFilters.ToList().ForEach(af => client.AssetFilters.Delete("ignite-truncated-StandardEncoder-H264SingleBitrate720p-98b7c74252", af.Name));
             //var assetFilter1 = client.AssetFilters.Get("liveoutput-c4debfe5", assetFilters.First().Name);
 
             // asset filter creation
@@ -407,7 +410,7 @@ namespace Sample
                 {
                     new() {
                         Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
-                        RelativePriority = "Normal"
+                        RelativePriority = TransformOutputPriorityType.Normal
                     }
                 }
             });
@@ -524,7 +527,7 @@ namespace Sample
             // live outputs listing
             var los = client.LiveOutputs.List(le.Name);
 
-            if (los.Count == 1)
+            if (los.ToList().Count == 1)
             {
                 var looo = client.LiveOutputs.Get(le.Name, los.First().Name);
             }

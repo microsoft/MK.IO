@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using MK.IO.Models;
+using System.Threading;
 
 namespace MK.IO.Operations
 {
@@ -16,7 +17,7 @@ namespace MK.IO.Operations
         /// <param name="label">Filters the set to the specified label key/value pair. Supports equality, inequality, and inexact matching. If multiple values are provided for the same key, assets matching either value will be returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
-        List<AssetSchema> List(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null);
+        IEnumerable<AssetSchema> List(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null);
 
         /// <summary>
         /// Retrieves a list of assets in the subscription.
@@ -26,8 +27,9 @@ namespace MK.IO.Operations
         /// <param name="label_key">Filters the set to the specified label key. If multiple label_keys are specified, matching assets must have all labels.</param>
         /// <param name="label">Filters the set to the specified label key/value pair. Supports equality, inequality, and inexact matching. If multiple values are provided for the same key, assets matching either value will be returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<AssetSchema>> ListAsync(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null);
+        Task<IEnumerable<AssetSchema>> ListAsync(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves a list of assets in the subscription using pages.
@@ -48,8 +50,9 @@ namespace MK.IO.Operations
         /// <param name="label_key">Filters the set to the specified label key. If multiple label_keys are specified, matching assets must have all labels.</param>
         /// <param name="label">Filters the set to the specified label key/value pair. Supports equality, inequality, and inexact matching. If multiple values are provided for the same key, assets matching either value will be returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<AssetSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null);
+        Task<PagedResult<AssetSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves a list of assets in the subscription using pages.
@@ -62,8 +65,9 @@ namespace MK.IO.Operations
         /// Retrieves a list of assets in the subscription using pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<PagedResult<AssetSchema>> ListAsPageNextAsync(string? nextPageLink);
+        Task<PagedResult<AssetSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete Asset.
@@ -78,8 +82,9 @@ namespace MK.IO.Operations
         /// When you delete an asset, the underlying storage container will be deleted too.You can control this behavior by assigning a DeletionPolicy to your asset.
         /// </summary>
         /// <param name="assetName">The name of the asset.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task DeleteAsync(string assetName);
+        Task DeleteAsync(string assetName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get an asset by name.
@@ -92,8 +97,9 @@ namespace MK.IO.Operations
         /// Get an asset by name.
         /// </summary>
         /// <param name="assetName"></param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<AssetSchema> GetAsync(string assetName);
+        Task<AssetSchema> GetAsync(string assetName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// <para>Create or Update Asset.</para>
@@ -120,8 +126,9 @@ namespace MK.IO.Operations
         /// <param name="description">The Asset description.</param>
         /// <param name="containerDeletionPolicy">Deletion policy for the underlying storage container. This determines the behavior when an asset record is deleted. A deletion policy of 'Delete' will result in the associated storage container and all its contents being removed from storage. A deletion policy of 'Retain' will leave the content in-place in your storage account.</param>
         /// <param name="alternateId">An alternate ID of the asset.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<AssetSchema> CreateOrUpdateAsync(string assetName, string containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null);
+        Task<AssetSchema> CreateOrUpdateAsync(string assetName, string containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// List Streaming Locators for Asset. This API call is a convenience method to retrieve
@@ -136,8 +143,9 @@ namespace MK.IO.Operations
         /// any and all playback configuations, or StreamingLocators, that are assocaited with this asset.
         /// </summary>
         /// <param name="assetName">The name of the asset.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<List<AssetStreamingLocator>> ListStreamingLocatorsAsync(string assetName);
+        Task<List<AssetStreamingLocator>> ListStreamingLocatorsAsync(string assetName, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// <para>The Azure Storage Data Retrieval API is designed to provide restricted information about data stored in Azure Storage containers.
@@ -174,7 +182,8 @@ namespace MK.IO.Operations
         /// any data from the storage account.</para>
         /// </summary>
         /// <param name="assetName">The name of the asset.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<AssetStorageResponseSchema> ListTracksAndDirListingAsync(string assetName);
+        Task<AssetStorageResponseSchema> ListTracksAndDirListingAsync(string assetName, CancellationToken cancellationToken = default);
     }
 }

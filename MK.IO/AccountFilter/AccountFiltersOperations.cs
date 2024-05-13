@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Net;
 #if NET462
 using System.Net.Http;
+using System.Reflection.Emit;
 #endif
 
 namespace MK.IO.Operations
@@ -35,24 +36,31 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public List<AccountFilterSchema> List(string? orderBy = null, string? filter = null, int? top = null)
+        public IEnumerable<AccountFilterSchema> List(string? orderBy = null, string? filter = null, int? top = null)
         {
-            Task<List<AccountFilterSchema>> task = Task.Run(async () => await ListAsync(orderBy, filter, top));
+            Task<IEnumerable<AccountFilterSchema>> task = Task.Run(async () => await ListAsync(orderBy, filter, top));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<List<AccountFilterSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<IEnumerable<AccountFilterSchema>> ListAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
-            var url = Client.GenerateApiUrl(_accountFiltersApiUrl);
-            url = MKIOClient.AddParametersToUrl(url, "$orderby", orderBy);
-            url = MKIOClient.AddParametersToUrl(url, "$filter", filter);
-            url = MKIOClient.AddParametersToUrl(url, "$top", top != null ? ((int)top).ToString() : null);
+            List<AccountFilterSchema> objectsSchema = [];
+            var objectsResult = await ListAsPageAsync(orderBy, filter, top, cancellationToken);
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                objectsSchema.AddRange(objectsResult.Results);
+                if (objectsResult.NextPageLink == null || (top != null && objectsSchema.Count >= top)) break;
+                objectsResult = await ListAsPageNextAsync(objectsResult.NextPageLink, cancellationToken);
+            }
 
-            string responseContent = await Client.GetObjectContentAsync(url);
+            if (top != null && top < objectsSchema.Count)
+            {
+                return objectsSchema.Take((int)top);
+            }
 
-            var objectToReturn = JsonConvert.DeserializeObject<AccountFilterListResponseSchema>(responseContent, ConverterLE.Settings);
-            return objectToReturn != null ? objectToReturn.Value : throw new Exception($"Error with account filter deserialization");
+            return objectsSchema;
         }
 
         /// <inheritdoc/>
@@ -63,10 +71,10 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<AccountFilterSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null)
+        public async Task<PagedResult<AccountFilterSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default)
         {
             var url = Client.GenerateApiUrl(_accountFiltersApiUrl);
-            return await Client.ListAsPageGenericAsync<AccountFilterSchema>(url, typeof(AccountFilterListResponseSchema), "account filter", orderBy, filter, top);
+            return await Client.ListAsPageGenericAsync<AccountFilterSchema>(url, typeof(AccountFilterListResponseSchema), "account filter", cancellationToken, orderBy, filter, top);
         }
 
         /// <inheritdoc/>
@@ -77,9 +85,9 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<AccountFilterSchema>> ListAsPageNextAsync(string? nextPageLink)
+        public async Task<PagedResult<AccountFilterSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default)
         {
-            return await Client.ListAsPageNextGenericAsync<AccountFilterSchema>(nextPageLink, typeof(AccountFilterListResponseSchema), "account filter");
+            return await Client.ListAsPageNextGenericAsync<AccountFilterSchema>(nextPageLink, typeof(AccountFilterListResponseSchema), "account filter", cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -89,12 +97,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<AccountFilterSchema> GetAsync(string accountFilterName)
+        public async Task<AccountFilterSchema> GetAsync(string accountFilterName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(accountFilterName, nameof(accountFilterName));
 
             var url = Client.GenerateApiUrl(_accountFilterApiUrl, accountFilterName);
-            string responseContent = await Client.GetObjectContentAsync(url);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return JsonConvert.DeserializeObject<AccountFilterSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with account filter deserialization");
         }
 
@@ -106,7 +114,7 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<AccountFilterSchema> CreateOrUpdateAsync(string accountFilterName, MediaFilterProperties properties)
+        public async Task<AccountFilterSchema> CreateOrUpdateAsync(string accountFilterName, MediaFilterProperties properties, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(accountFilterName, nameof(accountFilterName));
             Argument.AssertNotContainsSpace(accountFilterName, nameof(accountFilterName));
@@ -121,7 +129,7 @@ namespace MK.IO.Operations
                 Properties = properties
             };
 
-            string responseContent = await Client.CreateObjectPutAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings));
+            string responseContent = await Client.CreateObjectPutAsync(url, JsonConvert.SerializeObject(content, ConverterLE.Settings), cancellationToken);
             return JsonConvert.DeserializeObject<AccountFilterSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with account filter deserialization");
         }
 
@@ -132,12 +140,12 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(string accountFilterName)
+        public async Task DeleteAsync(string accountFilterName, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(accountFilterName, nameof(accountFilterName));
 
             var url = Client.GenerateApiUrl(_accountFilterApiUrl, accountFilterName);
-            await Client.ObjectContentAsync(url, HttpMethod.Delete);
+            await Client.ObjectContentAsync(url, HttpMethod.Delete, cancellationToken);
         }
     }
 }

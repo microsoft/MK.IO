@@ -25,7 +25,7 @@ namespace MK.IO.Models
         /// <value>Use an ISO 8601 time value between 1 and 10 seconds to specify the output fragment length for the video and audio tracks of an encoding live event. For example, use PT2S to indicate 2 seconds. For the video track it also defines the key frame interval, or the length of a GoP (group of pictures). If this value is not set for an encoding live event, the fragment duration defaults to 2 seconds. The value cannot be set for pass-through live events.</value>
         [DataMember(Name = "keyFrameInterval", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "keyFrameInterval")]
-        public TimeSpan KeyFrameInterval { get; set; }
+        public TimeSpan? KeyFrameInterval { get; set; }
 
         /// <summary>
         /// Defaults to either Default720p or Default1080p depending on encoding type. May be used to specify alternative encoding templates - contact support for assistance if your needs are complex.

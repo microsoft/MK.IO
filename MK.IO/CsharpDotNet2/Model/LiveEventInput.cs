@@ -40,7 +40,7 @@ namespace MK.IO.Models
         /// <value>ISO 8601 time duration of the key frame interval duration of the input. This value sets the EXT-X-TARGETDURATION property in the HLS output. For example, use PT2S to indicate 2 seconds. Leave the value empty for encoding live events.</value>
         [DataMember(Name = "keyFrameIntervalDuration", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "keyFrameIntervalDuration")]
-        public TimeSpan KeyFrameIntervalDuration { get; set; }
+        public TimeSpan? KeyFrameIntervalDuration { get; set; }
 
         /// <summary>
         /// The input protocol for the live event.          This is specified at creation time and cannot be updated.         Must be one of RTMP or SRT. fmp4 smooth input is not supported.         

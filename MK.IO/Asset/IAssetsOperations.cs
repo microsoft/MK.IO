@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using MK.IO.Models;
@@ -9,10 +9,10 @@ namespace MK.IO.Operations
     public interface IAssetsOperations
     {
         /// <summary>
-        /// Retrieves a list of assets in the subscription.
+        /// Returns a list of assets in the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
         /// <param name="label_key">Filters the set to the specified label key. If multiple label_keys are specified, matching assets must have all labels.</param>
         /// <param name="label">Filters the set to the specified label key/value pair. Supports equality, inequality, and inexact matching. If multiple values are provided for the same key, assets matching either value will be returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
@@ -20,10 +20,10 @@ namespace MK.IO.Operations
         IEnumerable<AssetSchema> List(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null);
 
         /// <summary>
-        /// Retrieves a list of assets in the subscription.
+        /// Returns a list of assets in the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
         /// <param name="label_key">Filters the set to the specified label key. If multiple label_keys are specified, matching assets must have all labels.</param>
         /// <param name="label">Filters the set to the specified label key/value pair. Supports equality, inequality, and inexact matching. If multiple values are provided for the same key, assets matching either value will be returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
@@ -32,10 +32,10 @@ namespace MK.IO.Operations
         Task<IEnumerable<AssetSchema>> ListAsync(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Retrieves a list of assets in the subscription using pages.
+        /// Returns a list of assets in the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
         /// <param name="label_key">Filters the set to the specified label key. If multiple label_keys are specified, matching assets must have all labels.</param>
         /// <param name="label">Filters the set to the specified label key/value pair. Supports equality, inequality, and inexact matching. If multiple values are provided for the same key, assets matching either value will be returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
@@ -43,10 +43,10 @@ namespace MK.IO.Operations
         PagedResult<AssetSchema> ListAsPage(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null);
 
         /// <summary>
-        /// Retrieves a list of assets in the subscription using pages.
+        /// Returns a list of assets in the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/alternateId, properties/assetId, properties/created</param>
         /// <param name="label_key">Filters the set to the specified label key. If multiple label_keys are specified, matching assets must have all labels.</param>
         /// <param name="label">Filters the set to the specified label key/value pair. Supports equality, inequality, and inexact matching. If multiple values are provided for the same key, assets matching either value will be returned.</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
@@ -55,14 +55,14 @@ namespace MK.IO.Operations
         Task<PagedResult<AssetSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, List<string>? label_key = null, List<string>? label = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Retrieves a list of assets in the subscription using pages.
+        /// Returns a list of assets in the subscription using next pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
         /// <returns></returns>
         PagedResult<AssetSchema> ListAsPageNext(string? nextPageLink);
 
         /// <summary>
-        /// Retrieves a list of assets in the subscription using pages.
+        /// Returns a list of assets in the subscription using next pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>

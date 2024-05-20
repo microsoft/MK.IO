@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using MK.IO.Models;
@@ -10,8 +10,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Retrieves a list of transforms for the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/lastModified</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/lastModified</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
         IEnumerable<TransformSchema> List(string? orderBy = null, string? filter = null, int? top = null);
@@ -19,8 +19,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Retrieves a list of transforms for the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/lastModified</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/lastModified</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
@@ -29,8 +29,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Retrieves a list of transforms for the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/lastModified</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/lastModified</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
         PagedResult<TransformSchema> ListAsPage(string? orderBy = null, string? filter = null, int? top = null);
@@ -38,22 +38,22 @@ namespace MK.IO.Operations
         /// <summary>
         /// Retrieves a list of transforms for the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/lastModified</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/lastModified</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<PagedResult<TransformSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Retrieves a list of transforms for the subscription using pages.
+        /// Retrieves a list of transforms for the subscription using next pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
         /// <returns></returns>
         PagedResult<TransformSchema> ListAsPageNext(string? nextPageLink);
 
         /// <summary>
-        /// Retrieves a list of transforms for the subscription using pages.
+        /// Retrieves a list of transforms for the subscription using next pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>

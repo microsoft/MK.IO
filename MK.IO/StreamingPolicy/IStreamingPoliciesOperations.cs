@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using MK.IO.Models;
@@ -10,8 +10,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Policies for the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
         IEnumerable<StreamingPolicySchema> List(string? orderBy = null, string? filter = null, int? top = null);
@@ -19,8 +19,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Policies for the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
@@ -29,8 +29,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Policies for the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
         PagedResult<StreamingPolicySchema> ListAsPage(string? orderBy = null, string? filter = null, int? top = null);
@@ -38,8 +38,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Policies for the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>

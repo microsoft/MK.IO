@@ -56,12 +56,6 @@ namespace Sample
                 Environment.Exit(0);
             }
 
-            //var myck = client.ContentKeyPolicies.Get("keypolicy-aes");
-            var myck2 = client.ContentKeyPolicies.Get("keypolicy-17c7ed160f");
-
-            var cks2 = client.ContentKeyPolicies.List();
-
-
             // Get subscription stats
             var stats = client.Account.GetSubscriptionStats();
 

@@ -1,6 +1,6 @@
-# MK.IO Client Library
+# A .NET client library for MediaKind MK.IO
 
-A client library for [MediaKind MK.IO](https://mk.io).
+This project is an open source client .NET library for [MediaKind MK.IO](https://mk.io).
 
 [Link to MK.IO Nuget package](https://www.nuget.org/packages/MK.IO).
 
@@ -212,4 +212,3 @@ trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
-

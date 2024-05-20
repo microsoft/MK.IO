@@ -10,8 +10,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Locators for the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/endTime</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/endTime</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
         IEnumerable<StreamingLocatorSchema> List(string? orderBy = null, string? filter = null, int? top = null);
@@ -19,8 +19,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Locators for the subscription.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Filters the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/endTime</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/endTime</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
@@ -29,8 +29,8 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Locators for the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/endTime</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/endTime</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <returns></returns>
         PagedResult<StreamingLocatorSchema> ListAsPage(string? orderBy = null, string? filter = null, int? top = null);
@@ -38,22 +38,22 @@ namespace MK.IO.Operations
         /// <summary>
         /// Returns a list of Streaming Locators for the subscription using pages.
         /// </summary>
-        /// <param name="orderBy">Specifies the key by which the result collection should be ordered.</param>
-        /// <param name="filter">Restricts the set of items returned.</param>
+        /// <param name="orderBy">Specifies the key by which the result collection should be ordered. Specify a field name, and optionally asc or desc. Sorting is valid on the following fields: name, properties/created, properties/endTime</param>
+        /// <param name="filter">Filters the set of items returned. Filters are valid on the following fields: name, properties/created, properties/endTime</param>
         /// <param name="top">Specifies a non-negative integer that limits the number of items returned from a collection. The service returns the number of available items up to but not greater than the specified value top.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<PagedResult<StreamingLocatorSchema>> ListAsPageAsync(string? orderBy = null, string? filter = null, int? top = null, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Returns a list of Streaming Locators for the subscription using pages.
+        /// Returns a list of Streaming Locators for the subscription using next pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
         /// <returns></returns>
         PagedResult<StreamingLocatorSchema> ListAsPageNext(string? nextPageLink);
 
         /// <summary>
-        /// Returns a list of Streaming Locators for the subscription using pages.
+        /// Returns a list of Streaming Locators for the subscription using next pages.
         /// </summary>
         /// <param name="nextPageLink">Next page link.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>

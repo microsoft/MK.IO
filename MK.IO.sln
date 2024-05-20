@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MK.IO", "MK.IO\MK.IO.csproj", "{D49EB09F-BB45-446F-8CC6-29E1C6E73EFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleNet8.0", "SampleNet8.0\SampleNet8.0.csproj", "{AC8541CD-7314-4B58-BA18-483891137232}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleNet9.0", "SampleNet9.0\SampleNet9.0.csproj", "{AC8541CD-7314-4B58-BA18-483891137232}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleNetFramework4.8", "SampleNetFramework4.8\SampleNetFramework4.8.csproj", "{FD73FD43-77EF-4057-B13D-98FC72F8F2C7}"
 	ProjectSection(ProjectDependencies) = postProject

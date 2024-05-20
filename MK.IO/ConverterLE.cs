@@ -29,7 +29,7 @@ namespace MK.IO
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
             AllowOutOfOrderMetadataProperties = true,
-            
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = {
                 new JsonStringEnumConverter(),
                 new CustomDateTimeConverter(),

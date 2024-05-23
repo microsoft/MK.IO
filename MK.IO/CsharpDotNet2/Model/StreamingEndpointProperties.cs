@@ -26,7 +26,7 @@ namespace MK.IO.Models
         /// </summary>
         /// <value>If CDN is enabled, the path that must be inserted after the hostname and before the locator, e.g. https://<hostName>/<cdnBasePath>/<locator>.</value>
         [JsonInclude]
-        public string CdnBasePath { get; private set; }
+        public string? CdnBasePath { get; private set; }
 
         /// <summary>
         /// Indicates if CDN is enabled for the streaming endpoint.
@@ -38,13 +38,13 @@ namespace MK.IO.Models
         /// If CDN is enabled, the optional CDN profile name for the streaming endpoint.
         /// </summary>
         /// <value>If CDN is enabled, the optional CDN profile name for the streaming endpoint.</value>
-        public string CdnProfile { get; set; }
+        public string? CdnProfile { get; set; }
 
         /// <summary>
         /// If CDN is enabled, the CDN provider name for the streaming endpoint.
         /// </summary>
         /// <value>If CDN is enabled, the CDN provider name for the streaming endpoint.</value>
-        public StreamingEndpointCdnProvider? CdnProvider { get; set; }
+        public StreamingEndpointCdnProviderType? CdnProvider { get; set; }
 
         /// <summary>
         /// The creation date and time of the streaming endpoint. Set by the system.

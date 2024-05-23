@@ -10,7 +10,7 @@ namespace MK.IO.Models
     /// </summary>
     /// <value>CDN provider name for the streaming endpoint.</value>
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum StreamingEndpointCdnProvider
+    public enum StreamingEndpointCdnProviderType
     {
         StandardAkamai
     }

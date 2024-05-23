@@ -51,7 +51,7 @@ namespace MK.IO.Models
         /// <value>If CDN is enabled, the CDN provider name for the streaming endpoint.</value>
         [DataMember(Name = "cdnProvider", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "cdnProvider")]
-        public StreamingEndpointCdnProvider? CdnProvider { get; set; }
+        public StreamingEndpointCdnProviderType? CdnProvider { get; set; }
 
         /// <summary>
         /// The creation date and time of the streaming endpoint. Set by the system.

@@ -538,22 +538,23 @@ namespace Sample
             // ******************************
 
             // get streaming endpoint
-            var mkse = client.StreamingEndpoints.Get("xpouyatse1");
+            var mkse = client.StreamingEndpoints.Get("se1");
 
             // list streaming endpoints
             var mkses = client.StreamingEndpoints.List();
 
             // create streaming endpoint
-            
+
             /*
-            var newSe = client.StreamingEndpoints.Create("streamingendpoint2", "francecentral", new StreamingEndpointProperties
+            var newSe = client.StreamingEndpoints.Create("streamingendpointxp2", "francecentral", new StreamingEndpointProperties
             {
                 Description = "my description",
-                ScaleUnits = 0,
-                CdnEnabled = false,
+                ScaleUnits = 1,
+                CdnEnabled = true,
+                CdnProvider = StreamingEndpointCdnProviderType.StandardAkamai,
                 Sku = new StreamingEndpointsCurrentSku
                 {
-                    Name = StreamingEndpointSkuType.Standard
+                    Name = StreamingEndpointSkuType.Premium
                 }
             });
             */

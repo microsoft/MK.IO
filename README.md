@@ -85,7 +85,7 @@ var newasset = client.Assets.CreateOrUpdate(newAssetName, newAssetName, "storage
 newAssetName = MKIOClient.GenerateUniqueName("asset");
 newasset = client.Assets.CreateOrUpdate(
     newAssetName,
-    newAssetName,
+    null,
     "storagename",
     "description of asset using labels",
     AssetContainerDeletionPolicyType.Retain,

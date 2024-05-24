@@ -28,7 +28,7 @@ namespace MK.IO
             }
         }
 
-        public static void AssertNotContainsSpace(string value, string name)
+        public static void AssertNotContainsSpace(string? value, string name)
         {
             if (value != null && value.Contains(' '))
             {
@@ -36,7 +36,7 @@ namespace MK.IO
             }
         }
 
-        public static void AssertNotMoreThanLength(string value, string name, int length)
+        public static void AssertNotMoreThanLength(string? value, string name, int length)
         {
             if (value != null && value.Length > length)
             {
@@ -44,7 +44,7 @@ namespace MK.IO
             }
         }
 
-        public static void AssertRespectRegex(string value, string name, string regexPattern)
+        public static void AssertRespectRegex(string? value, string name, string regexPattern)
         {
             // check if value respects regex pattern
             if (value != null && !Regex.IsMatch(value, regexPattern))

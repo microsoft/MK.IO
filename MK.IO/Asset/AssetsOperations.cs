@@ -124,6 +124,7 @@ namespace MK.IO.Operations
             Argument.AssertNotMoreThanLength(assetName, nameof(assetName), 260);
             Argument.AssertNotMoreThanLength(containerName, nameof(containerName), 63);
             Argument.AssertRespectRegex(containerName, nameof(containerName), @"^(?=.{3,63}$)[a-z0-9]+(-[a-z0-9]+)*$");
+            Argument.AssertNotNullOrEmpty(storageName, nameof(storageName));
 
             var url = Client.GenerateApiUrl(_assetApiUrl, assetName);
             AssetSchema content = new()
@@ -131,7 +132,7 @@ namespace MK.IO.Operations
                 Labels = labels!,
                 Properties = new AssetProperties
                 {
-                    Container = containerName,
+                    Container = containerName!,
                     Description = description!,
                     StorageAccountName = storageName,
                     ContainerDeletionPolicy = containerDeletionPolicy,

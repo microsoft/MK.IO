@@ -30,7 +30,7 @@ namespace MK.IO
 
         public static void AssertNotContainsSpace(string value, string name)
         {
-            if (value.Contains(' '))
+            if (value != null && value.Contains(' '))
             {
                 throw new ArgumentException("Value cannot contain space.", name);
             }
@@ -38,7 +38,7 @@ namespace MK.IO
 
         public static void AssertNotMoreThanLength(string value, string name, int length)
         {
-            if (value.Length > length)
+            if (value != null && value.Length > length)
             {
                 throw new ArgumentException($"Value length cannot exceed {length}.", name);
             }
@@ -47,7 +47,7 @@ namespace MK.IO
         public static void AssertRespectRegex(string value, string name, string regexPattern)
         {
             // check if value respects regex pattern
-            if (!Regex.IsMatch(value, regexPattern))
+            if (value != null && !Regex.IsMatch(value, regexPattern))
             {
                 throw new ArgumentException($"Value does not respect regex pattern {regexPattern}.", name);
             }

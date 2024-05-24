@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - 'main'       # Run the workflow when pushing to the main branch
-      - 'dev'
   release:
     types:
       - published    # Run the workflow when a new GitHub release is published

@@ -237,7 +237,7 @@ namespace MK.IO
                 return new PagedResult<T>
                 {
                     NextPageLink = WebUtility.UrlDecode(nextPageLink),
-                    Results = (objectToReturn).GetType().GetProperty("Value").GetValue(objectToReturn) as List<T>
+                    Results = objectToReturn.GetType().GetProperty("Value").GetValue(objectToReturn) as List<T>
                 };
             }
         }
@@ -261,7 +261,7 @@ namespace MK.IO
                 return new PagedResult<T>
                 {
                     NextPageLink = WebUtility.UrlDecode(nextPageLink),
-                    Results = (objectToReturn).GetType().GetProperty("Value").GetValue(objectToReturn) as List<T>
+                    Results = objectToReturn.GetType().GetProperty("Value").GetValue(objectToReturn) as List<T>
                 };
             }
         }

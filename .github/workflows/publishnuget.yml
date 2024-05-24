@@ -23,6 +23,10 @@ defaults:
 jobs:
   create_nuget:
     runs-on: windows-2019
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     
     steps:
     - uses: actions/checkout@v3

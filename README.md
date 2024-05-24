@@ -20,7 +20,7 @@ This should provide you with your user_id and token. Note that this token is val
 Another way to get the token is to use [Fiddler](https://www.telerik.com/fiddler) when you connect to the MK.IO portal with your browser.
 It is displayed in the header as `x-mkio-token`. For example, you should see it on the second REST call to https://api.mk.io/api/ams/mkiosubscriptionname/stats/.
 
-For more information, please read this [article](https://support.mediakind.com/portal/en/kb/articles/how-to-use-mkio-apis-step-by-step).
+For more information, please read this [article](https://support.mk.io/portal/en/kb/articles/how-to-use-mkio-apis-step-by-step).
 
 ### Supported operations
 

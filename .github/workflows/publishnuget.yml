@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - 'main'       # Run the workflow when pushing to the main branch
+      - 'dev'
   release:
     types:
       - published    # Run the workflow when a new GitHub release is published
@@ -22,6 +23,10 @@ defaults:
 jobs:
   create_nuget:
     runs-on: windows-2019
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     
     steps:
     - uses: actions/checkout@v3
@@ -33,9 +38,17 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.x'
-      
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: csharp
+
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
     - run: dotnet build MK.IO\MK.IO.csproj --configuration Release
+  
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
 
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - uses: actions/upload-artifact@v3
@@ -57,10 +70,12 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v3
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.x'
+
     - name: Run tests
       run: dotnet test --configuration Release
 
@@ -68,7 +83,7 @@ jobs:
     # Publish only when creating a GitHub Release
     # https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
     # You can update this logic if you want to manage releases differently
-    if: github.event_name == 'release'
+    if: (github.ref == 'main') && (github.event_name == 'release')
     runs-on: windows-latest
     needs: [ create_nuget, run_test ]
     steps:

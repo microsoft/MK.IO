@@ -286,7 +286,7 @@ namespace Sample
             // Delete
             // client.StorageAccounts.Delete(storages.First().Metadata.Id);
 
-      
+
 
 
             // ************************
@@ -520,7 +520,7 @@ namespace Sample
 
             var lo = client.LiveOutputs.Create(le.Name, MKIOClient.GenerateUniqueName("liveOutput"), new LiveOutputProperties
             {
-                ArchiveWindowLength = new TimeSpan(0,5,0),
+                ArchiveWindowLength = new TimeSpan(0, 5, 0),
                 AssetName = nameasset
             });
 

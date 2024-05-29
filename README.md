@@ -1,6 +1,6 @@
-# A .NET client library for MediaKind MK.IO
+# A .NET client SDK for MediaKind MK.IO
 
-This project is an open source client .NET library for [MediaKind MK.IO](https://mk.io).
+This project is an open source .NET SDK for [MediaKind MK.IO](https://mk.io). For maximum compatibility, it targets .NET 8.0, .NET Standard 2.0 and .NET Framework 4.6.2. 
 
 [Link to MK.IO Nuget package](https://www.nuget.org/packages/MK.IO).
 
@@ -77,15 +77,15 @@ while (true)
 // get asset
 var mkasset = client.Assets.Get("myassetname");
 
-// create asset
+// create a first asset, letting MK.IO generates a container name
 var newAssetName = MKIOClient.GenerateUniqueName("asset");
-var newasset = client.Assets.CreateOrUpdate(newAssetName, newAssetName, "storagename", "description of my asset");
+var newasset = client.Assets.CreateOrUpdate(newAssetName, null, "storagename", "description of my asset");
 
-// create asset and use labels to tag it
-newAssetName = MKIOClient.GenerateUniqueName("asset");
-newasset = client.Assets.CreateOrUpdate(
+// create another asset and use labels to tag it. Container name will be the nae of the asset
+var newAssetName2 = MKIOClient.GenerateUniqueName("asset");
+var newasset2 = client.Assets.CreateOrUpdate(
     newAssetName,
-    newAssetName,
+    newAssetName, // container name
     "storagename",
     "description of asset using labels",
     AssetContainerDeletionPolicyType.Retain,
@@ -96,14 +96,14 @@ newasset = client.Assets.CreateOrUpdate(
 // list assets using labels filtering
 var sourceEncodedAssets = client.Assets.List(label: new List<string> { "typeAsset=source" });
 
-// delete asset
+// delete created asset
 client.Assets.Delete(newsasset.Name);
 
 // get streaming locators for asset
-var locatorsAsset = client.Assets.ListStreamingLocators("copy-1b510ee166");
+var locatorsAsset = client.Assets.ListStreamingLocators("asset-1b510ee166");
 
 // Get tracks and directory of an asset
-var tracksAndDir = client.Assets.ListTracksAndDirListing("copy-ef2058b692");
+var tracksAndDir = client.Assets.ListTracksAndDirListing("asset-ef2058b692");
 
 
 // ******************************

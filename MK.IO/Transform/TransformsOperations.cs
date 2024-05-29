@@ -116,7 +116,7 @@ namespace MK.IO.Operations
         /// <inheritdoc/>
         public async Task<PagedResult<TransformSchema>> ListAsPageNextAsync(string? nextPageLink, CancellationToken cancellationToken = default)
         {
-            return await Client.ListAsPageNextGenericAsync<TransformSchema> (nextPageLink, typeof(TransformListResponseSchema), "transform", cancellationToken);
+            return await Client.ListAsPageNextGenericAsync<TransformSchema>(nextPageLink, typeof(TransformListResponseSchema), "transform", cancellationToken);
         }
 
         /// <inheritdoc/>

@@ -38,7 +38,7 @@ var jobs = client.Jobs.ListAll();
 
 // create output asset
 var outputAssetName = MKIOClient.GenerateUniqueName("asset");
-var outputAsset = client.Assets.CreateOrUpdate(outputAssetName, outputAssetName, config["StorageName"], "output asset for job");
+var outputAsset = client.Assets.CreateOrUpdate(outputAssetName, null, config["StorageName"], "output asset for job");
 // create a job with the output asset created and with an asset as a source
 var newJob = client.Jobs.Create(transform.Name, MKIOClient.GenerateUniqueName("job"), new JobProperties
     {

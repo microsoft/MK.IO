@@ -11,9 +11,9 @@ namespace Sample
 {
     public class ProgramDemo
     {
-        private const string TransformName = "CVQ720pTransform";
-        private const string InputMP4FileName = @"Ignite.mp4";
-        private const string BitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
+        private const string _transformName = "CVQ720pTransform";
+        private const string _inputMP4FileName = @"Ignite.mp4";
+        private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
         public static async Task SimpleEncodingAndPublishing()
         {
@@ -42,24 +42,24 @@ namespace Sample
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
 
             // Create a new input Asset and upload the specified local video file into it. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputAssetName, InputMP4FileName);
+            _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputAssetName, _inputMP4FileName);
 
             // Output from the encoding Job must be written to an Asset, so let's create one. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {TransformName} transform");
+            _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {_transformName} transform");
 
             // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
-            _ = await CreateOrUpdateTransformAsync(client, TransformName);
+            _ = await CreateOrUpdateTransformAsync(client, _transformName);
 
             // Submit a job request to MK.IO to apply the specified Transform to a given input video.
-            _ = await SubmitJobAsync(client, TransformName, jobName, inputAssetName, outputAssetName, InputMP4FileName);
+            _ = await SubmitJobAsync(client, _transformName, jobName, inputAssetName, outputAssetName, _inputMP4FileName);
 
             // Polls the status of the job and wait for it to finish.
-            var encodingJob = await WaitForJobToFinishAsync(client, TransformName, jobName);
+            var encodingJob = await WaitForJobToFinishAsync(client, _transformName, jobName);
 
             if (encodingJob.Properties.State != JobState.Finished)
             {
                 Console.WriteLine("Encoding job cancelled or in error.");
-                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, TransformName, jobName);
+                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName);
             }
             else
             {
@@ -72,7 +72,7 @@ namespace Sample
                 // Display streaming paths and test player urls
                 await ListStreamingUrlsAsync(client, locatorName);
 
-                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, TransformName, jobName, locatorName, createdEndpoint);
+                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName, locatorName, createdEndpoint);
                 Console.WriteLine("Press Enter to close the app.");
             }
         }
@@ -180,13 +180,13 @@ namespace Sample
             var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
             {
                 Description = "Encoding with H264MultipleBitrate720pWithCVQ preset",
-                Outputs = new List<TransformOutput>
-                {
+                Outputs =
+                [
                     new() {
                         Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
                         RelativePriority = TransformOutputPriorityType.Normal
                     }
-                }
+                ]
             });
             Console.WriteLine($"Transform '{transform.Name}' created/updated.");
             return transform;
@@ -322,7 +322,7 @@ namespace Sample
                     foreach (var se in streamingEndpoints)
                     {
                         Console.WriteLine($"      Url : https://{se.Properties.HostName}{p}");
-                        Console.WriteLine($"      Test player url: " + string.Format(BitmovinPlayer, path.StreamingProtocol.ToString().ToLower(), Uri.EscapeDataString("https://" + se.Properties.HostName + p)));
+                        Console.WriteLine($"      Test player url: " + string.Format(_bitmovinPlayer, path.StreamingProtocol.ToString().ToLower(), Uri.EscapeDataString("https://" + se.Properties.HostName + p)));
                     }
                 }
                 Console.WriteLine();

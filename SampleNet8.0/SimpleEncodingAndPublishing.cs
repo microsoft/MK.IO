@@ -11,6 +11,7 @@ namespace Sample
 {
     public class ProgramDemo
     {
+        private const string TransformName = "CVQ720pTransform";
         private const string InputMP4FileName = @"Ignite.mp4";
         private const string BitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
@@ -46,17 +47,17 @@ namespace Sample
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
 
             // Create a new input Asset and upload the specified local video file into it.
-            var inputAsset = await CreateInputAssetAsync(client, config["StorageName"], config["TenantId"], inputAssetName);
+            _ = await CreateInputAssetAsync(client, config["StorageName"], config["TenantId"], inputAssetName, InputMP4FileName);
 
             // Output from the encoding Job must be written to an Asset, so let's create one
-            var outputAsset = await CreateOutputAssetAsync(client, config["StorageName"], outputAssetName, $"encoded asset from {inputAsset.Name} using CVQ720pTransform transform");
+            _ = await CreateOutputAssetAsync(client, config["StorageName"], outputAssetName, $"encoded asset from {inputAssetName} using {TransformName} transform");
 
             // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
-            TransformSchema transform = await CreateOrUpdateTransformAsync(client);
+            _ = await CreateOrUpdateTransformAsync(client, TransformName);
 
-            var encodingJob = await SubmitJobAsync(client, jobName, transform, inputAsset, outputAsset);
+            _ = await SubmitJobAsync(client, TransformName, jobName, inputAssetName, outputAssetName, InputMP4FileName);
 
-            encodingJob = await WaitForJobToFinishAsync(client, transform.Name, encodingJob.Name);
+            var encodingJob = await WaitForJobToFinishAsync(client, TransformName, jobName);
 
             // Encoding is finished.
 
@@ -67,11 +68,11 @@ namespace Sample
             }
 
             // Create a locator for clear streaming
-            var locator = client.StreamingLocators.Create(
+            _ = client.StreamingLocators.Create(
                  locatorName,
                  new StreamingLocatorProperties
                  {
-                     AssetName = outputAsset.Name,
+                     AssetName = outputAssetName,
                      StreamingPolicyName = PredefinedStreamingPolicy.ClearStreamingOnly
                  });
 
@@ -79,12 +80,147 @@ namespace Sample
             await ListStreamingEndpointsAndCreateOneIfNeededAsync(client);
 
             // Display streaming paths and test player urls
-            await ListStreamingUrlsAsync(client, locator.Name);
+            await ListStreamingUrlsAsync(client, locatorName);
 
             Console.WriteLine("Press Enter to close the app.");
             Console.ReadLine();
         }
 
+
+        /// <summary>
+        /// Creates a new input Asset and uploads the specified local video file into it.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="storageName">The storage name.</param>
+        /// <param name="tenantId">The Azure Tenant Id</param>
+        /// <param name="assetName">The asset name.</param>
+        /// <param name="fileToUpload">The file you want to upload into the asset.</param>
+        /// <returns></returns>
+        private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName, string fileToUpload)
+        {
+            // Create an input asset
+            var inputAsset = await client.Assets.CreateOrUpdateAsync(
+                assetName,
+                null,
+                storageName!,
+                $"input asset {fileToUpload}",
+                AssetContainerDeletionPolicyType.Retain,
+                null,
+                new Dictionary<string, string> { { "typeAsset", "source" } }
+            );
+            Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
+
+            // Create an interactive browser credential which will use the system authentication broker
+            var blobContainerClient = new BlobContainerClient(
+                new Uri($"https://{inputAsset.Properties.StorageAccountName}.blob.core.windows.net/{inputAsset.Properties.Container}"),
+                new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions()
+                {
+                    TenantId = tenantId
+                }
+                )
+                );
+
+            // User or app must have Storage Blob Data Contributor on the account for the upload to work!
+            // Upload a blob (e.g., from a local file)
+            var blobName = fileToUpload; // Replace with your blob name
+            var blobClient = blobContainerClient.GetBlobClient(blobName);
+            await blobClient.UploadAsync(fileToUpload);
+            Console.WriteLine($"File '{fileToUpload}' uploaded to input asset.");
+            return inputAsset;
+        }
+
+        /// <summary>
+        /// Creates an ouput asset. The output from the encoding Job must be written to an Asset.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="storageName">The storage name.</param>
+        /// <param name="assetName">The asset name.</param>
+        /// <param name="description">The description of the asset.</param>
+        /// <returns></returns>
+        private static async Task<AssetSchema> CreateOutputAssetAsync(MKIOClient client, string storageName, string assetName, string description)
+        {
+            // Create an empty output asset
+
+            var outputAsset = await client.Assets.CreateOrUpdateAsync(
+                assetName,
+                null,
+                storageName!,
+                description,
+                AssetContainerDeletionPolicyType.Retain, null,
+                new Dictionary<string, string> { { "typeAsset", "encoded" } }
+                );
+            Console.WriteLine($"Output asset '{outputAsset.Name}' created.");
+
+            return outputAsset;
+        }
+
+        /// <summary>
+        /// Create or update the Transform
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="transformName"></param>
+        /// <returns></returns>
+        private static async Task<TransformSchema> CreateOrUpdateTransformAsync(MKIOClient client, string transformName)
+        {
+            // Create or update a transform for CVQ encoding
+            var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
+            {
+                Description = "Encoding with H264MultipleBitrate720pWithCVQ preset",
+                Outputs = new List<TransformOutput>
+                {
+                    new() {
+                        Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
+                        RelativePriority = TransformOutputPriorityType.Normal
+                    }
+                }
+            });
+            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
+            return transform;
+        }
+
+        /// <summary>
+        /// Submits a request to MK.IO to apply the specified Transform to a given input video.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="transformName">The transform name.</param>
+        /// <param name="jobName">The job name.</param>
+        /// <param name="inputAssetName"></param>
+        /// <param name="outputAssetName"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string transformName, string jobName, string inputAssetName, string outputAssetName, string fileName)
+        {
+            // Create the encoding job
+            var encodingJob = await client.Jobs.CreateAsync(
+                transformName,
+                jobName,
+                new JobProperties
+                {
+                    Description = $"My job which encodes '{inputAssetName}' to '{outputAssetName}' with '{transformName}' transform.",
+                    Priority = JobPriorityType.Normal,
+                    Input = new JobInputAsset(
+                       inputAssetName,
+                       [
+                           fileName
+                       ]),
+                    Outputs =
+                    [
+                       new JobOutputAsset()
+                       {
+                           AssetName= outputAssetName
+                       }
+                    ]
+                }
+                );
+            Console.WriteLine($"Encoding job '{encodingJob.Name}' submitted.");
+            return encodingJob;
+        }
+
+        /// <summary>
+        /// List the streaming endpoint(s) and propose to create one if none
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <returns></returns>
         private static async Task ListStreamingEndpointsAndCreateOneIfNeededAsync(MKIOClient client)
         {
             var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
@@ -122,6 +258,12 @@ namespace Sample
             }
         }
 
+        /// <summary>
+        /// List the streaming Urls for a specified locator name
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="locatorName"></param>
+        /// <returns></returns>
         private static async Task ListStreamingUrlsAsync(MKIOClient client, string locatorName)
         {
             // list Streaming Endpoints
@@ -145,23 +287,13 @@ namespace Sample
             }
         }
 
-        private static async Task<AssetSchema> CreateOutputAssetAsync(MKIOClient client, string storageName, string assetName, string description)
-        {
-            // Create an empty output asset
-
-            var outputAsset = await client.Assets.CreateOrUpdateAsync(
-                assetName,
-                null,
-                storageName!,
-                description,
-                AssetContainerDeletionPolicyType.Retain, null,
-                new Dictionary<string, string> { { "typeAsset", "encoded" } }
-                );
-            Console.WriteLine($"Output asset '{outputAsset.Name}' created.");
-
-            return outputAsset;
-        }
-
+        /// <summary>
+        /// Polls MK.IO for the status of the Job.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="transformName">The transform name.</param>
+        /// <param name="jobName">The job name.</param>
+        /// <returns></returns>
         private static async Task<JobSchema> WaitForJobToFinishAsync(MKIOClient client, string transformName, string jobName)
         {
             JobSchema job;
@@ -175,86 +307,6 @@ namespace Sample
             while (job.Properties.State == JobState.Queued || job.Properties.State == JobState.Scheduled || job.Properties.State == JobState.Processing);
 
             return job;
-        }
-
-        private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName)
-        {
-            // Create an input asset
-            var inputAsset = await client.Assets.CreateOrUpdateAsync(
-                assetName,
-                null,
-                storageName!,
-                $"input asset {InputMP4FileName}",
-                AssetContainerDeletionPolicyType.Retain,
-                null,
-                new Dictionary<string, string> { { "typeAsset", "source" } }
-            );
-            Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
-
-            // Create an interactive browser credential which will use the system authentication broker
-            var blobContainerClient = new BlobContainerClient(
-                new Uri($"https://{inputAsset.Properties.StorageAccountName}.blob.core.windows.net/{inputAsset.Properties.Container}"),
-                new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions()
-                {
-                    TenantId = tenantId
-                }
-                )
-                );
-
-            // User or app must have Storage Blob Data Contributor on the account for the upload to work!
-            // Upload a blob (e.g., from a local file)
-            var blobName = InputMP4FileName; // Replace with your blob name
-            var blobClient = blobContainerClient.GetBlobClient(blobName);
-            await blobClient.UploadAsync(InputMP4FileName);
-            Console.WriteLine($"File '{InputMP4FileName}' uploaded to input asset.");
-            return inputAsset;
-        }
-
-
-        private static async Task<TransformSchema> CreateOrUpdateTransformAsync(MKIOClient client)
-        {
-            // Create or update a transform for CVQ encoding
-            var transform = await client.Transforms.CreateOrUpdateAsync("CVQ720pTransform", new TransformProperties
-            {
-                Description = "Encoding with CVQ 720p",
-                Outputs = new List<TransformOutput>
-                {
-                    new() {
-                        Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
-                        RelativePriority = TransformOutputPriorityType.Normal
-                    }
-                }
-            });
-            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
-            return transform;
-        }
-
-        private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string jobName, TransformSchema transform, AssetSchema inputAsset, AssetSchema outputAsset)
-        {
-            // Create the encoding job
-            var encodingJob = await client.Jobs.CreateAsync(
-                transform.Name,
-                jobName,
-                new JobProperties
-                {
-                    Description = $"My job which encodes '{inputAsset.Name}' to '{outputAsset.Name}' with '{transform.Name}' transform.",
-                    Priority = JobPriorityType.Normal,
-                    Input = new JobInputAsset(
-                       inputAsset.Name,
-                       [
-                           InputMP4FileName
-                       ]),
-                    Outputs =
-                    [
-                       new JobOutputAsset()
-                       {
-                           AssetName= outputAsset.Name
-                       }
-                    ]
-                }
-                );
-            Console.WriteLine($"Encoding job '{encodingJob.Name}' submitted.");
-            return encodingJob;
         }
     }
 }

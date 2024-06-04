@@ -16,15 +16,15 @@ namespace Sample
 
         public static async Task SimpleEncodingAndPublishing()
         {
-            Console.WriteLine("Sample that uploads a file in a new asset, does a video encoding to multiple bitrate with MK.IO and publish the output asset for clear streaming.");
-
             /* you need to add an appsettings.json file with the following content:
-             {
-                "MKIOSubscriptionName": "yourMKIOsubscriptionname",
-                "MKIOToken": "yourMKIOtoken",
-                "TenantId" : "your Azure tenant ID " // optional
-             }
-            */
+           {
+              "MKIOSubscriptionName": "yourMKIOsubscriptionname",
+              "MKIOToken": "yourMKIOtoken",
+              "TenantId" : "your Azure tenant ID " // optional
+           }
+          */
+
+            Console.WriteLine("Sample that uploads a file in a new asset, does a video encoding to multiple bitrate with MK.IO and publish the output asset for clear streaming.");
 
             // Build a config object, using env vars and JSON providers.
             IConfigurationRoot config = new ConfigurationBuilder()
@@ -34,109 +34,59 @@ namespace Sample
 
             Console.WriteLine($"Using '{config["MKIOSubscriptionName"]}' MK.IO subscription.");
 
-            // **********************
-            // MK.IO Client creation
-            // **********************
+            // Creating a unique suffix so that we don't have name collisions if you run the sample
+            // multiple times without cleaning up.
+            string uniqueId = MKIOClient.GenerateUniqueName(string.Empty);
+            string inputAssetName = $"input-{uniqueId}";
+            string outputAssetName = $"output-{uniqueId}";
+            string jobName = $"job-{uniqueId}";
+            string locatorName = $"locator-{uniqueId}";
 
+            // MK.IO Client creation
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
 
-            // Create an input asset
-            var inputAsset = await client.Assets.CreateOrUpdateAsync(
-                MKIOClient.GenerateUniqueName("asset"),
-                null,
-                config["StorageName"]!,
-                $"input asset {InputMP4FileName}",
-                AssetContainerDeletionPolicyType.Retain,
-                null,
-                new Dictionary<string, string> { { "typeAsset", "source" } }
-            );
-            Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
+            // Create a new input Asset and upload the specified local video file into it.
+            var inputAsset = await CreateInputAssetAsync(client, config["StorageName"], config["TenantId"], inputAssetName);
 
-            // Create an interactive browser credential which will use the system authentication broker
-            var blobContainerClient = new BlobContainerClient(
-                new Uri($"https://{inputAsset.Properties.StorageAccountName}.blob.core.windows.net/{inputAsset.Properties.Container}"),
-                new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions()
-                {
-                    TenantId = config["TenantId"]
-                }
-                )
-                );
+            // Output from the encoding Job must be written to an Asset, so let's create one
+            var outputAsset = await CreateOutputAssetAsync(client, config["StorageName"], outputAssetName, $"encoded asset from {inputAsset.Name} using CVQ720pTransform transform");
 
-            // User or app must have Storage Blob Data Contributor on the account for the upload to work!
-            // Upload a blob (e.g., from a local file)
-            var blobName = InputMP4FileName; // Replace with your blob name
-            var blobClient = blobContainerClient.GetBlobClient(blobName);
-            await blobClient.UploadAsync(InputMP4FileName);
-            Console.WriteLine($"File '{InputMP4FileName}' uploaded to input asset.");
+            // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
+            TransformSchema transform = await CreateOrUpdateTransformAsync(client);
 
-            // Create an empty output asset
-            var jobId = MKIOClient.GenerateUniqueName(string.Empty);
-            var outputAsset = client.Assets.CreateOrUpdate(
-                $"{inputAsset.Name}-encoded-{jobId}",
-                null,
-                config["StorageName"]!,
-                $"encoded asset from {inputAsset.Name} with job {jobId} using CVQ720pTransform transform",
-                AssetContainerDeletionPolicyType.Retain, null,
-                new Dictionary<string, string> { { "typeAsset", "encoded" } }
-                );
-            Console.WriteLine($"Output asset '{outputAsset.Name}' created.");
+            var encodingJob = await SubmitJobAsync(client, jobName, transform, inputAsset, outputAsset);
 
-            // Create or update a transform for CVQ encoding
-            var transform = client.Transforms.CreateOrUpdate("CVQ720pTransform", new TransformProperties
-            {
-                Description = "Encoding with CVQ 720p",
-                Outputs = new List<TransformOutput>
-                {
-                    new() {
-                        Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
-                        RelativePriority = TransformOutputPriorityType.Normal
-                    }
-                }
-            });
-            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
-
-            // Create the encoding job
-            var encodingJob = client.Jobs.Create(
-                transform.Name,
-                $"job-{jobId}",
-                new JobProperties
-                {
-                    Description = $"My job which encodes '{inputAsset.Name}' to '{outputAsset.Name}' with '{transform.Name}' transform.",
-                    Priority = JobPriorityType.Normal,
-                    Input = new JobInputAsset(
-                       inputAsset.Name,
-                       [
-                           InputMP4FileName
-                       ]),
-                    Outputs =
-                    [
-                       new JobOutputAsset()
-                       {
-                           AssetName= outputAsset.Name
-                       }
-                    ]
-                }
-                );
-            Console.WriteLine($"Encoding job '{encodingJob.Name}' submitted.");
-
-            while (encodingJob.Properties.State == JobState.Queued || encodingJob.Properties.State == JobState.Scheduled || encodingJob.Properties.State == JobState.Processing)
-            {
-                encodingJob = client.Jobs.Get(transform.Name, encodingJob.Name);
-                Console.WriteLine(encodingJob.Properties.State + (encodingJob.Properties.Outputs.First().Progress != null ? $" {encodingJob.Properties.Outputs.First().Progress}%" : string.Empty));
-                Thread.Sleep(10000);
-            }
+            encodingJob = await WaitForJobToFinishAsync(client, transform.Name, encodingJob.Name);
 
             // Encoding is finished.
+
+            if (encodingJob.Properties.State != JobState.Finished)
+            {
+                Console.WriteLine("Encoding job cancelled or in error.");
+                return;
+            }
+
             // Create a locator for clear streaming
             var locator = client.StreamingLocators.Create(
-                 MKIOClient.GenerateUniqueName("locator"),
+                 locatorName,
                  new StreamingLocatorProperties
                  {
-                     AssetName = "asset-0ee54a50-encoded-ad92f7d6",//outputAsset.Name,
+                     AssetName = outputAsset.Name,
                      StreamingPolicyName = PredefinedStreamingPolicy.ClearStreamingOnly
                  });
 
-            // list the streaming endpint(s) and propose creation if none
+            // list the streaming endpoint(s) and propose creation if needed
+            await ListStreamingEndpointsAndCreateOneIfNeededAsync(client);
+
+            // Display streaming paths and test player urls
+            await ListStreamingUrlsAsync(client, locator.Name);
+
+            Console.WriteLine("Press Enter to close the app.");
+            Console.ReadLine();
+        }
+
+        private static async Task ListStreamingEndpointsAndCreateOneIfNeededAsync(MKIOClient client)
+        {
             var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
             if (streamingEndpoints.Any())
             {
@@ -168,13 +118,18 @@ namespace Sample
                         );
                     Console.WriteLine($"Streaming endpoint '{streamingEndpoint.Name}' created and starting.");
                     Console.WriteLine();
-                    streamingEndpoints = await client.StreamingEndpoints.ListAsync();
                 }
             }
+        }
+
+        private static async Task ListStreamingUrlsAsync(MKIOClient client, string locatorName)
+        {
+            // list Streaming Endpoints
+            var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
 
             // List the streaming Url
-            var paths = client.StreamingLocators.ListUrlPaths(locator.Name);
-            Console.WriteLine($"Streaming paths for locator '{locator.Name}':");
+            var paths = await client.StreamingLocators.ListUrlPathsAsync(locatorName);
+            Console.WriteLine($"Streaming paths for locator '{locatorName}':");
             foreach (var path in paths.StreamingPaths)
             {
                 Console.WriteLine($"   Streaming protocol : {path.StreamingProtocol}");
@@ -182,28 +137,124 @@ namespace Sample
                 {
                     foreach (var se in streamingEndpoints)
                     {
-                        Console.WriteLine($"      https://{se.Properties.HostName}{p}");
+                        Console.WriteLine($"      Url : https://{se.Properties.HostName}{p}");
+                        Console.WriteLine($"      Test player url: " + string.Format(BitmovinPlayer, path.StreamingProtocol.ToString().ToLower(), Uri.EscapeDataString("https://" + se.Properties.HostName + p)));
                     }
                 }
+                Console.WriteLine();
             }
-            Console.WriteLine();
+        }
 
-            Console.WriteLine($"BITMOVIN test player URLs:");
-            foreach (var path in paths.StreamingPaths)
+        private static async Task<AssetSchema> CreateOutputAssetAsync(MKIOClient client, string storageName, string assetName, string description)
+        {
+            // Create an empty output asset
+
+            var outputAsset = await client.Assets.CreateOrUpdateAsync(
+                assetName,
+                null,
+                storageName!,
+                description,
+                AssetContainerDeletionPolicyType.Retain, null,
+                new Dictionary<string, string> { { "typeAsset", "encoded" } }
+                );
+            Console.WriteLine($"Output asset '{outputAsset.Name}' created.");
+
+            return outputAsset;
+        }
+
+        private static async Task<JobSchema> WaitForJobToFinishAsync(MKIOClient client, string transformName, string jobName)
+        {
+            JobSchema job;
+
+            do
             {
-                Console.WriteLine($"   Streaming protocol : {path.StreamingProtocol}");
-                foreach (var p in path.Paths)
+                job = await client.Jobs.GetAsync(transformName, jobName);
+                Console.WriteLine(job.Properties.State + (job.Properties.Outputs.First().Progress != null ? $" {job.Properties.Outputs.First().Progress}%" : string.Empty));
+                Thread.Sleep(10000);
+            }
+            while (job.Properties.State == JobState.Queued || job.Properties.State == JobState.Scheduled || job.Properties.State == JobState.Processing);
+
+            return job;
+        }
+
+        private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName)
+        {
+            // Create an input asset
+            var inputAsset = await client.Assets.CreateOrUpdateAsync(
+                assetName,
+                null,
+                storageName!,
+                $"input asset {InputMP4FileName}",
+                AssetContainerDeletionPolicyType.Retain,
+                null,
+                new Dictionary<string, string> { { "typeAsset", "source" } }
+            );
+            Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
+
+            // Create an interactive browser credential which will use the system authentication broker
+            var blobContainerClient = new BlobContainerClient(
+                new Uri($"https://{inputAsset.Properties.StorageAccountName}.blob.core.windows.net/{inputAsset.Properties.Container}"),
+                new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions()
                 {
-                    foreach (var se in streamingEndpoints)
-                    {
-                        Console.WriteLine($"      " + string.Format(BitmovinPlayer, path.StreamingProtocol.ToString().ToLower(), Uri.EscapeDataString("https://" + se.Properties.HostName + p)));
+                    TenantId = tenantId
+                }
+                )
+                );
+
+            // User or app must have Storage Blob Data Contributor on the account for the upload to work!
+            // Upload a blob (e.g., from a local file)
+            var blobName = InputMP4FileName; // Replace with your blob name
+            var blobClient = blobContainerClient.GetBlobClient(blobName);
+            await blobClient.UploadAsync(InputMP4FileName);
+            Console.WriteLine($"File '{InputMP4FileName}' uploaded to input asset.");
+            return inputAsset;
+        }
+
+
+        private static async Task<TransformSchema> CreateOrUpdateTransformAsync(MKIOClient client)
+        {
+            // Create or update a transform for CVQ encoding
+            var transform = await client.Transforms.CreateOrUpdateAsync("CVQ720pTransform", new TransformProperties
+            {
+                Description = "Encoding with CVQ 720p",
+                Outputs = new List<TransformOutput>
+                {
+                    new() {
+                        Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
+                        RelativePriority = TransformOutputPriorityType.Normal
                     }
                 }
-            }
+            });
+            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
+            return transform;
+        }
 
-            Console.WriteLine();
-            Console.WriteLine("Press Enter to close the app.");
-            Console.ReadLine();
+        private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string jobName, TransformSchema transform, AssetSchema inputAsset, AssetSchema outputAsset)
+        {
+            // Create the encoding job
+            var encodingJob = await client.Jobs.CreateAsync(
+                transform.Name,
+                jobName,
+                new JobProperties
+                {
+                    Description = $"My job which encodes '{inputAsset.Name}' to '{outputAsset.Name}' with '{transform.Name}' transform.",
+                    Priority = JobPriorityType.Normal,
+                    Input = new JobInputAsset(
+                       inputAsset.Name,
+                       [
+                           InputMP4FileName
+                       ]),
+                    Outputs =
+                    [
+                       new JobOutputAsset()
+                       {
+                           AssetName= outputAsset.Name
+                       }
+                    ]
+                }
+                );
+            Console.WriteLine($"Encoding job '{encodingJob.Name}' submitted.");
+            return encodingJob;
         }
     }
 }

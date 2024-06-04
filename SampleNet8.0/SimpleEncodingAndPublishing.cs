@@ -86,7 +86,6 @@ namespace Sample
             Console.ReadLine();
         }
 
-
         /// <summary>
         /// Creates a new input Asset and uploads the specified local video file into it.
         /// </summary>
@@ -122,8 +121,7 @@ namespace Sample
 
             // User or app must have Storage Blob Data Contributor on the account for the upload to work!
             // Upload a blob (e.g., from a local file)
-            var blobName = fileToUpload; // Replace with your blob name
-            var blobClient = blobContainerClient.GetBlobClient(blobName);
+            var blobClient = blobContainerClient.GetBlobClient(fileToUpload);
             await blobClient.UploadAsync(fileToUpload);
             Console.WriteLine($"File '{fileToUpload}' uploaded to input asset.");
             return inputAsset;
@@ -149,7 +147,7 @@ namespace Sample
                 AssetContainerDeletionPolicyType.Retain, null,
                 new Dictionary<string, string> { { "typeAsset", "encoded" } }
                 );
-            Console.WriteLine($"Output asset '{outputAsset.Name}' created.");
+            Console.WriteLine($"Output asset '{assetName}' created.");
 
             return outputAsset;
         }
@@ -158,7 +156,7 @@ namespace Sample
         /// Create or update the Transform
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
-        /// <param name="transformName"></param>
+        /// <param name="transformName">The transform name.</param>
         /// <returns></returns>
         private static async Task<TransformSchema> CreateOrUpdateTransformAsync(MKIOClient client, string transformName)
         {
@@ -184,9 +182,9 @@ namespace Sample
         /// <param name="client">The MK.IO client.</param>
         /// <param name="transformName">The transform name.</param>
         /// <param name="jobName">The job name.</param>
-        /// <param name="inputAssetName"></param>
-        /// <param name="outputAssetName"></param>
-        /// <param name="fileName"></param>
+        /// <param name="inputAssetName">The input asset name.</param>
+        /// <param name="outputAssetName">The output asset name.</param>
+        /// <param name="fileName">The filename in the input asset name.</param>
         /// <returns></returns>
         private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string transformName, string jobName, string inputAssetName, string outputAssetName, string fileName)
         {
@@ -262,7 +260,7 @@ namespace Sample
         /// List the streaming Urls for a specified locator name
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
-        /// <param name="locatorName"></param>
+        /// <param name="locatorName">The locator name.</param>
         /// <returns></returns>
         private static async Task ListStreamingUrlsAsync(MKIOClient client, string locatorName)
         {

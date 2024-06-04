@@ -9,6 +9,17 @@ using MK.IO.Models;
 
 namespace Sample
 {
+    /// <summary>
+    /// Sample code for MK.IO using MK.IO .NET SDK that does the following
+    /// - upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
+    /// - create the output asset
+    /// - create/update a transform
+    /// - submit an encoding job
+    /// - create a locator
+    /// - create and start a streaming endpoint if there is none
+    /// - list the streaming urls and test player urls.
+    /// - clean the created resources if the user accepts
+    /// </summary>
     public class ProgramDemo
     {
         private const string _transformName = "CVQ720pTransform";
@@ -66,7 +77,7 @@ namespace Sample
                 // Create a locator for clear streaming
                 _ = await CreateStreamingLocatorAsync(client, outputAssetName, locatorName);
 
-                // list the streaming endpoint(s) and propose creation if needed
+                // List the streaming endpoint(s) and propose creation if needed
                 var createdEndpoint = await ListStreamingEndpointsAndCreateOneIfNeededAsync(client);
 
                 // Display streaming paths and test player urls
@@ -78,9 +89,9 @@ namespace Sample
         }
 
         /// <summary>
-        /// do the settings loading and checking
+        /// Does the settings loading and checking.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Configuration.</returns>
         /// <exception cref="Exception"></exception>
         private static IConfigurationRoot LoadAndCheckSettings()
         {
@@ -109,7 +120,7 @@ namespace Sample
         /// <param name="tenantId">The Azure Tenant Id</param>
         /// <param name="assetName">The asset name.</param>
         /// <param name="fileToUpload">The file you want to upload into the asset.</param>
-        /// <returns></returns>
+        /// <returns>The asset.</returns>
         private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName, string fileToUpload)
         {
             // Create an input asset
@@ -149,7 +160,7 @@ namespace Sample
         /// <param name="storageName">The storage name.</param>
         /// <param name="assetName">The asset name.</param>
         /// <param name="description">The description of the asset.</param>
-        /// <returns></returns>
+        /// <returns>The asset.</returns>
         private static async Task<AssetSchema> CreateOutputAssetAsync(MKIOClient client, string storageName, string assetName, string description)
         {
             // Create an empty output asset
@@ -169,11 +180,11 @@ namespace Sample
         }
 
         /// <summary>
-        /// Create or update the Transform
+        /// Creates or updates the Transform.
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
         /// <param name="transformName">The transform name.</param>
-        /// <returns></returns>
+        /// <returns>The transform.</returns>
         private static async Task<TransformSchema> CreateOrUpdateTransformAsync(MKIOClient client, string transformName)
         {
             // Create or update a transform for CVQ encoding
@@ -201,7 +212,7 @@ namespace Sample
         /// <param name="inputAssetName">The input asset name.</param>
         /// <param name="outputAssetName">The output asset name.</param>
         /// <param name="fileName">The filename in the input asset name.</param>
-        /// <returns></returns>
+        /// <returns>The job.</returns>
         private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string transformName, string jobName, string inputAssetName, string outputAssetName, string fileName)
         {
             // Create the encoding job
@@ -231,12 +242,12 @@ namespace Sample
         }
 
         /// <summary>
-        /// Create a streaming locator on the asset
+        /// Creates a streaming locator on the asset.
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
         /// <param name="outputAssetName">The output asset name.</param>
         /// <param name="locatorName">The locator name.</param>
-        /// <returns></returns>
+        /// <returns>The streaming locator.</returns>
         private static async Task<StreamingLocatorSchema> CreateStreamingLocatorAsync(MKIOClient client, string outputAssetName, string locatorName)
         {
             return await client.StreamingLocators.CreateAsync(
@@ -249,10 +260,10 @@ namespace Sample
         }
 
         /// <summary>
-        /// List the streaming endpoint(s) and propose to create one if none
+        /// Lists the streaming endpoint(s) and proposes to create one if there is none.
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
-        /// <returns>The name of the streaming endpoint created, otherwise null</returns>
+        /// <returns>The name of the streaming endpoint created, otherwise null.</returns>
         private static async Task<string?> ListStreamingEndpointsAndCreateOneIfNeededAsync(MKIOClient client)
         {
             string? createdStreamingEndpointName = null;
@@ -301,7 +312,7 @@ namespace Sample
         }
 
         /// <summary>
-        /// List the streaming Urls for a specified locator name
+        /// Lists the streaming Urls for a specified locator name.
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
         /// <param name="locatorName">The locator name.</param>
@@ -335,7 +346,7 @@ namespace Sample
         /// <param name="client">The MK.IO client.</param>
         /// <param name="transformName">The transform name.</param>
         /// <param name="jobName">The job name.</param>
-        /// <returns></returns>
+        /// <returns>The job when processing is finished/failed/cancelled.</returns>
         private static async Task<JobSchema> WaitForJobToFinishAsync(MKIOClient client, string transformName, string jobName)
         {
             const int SleepIntervalMs = 10 * 1000;
@@ -353,7 +364,7 @@ namespace Sample
         }
 
         /// <summary>
-        /// Clean the created resources if user accepts
+        /// Cleans the created resources if user accepts.
         /// </summary>
         /// <param name="client"></param>
         /// <param name="inputAssetName"></param>

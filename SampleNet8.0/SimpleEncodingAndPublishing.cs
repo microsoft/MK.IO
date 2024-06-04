@@ -27,13 +27,8 @@ namespace Sample
 
             Console.WriteLine("Sample that uploads a file in a new asset, does a video encoding to multiple bitrate with MK.IO and publish the output asset for clear streaming.");
 
-            // Build a config object, using env vars and JSON providers.
-            IConfigurationRoot config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
-
-            Console.WriteLine($"Using '{config["MKIOSubscriptionName"]}' MK.IO subscription.");
+            // Load settings from the appsettings.json file and check them
+            IConfigurationRoot config = LoadAndCheckSettings();
 
             // Creating a unique suffix so that we don't have name collisions if you run the sample
             // multiple times without cleaning up.
@@ -47,15 +42,15 @@ namespace Sample
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
 
             // Create a new input Asset and upload the specified local video file into it. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateInputAssetAsync(client, config["StorageName"], config["TenantId"], inputAssetName, InputMP4FileName);
+            _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputAssetName, InputMP4FileName);
 
             // Output from the encoding Job must be written to an Asset, so let's create one. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateOutputAssetAsync(client, config["StorageName"], outputAssetName, $"encoded asset from {inputAssetName} using {TransformName} transform");
+            _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {TransformName} transform");
 
             // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
             _ = await CreateOrUpdateTransformAsync(client, TransformName);
 
-            // Submit a joib request to MK.IO to apply the specified Transform to a given input video.
+            // Submit a job request to MK.IO to apply the specified Transform to a given input video.
             _ = await SubmitJobAsync(client, TransformName, jobName, inputAssetName, outputAssetName, InputMP4FileName);
 
             // Polls the status of the job and wait for it to finish.
@@ -65,28 +60,47 @@ namespace Sample
             {
                 Console.WriteLine("Encoding job cancelled or in error.");
                 await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, TransformName, jobName);
-                return;
+            }
+            else
+            {
+                // Create a locator for clear streaming
+                _ = await CreateStreamingLocatorAsync(client, outputAssetName, locatorName);
+
+                // list the streaming endpoint(s) and propose creation if needed
+                var createdEndpoint = await ListStreamingEndpointsAndCreateOneIfNeededAsync(client);
+
+                // Display streaming paths and test player urls
+                await ListStreamingUrlsAsync(client, locatorName);
+
+                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, TransformName, jobName, locatorName, createdEndpoint);
+                Console.WriteLine("Press Enter to close the app.");
+            }
+        }
+
+        /// <summary>
+        /// do the settings loading and checking
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private static IConfigurationRoot LoadAndCheckSettings()
+        {
+            // Build a config object, using env vars and JSON providers.
+            IConfigurationRoot config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+
+            // Checking settings
+            if (string.IsNullOrEmpty(config["MKIOSubscriptionName"]) || string.IsNullOrEmpty(config["MKIOToken"]) || string.IsNullOrEmpty(config["StorageName"]))
+            {
+                Console.WriteLine("Missing MKIOSubscriptionName, MKIOToken, or StorageName in configuration file.");
+                throw new Exception("Missing mandatory configuration settings.");
             }
 
-            // Create a locator for clear streaming
-            _ = client.StreamingLocators.Create(
-                 locatorName,
-                 new StreamingLocatorProperties
-                 {
-                     AssetName = outputAssetName,
-                     StreamingPolicyName = PredefinedStreamingPolicy.ClearStreamingOnly
-                 });
-
-            // list the streaming endpoint(s) and propose creation if needed
-            await ListStreamingEndpointsAndCreateOneIfNeededAsync(client);
-
-            // Display streaming paths and test player urls
-            await ListStreamingUrlsAsync(client, locatorName);
-
-            await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, TransformName, jobName, locatorName);
-            Console.WriteLine("Press Enter to close the app.");
+            Console.WriteLine($"Using '{config["MKIOSubscriptionName"]!}' MK.IO subscription.");
+            return config;
         }
-        
+
         /// <summary>
         /// Creates a new input Asset and uploads the specified local video file into it.
         /// </summary>
@@ -217,12 +231,31 @@ namespace Sample
         }
 
         /// <summary>
+        /// Create a streaming locator on the asset
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="outputAssetName">The output asset name.</param>
+        /// <param name="locatorName">The locator name.</param>
+        /// <returns></returns>
+        private static async Task<StreamingLocatorSchema> CreateStreamingLocatorAsync(MKIOClient client, string outputAssetName, string locatorName)
+        {
+            return await client.StreamingLocators.CreateAsync(
+                 locatorName,
+                 new StreamingLocatorProperties
+                 {
+                     AssetName = outputAssetName,
+                     StreamingPolicyName = PredefinedStreamingPolicy.ClearStreamingOnly
+                 });
+        }
+
+        /// <summary>
         /// List the streaming endpoint(s) and propose to create one if none
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
-        /// <returns></returns>
-        private static async Task ListStreamingEndpointsAndCreateOneIfNeededAsync(MKIOClient client)
+        /// <returns>The name of the streaming endpoint created, otherwise null</returns>
+        private static async Task<string?> ListStreamingEndpointsAndCreateOneIfNeededAsync(MKIOClient client)
         {
+            string? createdStreamingEndpointName = null;
             var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
             if (streamingEndpoints.Any())
             {
@@ -243,19 +276,28 @@ namespace Sample
                     var locs = await client.Account.ListAllLocationsAsync();
                     var locationToUse = locs.FirstOrDefault(l => l.Metadata.Id == sub.Spec.LocationId);
 
-                    var streamingEndpoint = await client.StreamingEndpoints.CreateAsync(
-                        MKIOClient.GenerateUniqueName("endpoint"),
-                        locationToUse.Metadata.Name,
-                        new StreamingEndpointProperties
-                        {
-                            Description = "Streaming endpoint created by sample"
-                        },
-                        true
-                        );
-                    Console.WriteLine($"Streaming endpoint '{streamingEndpoint.Name}' created and starting.");
+                    if (locationToUse != null)
+                    {
+                        var streamingEndpoint = await client.StreamingEndpoints.CreateAsync(
+                           MKIOClient.GenerateUniqueName("endpoint"),
+                           locationToUse.Metadata.Name,
+                           new StreamingEndpointProperties
+                           {
+                               Description = "Streaming endpoint created by sample"
+                           },
+                           true
+                           );
+                        createdStreamingEndpointName = streamingEndpoint.Name;
+                        Console.WriteLine($"Streaming endpoint '{streamingEndpoint.Name}' created and starting.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error. No location found. Cannot create the streaming endpoint.");
+                    }
                     Console.WriteLine();
                 }
             }
+            return createdStreamingEndpointName;
         }
 
         /// <summary>
@@ -320,7 +362,7 @@ namespace Sample
         /// <param name="jobName"></param>
         /// <param name="locatorName"></param>
         /// <returns></returns>
-        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string locatorName = null)
+        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string? locatorName = null, string? streamingEndpoint = null)
         {
             Console.WriteLine("Do you want to clean the created resources (assets, job, etc) ? (Y/N)");
             var response = Console.ReadLine();
@@ -330,36 +372,36 @@ namespace Sample
                 {
                     await client.Assets.DeleteAsync(inputAssetName);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Error deleting asset '{inputAssetName}'.");
+                    Console.WriteLine($"Unexpected error deleting asset '{inputAssetName}'. Error: {ex.Message}");
                 }
 
                 try
                 {
                     await client.Assets.DeleteAsync(outputAssetName);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Error deleting asset '{outputAssetName}'.");
+                    Console.WriteLine($"Error deleting asset '{outputAssetName}'. Error: {ex.Message}");
                 }
 
                 try
                 {
                     await client.Jobs.DeleteAsync(transformName, jobName);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Error deleting asset '{outputAssetName}'.");
+                    Console.WriteLine($"Error deleting asset '{outputAssetName}'. Error: {ex.Message}");
                 }
 
                 try
                 {
                     await client.Transforms.DeleteAsync(transformName);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Error deleting transform '{transformName}'.");
+                    Console.WriteLine($"Error deleting transform '{transformName}'. Error: {ex.Message}");
                 }
 
                 if (locatorName != null)
@@ -367,9 +409,18 @@ namespace Sample
                     {
                         await client.StreamingLocators.DeleteAsync(locatorName);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        Console.WriteLine($"Error deleting locator '{locatorName}'.");
+                        Console.WriteLine($"Error deleting locator '{locatorName}'. Error: {ex.Message}");
+                    }
+                if (streamingEndpoint != null)
+                    try
+                    {
+                        await client.StreamingEndpoints.DeleteAsync(streamingEndpoint);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error deleting streaming endpoint '{streamingEndpoint}'. Error: {ex.Message}");
                     }
                 Console.WriteLine("Cleaning done.");
             }

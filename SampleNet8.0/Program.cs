@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 namespace Sample
 {
-    internal class Program
+    public class Program
     {
         static void Main()
         {
@@ -21,6 +21,10 @@ namespace Sample
         static async Task MainAsync()
         {
             Console.WriteLine("Sample that operates MK.IO.");
+
+            await ProgramDemo.SimpleEncodingAndPublishing();
+
+            return;
 
             /* you need to add an appsettings.json file with the following content:
              {
@@ -68,8 +72,6 @@ namespace Sample
             // *****************
 
             // list assets
-
-
             var mkioAssetsResult2 = client.Assets.List(null, "name gt 'ignite-t'", null, null);
 
             var mkioAssetsResult = client.Assets.ListAsPage("properties/created desc", null, null, null, 10);
@@ -430,7 +432,7 @@ namespace Sample
             client.Jobs.Create("simple", "testjob2", new JobProperties
             {
                 Description = "My job",
-                Priority = "Normal",
+                Priority = JobPriorityType.Normal,
                 Input = new JobInputAsset(
                     "copy-ef2058b692-copy",
                     new List<string> {

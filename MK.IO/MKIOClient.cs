@@ -402,7 +402,7 @@ namespace MK.IO
         {
             // return a string of length "length" containing random characters
 
-            return prefix + "-" + Guid.NewGuid().ToString("N").Substring(0, length);
+            return (string.IsNullOrEmpty(prefix) ? string.Empty : prefix + "-") + Guid.NewGuid().ToString("N").Substring(0, length);
         }
     }
 }

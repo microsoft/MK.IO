@@ -152,12 +152,23 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotContainsSpace(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotMoreThanLength(streamingEndpointName, nameof(streamingEndpointName), 24);
-            Argument.AssertRespectRegex(streamingEndpointName, nameof(streamingEndpointName), @"^[a-zA-Z0-9]+$");
+            Argument.AssertRespectRegex(streamingEndpointName, nameof(streamingEndpointName), @"^[a-zA-Z0-9-]+$");
             Argument.AssertNotNullOrEmpty(location, nameof(location));
             Argument.AssertNotNull(properties, nameof(properties));
 
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl + "?autoStart=" + autoStart.ToString(), streamingEndpointName);
             tags ??= new Dictionary<string, string>();
+
+            if (properties.Sku == null)
+            {
+                properties.Sku = new StreamingEndpointsCurrentSku();
+            }
+
+            if (properties.ScaleUnits == null)
+            {
+                properties.ScaleUnits = (properties.Sku.Name == StreamingEndpointSkuType.Premium ? 1 : 0);
+            }
+
             var content = new StreamingEndpointSchema
             {
                 Location = location,

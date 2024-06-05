@@ -12,81 +12,87 @@ namespace MK.IO.Models
     public enum EncoderNamedPreset
     {
         /// <summary>
-        /// Enum H264SingleBitrateSD for value: H264SingleBitrateSD
+        /// Outputs single MP4 file containing only stereo audio encoded at 192 kbps
+        /// </summary>
+        [EnumMember(Value = "AACGoodQualityAudio")]
+        AACGoodQualityAudio,
+
+        /// <summary>
+        /// Outputs H.264 video (2200 kbps, 480p) and AAC stereo audio (128 kbps)
         /// </summary>
         [EnumMember(Value = "H264SingleBitrateSD")]
         H264SingleBitrateSD,
 
         /// <summary>
-        /// Enum H264SingleBitrate720p for value: H264SingleBitrate720p
-        /// </summary>
-        [EnumMember(Value = "H264SingleBitrate720p")]
-        H264SingleBitrate720p,
-
-        /// <summary>
-        /// Enum H264SingleBitrate1080p for value: H264SingleBitrate1080p
-        /// </summary>
-        [EnumMember(Value = "H264SingleBitrate1080p")]
-        H264SingleBitrate1080p,
-
-        /// <summary>
-        /// Enum H264MultipleBitrateSD for value: H264MultipleBitrateSD
+        /// Outputs H.264 video (400-1900 kbps, 240-480p) and AAC stereo audio
         /// </summary>
         [EnumMember(Value = "H264MultipleBitrateSD")]
         H264MultipleBitrateSD,
 
         /// <summary>
-        /// Enum H264MultipleBitrate720p for value: H264MultipleBitrate720p
-        /// </summary>
-        [EnumMember(Value = "H264MultipleBitrate720p")]
-        H264MultipleBitrate720p,
-
-        /// <summary>
-        /// Enum H264MultipleBitrate1080p for value: H264MultipleBitrate1080p
-        /// </summary>
-        [EnumMember(Value = "H264MultipleBitrate1080p")]
-        H264MultipleBitrate1080p,
-
-        /// <summary>
-        /// Enum H264MultipleBitrateSDWithCVQ for value: H264MultipleBitrateSDWithCVQ
+        /// Outputs H.264 video (400-1900 kbps, 240-480p) and AAC stereo audio With CVQ
         /// </summary>
         [EnumMember(Value = "H264MultipleBitrateSDWithCVQ")]
         H264MultipleBitrateSDWithCVQ,
 
         /// <summary>
-        /// Enum H264MultipleBitrate720pWithCVQ for value: H264MultipleBitrate720pWithCVQ
+        /// Outputs H.264 video (4500 kbps, 720p) and AAC stereo audio (128 kbps)
+        /// </summary>
+        [EnumMember(Value = "H264SingleBitrate720p")]
+        H264SingleBitrate720p,
+
+        /// <summary>
+        /// Outputs H.264 video (400-3400 kbps, 180-720p) and AAC stereo audio
+        /// </summary>
+        [EnumMember(Value = "H264MultipleBitrate720p")]
+        H264MultipleBitrate720p,
+
+        /// <summary>
+        /// Outputs H.264 video (400-3400 kbps, 180-720p) and AAC stereo audio with CVQ
         /// </summary>
         [EnumMember(Value = "H264MultipleBitrate720pWithCVQ")]
         H264MultipleBitrate720pWithCVQ,
 
         /// <summary>
-        /// Enum H264MultipleBitrate1080pWithCVQ for value: H264MultipleBitrate1080pWithCVQ
+        /// Outputs H.264 video (6750 kbps, 1080p) and AAC stereo audio (128 kbps)
+        /// </summary>
+        [EnumMember(Value = "H264SingleBitrate1080p")]
+        H264SingleBitrate1080p,
+
+        /// <summary>
+        /// Outputs H.264 video (400-6000 kbps, 180-1080p) and AAC stereo audio
+        /// </summary>
+        [EnumMember(Value = "H264MultipleBitrate1080p")]
+        H264MultipleBitrate1080p,
+
+        /// <summary>
+        /// Outputs H.264 video (400-6000 kbps, 180-1080p) and AAC stereo audio with CVQ
         /// </summary>
         [EnumMember(Value = "H264MultipleBitrate1080pWithCVQ")]
         H264MultipleBitrate1080pWithCVQ,
 
         /// <summary>
-        /// Enum H265SingleBitrate720p for value: H265SingleBitrate720p
+        /// Outputs H.264 video (400-6000 kbps, 180-1080p) and AAC stereo audio
+        /// </summary>
+        [EnumMember(Value = "H264MultipleBitrateSport1080p")]
+        H264MultipleBitrateSport1080p,
+
+        /// <summary>
+        /// Outputs H.265 video (400-3400 kbps, 180-720p) and AAC stereo audio
         /// </summary>
         [EnumMember(Value = "H265SingleBitrate720p")]
         H265SingleBitrate720p,
 
         /// <summary>
-        /// Enum H265SingleBitrate1080p for value: H265SingleBitrate1080p
+        /// Outputs H.265 video (3500 kbps, 1080p) and AAC stereo audio (128 kbps)
         /// </summary>
         [EnumMember(Value = "H265SingleBitrate1080p")]
         H265SingleBitrate1080p,
 
         /// <summary>
-        /// Enum H265SingleBitrate4K for value: H265SingleBitrate4K
+        /// Outputs H.265 video (9500 kbps, 2160p) and AAC stereo audio (128 kbps)
         /// </summary>
         [EnumMember(Value = "H265SingleBitrate4K")]
-        H265SingleBitrate4K,
-
-        /// <summary>
-        /// Enum AACGoodQualityAudio for value: AACGoodQualityAudio
-        /// </summary>
-        [EnumMember(Value = "AACGoodQualityAudio")]
-        AACGoodQualityAudio
+        H265SingleBitrate4K
     }
 }

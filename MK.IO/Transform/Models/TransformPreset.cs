@@ -9,6 +9,7 @@ namespace MK.IO.Models
     [JsonConverter(typeof(JsonSubtypes), "@odata.type")]
     [JsonSubtypes.KnownSubType(typeof(BuiltInStandardEncoderPreset), "#Microsoft.Media.BuiltInStandardEncoderPreset")]
     [JsonSubtypes.KnownSubType(typeof(AudioAnalyzerPreset), "#Microsoft.Media.AudioAnalyzerPreset")]
+    [JsonSubtypes.KnownSubType(typeof(BuiltInAssetConverterPreset), "#Microsoft.Media.BuiltInAssetConverterPreset")]
 
     //
     // Summary:

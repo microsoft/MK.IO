@@ -315,7 +315,16 @@ namespace MK.IO
                     throw new ApiException("Bad Request" + errorDetail, status_, responseContent, null);
                 }
                 else
-               if (status_ == 403)
+                if (status_ == 401)
+                {
+                    if (message == null)
+                    {
+                        throw new ApiException("Response was null which was not expected.", status_, null, null);
+                    }
+                    throw new ApiException("Unauthorized" + errorDetail, status_, responseContent, null);
+                }
+                else
+                if (status_ == 403)
                 {
                     if (message == null)
                     {

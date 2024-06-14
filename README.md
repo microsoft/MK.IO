@@ -41,7 +41,7 @@ In the current version, operations are supported for :
 
 ### End-to-end sample code
 
-There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](/blob/main/SampleNet8.0/SimpleEncodingAndPublishing.cs).
+There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](/SampleNet8.0/SimpleEncodingAndPublishing.cs).
 
 This sample code does the following :
 

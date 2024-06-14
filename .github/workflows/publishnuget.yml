@@ -6,9 +6,9 @@ on:
   push:
     branches:
       - 'main'       # Run the workflow when pushing to the main branch
-  #release:
-  #  types:
-  #    - published    # Run the workflow when a new GitHub release is published
+  release:
+    types:
+      - published    # Run the workflow when a new GitHub release is published
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1

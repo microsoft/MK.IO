@@ -78,12 +78,12 @@ namespace MK.IO
         /// <param name="name"></param>
         /// <param name="regexPattern"></param>
         /// <exception cref="ArgumentException"></exception>
-        public static void AssertRespectRegex(string? value, string name, string regexPattern)
+        public static void AssertRespectRegex(string? value, string name, string regexPattern, string? tip = null)
         {
             // check if value respects regex pattern
             if (value != null && !Regex.IsMatch(value, regexPattern))
             {
-                throw new ArgumentException($"Value does not respect regex pattern {regexPattern}.", name);
+                throw new ArgumentException($"Value does not respect regex pattern {regexPattern}." + tip != null ? System.Environment.NewLine + tip : "", name);
             }
         }
     }

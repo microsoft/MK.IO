@@ -39,7 +39,26 @@ In the current version, operations are supported for :
 - Account filters
 - Streaming policies
 
-### Sample code
+### End-to-end sample code
+
+There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](/SampleNet8.0/SimpleEncodingAndPublishing.cs).
+
+This sample code does the following :
+
+- upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
+- create the output asset
+- create/update a transform with MK.IO
+- submit a encoding job with MK.IO anbd wait for its completion
+- create a locator with MK.IO
+- create a streaming endpoint with MK.IO if there is none
+- list the streaming urls and test player urls
+- clean the resources
+
+Run the SampleNet8.10 to execute this sample code.
+
+### Other examples
+
+Here is an example on how to use the SDK to manage assets and streaming endpoints :
 
 ```csharp
 using MK.IO;

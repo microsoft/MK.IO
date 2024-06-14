@@ -39,6 +39,14 @@ namespace MK.IO.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// FairPlay AMS compatibility enabled.
+        /// </summary>
+        /// <value>FairPlay AMS compatibility enabled.</value>
+        [DataMember(Name = "fairPlayAmsCompatibility", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "fairPlayAmsCompatibility")]
+        public bool? FairPlayAmsCompatibility { get; set; }
+
+        /// <summary>
         /// The last modified date of the Policy
         /// </summary>
         /// <value>The last modified date of the Policy</value>

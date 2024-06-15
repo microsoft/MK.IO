@@ -155,11 +155,11 @@ client.StreamingEndpoints.Delete("streamingendpoint1");
 
 Additional samples are available :
 
-- [live operations](https://github.com/xpouyat/MK.IO/blob/master/SampleLiveOperations.md) 
-- [storage operations](https://github.com/xpouyat/MK.IO/blob/master/SampleStorageOperations.md)
-- [transform and job operations](https://github.com/xpouyat/MK.IO/blob/master/SampleTransformAndJobOperations.md)
-- [account filter and asset filter operations](https://github.com/xpouyat/MK.IO/blob/master/SampleFilterOperations.md)
-- [content key policy and streaming locator operations](https://github.com/xpouyat/MK.IO/blob/master/SampleContentKeyPolicyOperations.md)
+- [live operations](https://github.com/microsoft/MK.IO/blob/master/SampleLiveOperations.md) 
+- [storage operations](https://github.com/microsoft/MK.IO/blob/master/SampleStorageOperations.md)
+- [transform and job operations](https://github.com/microsoft/MK.IO/blob/master/SampleTransformAndJobOperations.md)
+- [account filter and asset filter operations](https://github.com/microsoft/MK.IO/blob/master/SampleFilterOperations.md)
+- [content key policy and streaming locator operations](https://github.com/microsoft/MK.IO/blob/master/SampleContentKeyPolicyOperations.md)
 
 
 Async operations are also supported. For example :

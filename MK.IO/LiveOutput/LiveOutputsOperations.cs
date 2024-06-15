@@ -3,6 +3,7 @@
 
 using MK.IO.Models;
 using Newtonsoft.Json;
+using System.Net;
 #if NET462
 using System.Net.Http;
 #endif
@@ -149,7 +150,7 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
             Argument.AssertNotNullOrEmpty(liveOutputName, nameof(liveOutputName));
 
-            var url = Client.GenerateApiUrl(_liveOutputApiUrl, liveEventName, liveOutputName);
+            var url = Client.GenerateApiUrl(_liveOutputApiUrl, liveEventName);
             await Client.ObjectContentAsync(url, HttpMethod.Delete, cancellationToken);
         }
     }

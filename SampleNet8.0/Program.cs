@@ -16,7 +16,6 @@ namespace Sample
         {
             await ProgramDemo.SimpleEncodingAndPublishing();
             // await ProgramGenTesting.GeneralTesting();
-            // await ProgramLiveTesting.LiveStreamTesting();
         }
     }
 }

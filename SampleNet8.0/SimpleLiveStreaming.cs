@@ -4,7 +4,6 @@
 using Microsoft.Extensions.Configuration;
 using MK.IO;
 using MK.IO.Models;
-using System.IO;
 
 namespace Sample
 {
@@ -25,8 +24,6 @@ namespace Sample
 
         public static async Task RunAsync()
         {
-            Console.WriteLine("Live testing that operates MK.IO.");
-
             /* you need to add an appsettings.json file with the following content:
              {
                 "MKIOSubscriptionName": "yourMKIOsubscriptionname",
@@ -35,7 +32,7 @@ namespace Sample
              }
             */
 
-            Console.WriteLine("Sample that create a live event and live output with MK.IO and publish the output asset for clear streaming.");
+            Console.WriteLine("Sample that creates a live event and live output with MK.IO and publishes the output asset for clear streaming.");
 
             // Load settings from the appsettings.json file and check them
             IConfigurationRoot config = LoadAndCheckSettings();
@@ -52,40 +49,16 @@ namespace Sample
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
 
             // Create a live event
-            var locationName = await ReturnLocationNameOfSubscriptionAsync(client);
-            var liveEvent = await client.LiveEvents.CreateAsync(liveEventName, locationName, new LiveEventProperties
-            {
-                Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
-                StreamOptions = ["Default"],
-                Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.PassthroughBasic }
-            });
-            Console.WriteLine($"Live Event created: {liveEventName}");
+            _ = await CreateLiveEventAsync(client, liveEventName);
 
             // Create a live output asset
-            var assetLiveOuput = await client.Assets.CreateOrUpdateAsync(outputAssetName, null, config["StorageName"], "live output asset");
+            _ = await client.Assets.CreateOrUpdateAsync(outputAssetName, null, config["StorageName"]!, "live output asset", AssetContainerDeletionPolicyType.Delete);
 
             // Create a live output
-            var liveOutput = await client.LiveOutputs.CreateAsync(liveEvent.Name, liveOutputName, new LiveOutputProperties
-            {
-                ArchiveWindowLength = new TimeSpan(0, 5, 0),
-                AssetName = outputAssetName
-            });
-            Console.WriteLine($"Live Output created: {liveOutputName}");
+            _ = await CreateLiveOutputAsync(client, liveEventName, liveOutputName, outputAssetName);
 
-            Console.WriteLine("Press ENTER to start the live event (billing will start)");
-            Console.ReadLine();
-
-            Console.WriteLine($"Starting the live event: {liveEventName}");
-            await client.LiveEvents.StartAsync(liveEventName, true);
-
-            // Refresh the live event object to get URLs
-            liveEvent = await client.LiveEvents.GetAsync(liveEventName);
-            Console.WriteLine($"Live Event ingest url: {liveEvent.Properties.Input.Endpoints.First().Url}/stream");
-            Console.WriteLine($"Live Event preview url: {liveEvent.Properties.Preview.Endpoints.First().Url}");
-            Console.WriteLine($"Live Event preview test player url: " + string.Format(_bitmovinPlayer, liveEvent.Properties.Preview.Endpoints.First().Protocol.ToString().ToLower(), liveEvent.Properties.Preview.Endpoints.First().Url));
-
-            Console.WriteLine("Please connect your RTMP encoder to the ingest URL, press ENTER when done or to continue)");
-            Console.ReadLine();
+            // start the live event and display urls
+            await StartLiveEventAndDisplayUrlsAsync(client, liveEventName);
 
             // Create a locator for clear streaming
             _ = await CreateStreamingLocatorAsync(client, outputAssetName, locatorName);
@@ -98,6 +71,31 @@ namespace Sample
 
             // Clean up of resources
             await CleanIfUserAcceptsAsync(client, outputAssetName, liveEventName, liveOutputName, createdEndpoint);
+        }
+
+        /// <summary>
+        /// Starts the live event and displays useful urls.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="liveEventName">The live event name.<param>
+        /// <returns></returns>
+        private static async Task StartLiveEventAndDisplayUrlsAsync(MKIOClient client, string liveEventName)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Press ENTER to start the live event (billing will occur)");
+            Console.ReadLine();
+
+            Console.WriteLine($"Starting the live event: '{liveEventName}'.");
+            await client.LiveEvents.StartAsync(liveEventName, true);
+
+            // Refresh the live event object to get URLs
+            var liveEvent = await client.LiveEvents.GetAsync(liveEventName);
+            Console.WriteLine($"Live Event ingest url: {liveEvent.Properties.Input.Endpoints.First().Url}/stream");
+            Console.WriteLine($"Live Event preview url: {liveEvent.Properties.Preview.Endpoints.First().Url}");
+            Console.WriteLine($"Live Event preview test player url: " + string.Format(_bitmovinPlayer, liveEvent.Properties.Preview.Endpoints.First().Protocol.ToString().ToLower(), liveEvent.Properties.Preview.Endpoints.First().Url));
+            Console.WriteLine();
+            Console.WriteLine("Please connect your RTMP encoder to the ingest URL (press ENTER when done or to continue)");
+            Console.ReadLine();
         }
 
         /// <summary>
@@ -125,6 +123,38 @@ namespace Sample
         }
 
         /// <summary>
+        /// Creates a live event.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="liveEventName">The live event name.<param>
+        /// <returns>The live event.</returns>
+        private static async Task<LiveEventSchema> CreateLiveEventAsync(MKIOClient client, string liveEventName)
+        {
+            // Create a live event
+            LiveEventSchema liveEvent;
+           
+            var locationName = await ReturnLocationNameOfSubscriptionAsync(client);
+
+            if (locationName != null)
+            {
+                liveEvent = await client.LiveEvents.CreateAsync(liveEventName, locationName, new LiveEventProperties
+                {
+                    Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
+                    StreamOptions = ["Default"],
+                    Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.PassthroughBasic }
+                });
+                Console.WriteLine($"Live Event '{liveEventName}' created.");
+            }
+            else
+            {
+                Console.WriteLine("Error. No location found. Cannot create the live event.");
+                throw(new Exception("No location found. Cannot create the live event."));
+            }
+
+            return liveEvent;
+        }
+
+        /// <summary>
         /// Returns the location name of the subscription
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
@@ -136,6 +166,26 @@ namespace Sample
             var locationOfSub = locs.FirstOrDefault(l => l.Metadata.Id == sub.Spec.LocationId);
 
             return locationOfSub?.Metadata.Name;
+        }
+
+        /// <summary>
+        /// Creates a live ouput.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="liveOutputName">The live output name.<param>
+        /// <param name="liveOutputName">The live output name.<param>
+        /// <returns>The live output.</returns>
+        private static async Task<LiveOutputSchema> CreateLiveOutputAsync(MKIOClient client, string liveEventName, string liveOutputName, string outputAssetName)
+        {
+            // Create a live output
+            var liveOutput = await client.LiveOutputs.CreateAsync(liveEventName, liveOutputName, new LiveOutputProperties
+            {
+                ArchiveWindowLength = new TimeSpan(0, 5, 0),
+                AssetName = outputAssetName
+            });
+            Console.WriteLine($"Live Output '{liveOutputName}' created.");
+
+            return liveOutput;
         }
 
         /// <summary>
@@ -233,7 +283,6 @@ namespace Sample
                 Console.WriteLine();
             }
         }
-
 
         /// <summary>
         /// Cleans the created resources if user accepts.

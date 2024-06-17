@@ -56,6 +56,8 @@ This sample code does the following :
 
 Run the SampleNet8.10 to execute this sample code.
 
+There is another documented end-to-end sample code for live streaming, in file [SimpleLiveStreaming.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleLiveStreaming.cs).
+
 ### Other examples
 
 Here is an example on how to use the SDK to manage assets and streaming endpoints :

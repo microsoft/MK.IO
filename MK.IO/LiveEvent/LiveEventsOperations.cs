@@ -21,6 +21,7 @@ namespace MK.IO.Operations
         //
         private const string _liveEventsApiUrl = MKIOClient._liveEventsApiUrl;
         private const string _liveEventApiUrl = _liveEventsApiUrl + "/{1}";
+        private const int DelayLiveEventOperations = 5 * 1000; // 5 seconds
 
         /// <summary>
         /// Gets a reference to the AzureMediaServicesClient
@@ -179,30 +180,52 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public void Start(string liveEventName)
+        public void Start(string liveEventName, bool waitUntilCompleted = false)
         {
-            Task.Run(async () => await StartAsync(liveEventName)).GetAwaiter().GetResult();
+            Task.Run(async () => await StartAsync(liveEventName, waitUntilCompleted)).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task StartAsync(string liveEventName, CancellationToken cancellationToken = default)
+        public async Task StartAsync(string liveEventName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
             await LiveEventOperationAsync(liveEventName, "start", HttpMethod.Post, cancellationToken);
+
+            if (waitUntilCompleted)
+            {
+                var liveEvent = await GetAsync(liveEventName);
+                do
+                {
+                    await Task.Delay(DelayLiveEventOperations, cancellationToken);
+                    liveEvent = await GetAsync(liveEventName);
+                }
+                while (liveEvent.Properties.ResourceState == LiveEventResourceState.Starting);
+            }
         }
 
-        public void Stop(string liveEventName)
+        public void Stop(string liveEventName, bool waitUntilCompleted = false)
         {
-            Task.Run(async () => await StopAsync(liveEventName)).GetAwaiter().GetResult();
+            Task.Run(async () => await StopAsync(liveEventName, waitUntilCompleted)).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task StopAsync(string liveEventName, CancellationToken cancellationToken = default)
+        public async Task StopAsync(string liveEventName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
 
             await LiveEventOperationAsync(liveEventName, "stop", HttpMethod.Post, cancellationToken);
+
+            if (waitUntilCompleted)
+            {
+                var liveEvent = await GetAsync(liveEventName);
+                do
+                {
+                    await Task.Delay(DelayLiveEventOperations, cancellationToken);
+                    liveEvent = await GetAsync(liveEventName);
+                }
+                while (liveEvent.Properties.ResourceState == LiveEventResourceState.Stopping);
+            }
         }
 
         /*

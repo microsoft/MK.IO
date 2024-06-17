@@ -20,13 +20,13 @@ namespace Sample
     /// - list the streaming urls and test player urls.
     /// - clean the created resources if the user accepts
     /// </summary>
-    public class ProgramDemo
+    public class SimpleEncodingAndPublishing
     {
         private const string _transformName = "CVQ720pTransform";
         private const string _inputMP4FileName = @"Ignite.mp4";
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
-        public static async Task SimpleEncodingAndPublishing()
+        public static async Task RunAsync()
         {
             /* you need to add an appsettings.json file with the following content:
            {
@@ -83,8 +83,7 @@ namespace Sample
                 // Display streaming paths and test player urls
                 await ListStreamingUrlsAsync(client, locatorName);
 
-                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName, locatorName, createdEndpoint);
-                Console.WriteLine("Press Enter to close the app.");
+                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName, createdEndpoint);
             }
         }
 
@@ -283,15 +282,12 @@ namespace Sample
                 var response = Console.ReadLine();
                 if (response == "Y" || response == "y")
                 {
-                    var sub = await client.Account.GetSubscriptionAsync();
-                    var locs = await client.Account.ListAllLocationsAsync();
-                    var locationToUse = locs.FirstOrDefault(l => l.Metadata.Id == sub.Spec.LocationId);
-
+                    var locationToUse = await ReturnLocationNameOfSubscriptionAsync(client);
                     if (locationToUse != null)
                     {
                         var streamingEndpoint = await client.StreamingEndpoints.CreateAsync(
                            MKIOClient.GenerateUniqueName("endpoint"),
-                           locationToUse.Metadata.Name,
+                           locationToUse,
                            new StreamingEndpointProperties
                            {
                                Description = "Streaming endpoint created by sample"
@@ -310,6 +306,21 @@ namespace Sample
             }
             return createdStreamingEndpointName;
         }
+
+        /// <summary>
+        /// Returns the location name of the subscription
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <returns>The name of the location, otherwise null.</returns>
+        private static async Task<string?> ReturnLocationNameOfSubscriptionAsync(MKIOClient client)
+        {
+            var sub = await client.Account.GetSubscriptionAsync();
+            var locs = await client.Account.ListAllLocationsAsync();
+            var locationOfSub = locs.FirstOrDefault(l => l.Metadata.Id == sub.Spec.LocationId);
+
+            return locationOfSub?.Metadata.Name;
+        }
+
 
         /// <summary>
         /// Lists the streaming Urls for a specified locator name.
@@ -371,12 +382,18 @@ namespace Sample
         /// <param name="outputAssetName"></param>
         /// <param name="transformName"></param>
         /// <param name="jobName"></param>
-        /// <param name="locatorName"></param>
+        /// <param name="streamingEndpoint"></param>
         /// <returns></returns>
-        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string? locatorName = null, string? streamingEndpoint = null)
+        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string? streamingEndpoint = null)
         {
-            Console.WriteLine("Do you want to clean the created resources (assets, job, etc) ? (Y/N)");
-            var response = Console.ReadLine();
+            string? response = null;
+            do
+            {
+                Console.WriteLine("Do you want to clean the created resources ((assets, job, etc) ? (y/n)");
+                response = Console.ReadLine();
+
+            } while (response != "Y" && response != "N" && response != "y" && response != "n");
+
             if (response == "Y" || response == "y")
             {
                 try
@@ -415,15 +432,6 @@ namespace Sample
                     Console.WriteLine($"Error deleting transform '{transformName}'. Error: {ex.Message}");
                 }
 
-                if (locatorName != null)
-                    try
-                    {
-                        await client.StreamingLocators.DeleteAsync(locatorName);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error deleting locator '{locatorName}'. Error: {ex.Message}");
-                    }
                 if (streamingEndpoint != null)
                     try
                     {

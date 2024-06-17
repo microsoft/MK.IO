@@ -1,11 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Extensions.Configuration;
-using MK.IO;
-using MK.IO.Models;
-using System.Security.Cryptography;
-
 namespace Sample
 {
     public class Program

@@ -3,10 +3,8 @@
 
 using MK.IO.Models;
 using Newtonsoft.Json;
-using System.Net;
 #if NET462
 using System.Net.Http;
-using System.Threading;
 #endif
 
 namespace MK.IO.Operations
@@ -243,7 +241,7 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
 
             await StreamingEndpointOperationAsync(streamingEndpointName, "start", HttpMethod.Post, cancellationToken);
-            
+
             if (waitUntilCompleted)
             {
                 var streamingEndpoint = await GetAsync(streamingEndpointName);

@@ -132,7 +132,7 @@ namespace Sample
         {
             // Create a live event
             LiveEventSchema liveEvent;
-           
+
             var locationName = await ReturnLocationNameOfSubscriptionAsync(client);
 
             if (locationName != null)
@@ -148,7 +148,7 @@ namespace Sample
             else
             {
                 Console.WriteLine("Error. No location found. Cannot create the live event.");
-                throw(new Exception("No location found. Cannot create the live event."));
+                throw (new Exception("No location found. Cannot create the live event."));
             }
 
             return liveEvent;

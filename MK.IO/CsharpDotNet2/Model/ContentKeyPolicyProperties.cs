@@ -33,15 +33,14 @@ namespace MK.IO.Models
         /// A description for the Policy.
         /// </summary>
         /// <value>A description for the Policy.</value>
-        [JsonInclude] 
+        [JsonInclude]
         public string Description { get; set; }
 
         /// <summary>
         /// FairPlay AMS compatibility enabled.
         /// </summary>
         /// <value>FairPlay AMS compatibility enabled.</value>
-        [DataMember(Name = "fairPlayAmsCompatibility", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "fairPlayAmsCompatibility")]
+        [JsonInclude]
         public bool? FairPlayAmsCompatibility { get; set; }
 
         /// <summary>

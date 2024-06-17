@@ -1,8 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MK.IO.Models
 {
@@ -14,10 +15,9 @@ namespace MK.IO.Models
             PresetName = presetName;
         }
 
-        [JsonProperty("@odata.type")]
-        internal override string OdataType => "#Microsoft.Media.BuiltInAssetConverterPreset";
+        [JsonPropertyName("@odata.type")]
+        internal override string OdataType => "#Microsoft.Media.BuiltInStandardEncoderPreset";
 
-        [JsonProperty("presetName")]
         public ConverterNamedPreset PresetName { get; set; }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace MK.IO.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
     }
 }

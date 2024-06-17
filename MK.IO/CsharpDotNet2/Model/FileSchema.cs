@@ -25,7 +25,7 @@ namespace MK.IO.Models
         /// <summary>
         /// Gets or Sets Size
         /// </summary>
-        public int? Size { get; set; }
+        public ulong? Size { get; set; }
 
 
         /// <summary>

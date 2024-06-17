@@ -170,28 +170,32 @@ namespace MK.IO.Operations
         /// Start a Live Event. This operation transitions your Live Event into a running state
         /// </summary>
         /// <param name="liveEventName">The name of the live event.</param>
-        void Start(string liveEventName);
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
+        void Start(string liveEventName, bool waitUntilCompleted = false);
 
         /// <summary>
         /// Start a Live Event. This operation transitions your Live Event into a running state
         /// </summary>
         /// <param name="liveEventName">The name of the live event.</param>
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task StartAsync(string liveEventName, CancellationToken cancellationToken = default);
+        Task StartAsync(string liveEventName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Stops a Live Event. Any active playback sessions will be interrupted.
         /// </summary>
         /// <param name="liveEventName">The name of the live event.</param>
-        void Stop(string liveEventName);
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
+        void Stop(string liveEventName, bool waitUntilCompleted = false);
 
         /// <summary>
         /// Stops a Live Event. Any active playback sessions will be interrupted.
         /// </summary>
         /// <param name="liveEventName">The name of the live event.</param>
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task StopAsync(string liveEventName, CancellationToken cancellationToken = default);
+        Task StopAsync(string liveEventName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default);
     }
 }

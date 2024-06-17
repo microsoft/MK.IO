@@ -7,7 +7,6 @@ using System.Net;
 using System.Text.Json;
 #if NET462
 using System.Net.Http;
-using System.Threading;
 #endif
 
 namespace MK.IO.Operations
@@ -24,6 +23,7 @@ namespace MK.IO.Operations
         //
         private const string _streamingEndpointsApiUrl = MKIOClient._streamingEndpointsApiUrl;
         private const string _streamingEndpointApiUrl = _streamingEndpointsApiUrl + "/{1}";
+        private const int DelayStreamingEndpointOperations = 5 * 1000; // 5 seconds
 
         /// <summary>
         /// Gets a reference to the AzureMediaServicesClient
@@ -153,12 +153,23 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotContainsSpace(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotMoreThanLength(streamingEndpointName, nameof(streamingEndpointName), 24);
-            Argument.AssertRespectRegex(streamingEndpointName, nameof(streamingEndpointName), @"^[a-zA-Z0-9]+$");
+            Argument.AssertRespectRegex(streamingEndpointName, nameof(streamingEndpointName), @"^[a-zA-Z0-9-]+$");
             Argument.AssertNotNullOrEmpty(location, nameof(location));
             Argument.AssertNotNull(properties, nameof(properties));
 
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl + "?autoStart=" + autoStart.ToString(), streamingEndpointName);
             tags ??= new Dictionary<string, string>();
+
+            if (properties.Sku == null)
+            {
+                properties.Sku = new StreamingEndpointsCurrentSku();
+            }
+
+            if (properties.ScaleUnits == null)
+            {
+                properties.ScaleUnits = (properties.Sku.Name == StreamingEndpointSkuType.Premium ? 1 : 0);
+            }
+
             var content = new StreamingEndpointSchema
             {
                 Location = location,
@@ -170,46 +181,79 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public void Scale(string streamingEndpointName, int scaleUnit)
+        public void Scale(string streamingEndpointName, int scaleUnit, bool waitUntilCompleted = false)
         {
-            Task.Run(async () => await ScaleAsync(streamingEndpointName, scaleUnit)).GetAwaiter().GetResult();
+            Task.Run(async () => await ScaleAsync(streamingEndpointName, scaleUnit, waitUntilCompleted)).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task ScaleAsync(string streamingEndpointName, int scaleUnit, CancellationToken cancellationToken = default)
+        public async Task ScaleAsync(string streamingEndpointName, int scaleUnit, bool waitUntilCompleted = false, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl + "/scale", streamingEndpointName);
             var content = new StreamingEndpointScaleSchema { ScaleUnit = scaleUnit };
             await Client.CreateObjectPostAsync(url, JsonSerializer.Serialize(content, ConverterLE.Settings), cancellationToken);
+
+            if (waitUntilCompleted)
+            {
+                var streamingEndpoint = await GetAsync(streamingEndpointName);
+                do
+                {
+                    await Task.Delay(DelayStreamingEndpointOperations, cancellationToken);
+                    streamingEndpoint = await GetAsync(streamingEndpointName);
+                }
+                while (streamingEndpoint.Properties.ResourceState == StreamingEndpointResourceState.Scaling);
+            }
         }
 
         /// <inheritdoc/>
-        public void Stop(string streamingEndpointName)
+        public void Stop(string streamingEndpointName, bool waitUntilCompleted = false)
         {
-            Task.Run(async () => await StopAsync(streamingEndpointName)).GetAwaiter().GetResult();
+            Task.Run(async () => await StopAsync(streamingEndpointName, waitUntilCompleted)).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task StopAsync(string streamingEndpointName, CancellationToken cancellationToken = default)
+        public async Task StopAsync(string streamingEndpointName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
 
             await StreamingEndpointOperationAsync(streamingEndpointName, "stop", HttpMethod.Post, cancellationToken);
+
+            if (waitUntilCompleted)
+            {
+                var streamingEndpoint = await GetAsync(streamingEndpointName);
+                do
+                {
+                    await Task.Delay(DelayStreamingEndpointOperations, cancellationToken);
+                    streamingEndpoint = await GetAsync(streamingEndpointName);
+                }
+                while (streamingEndpoint.Properties.ResourceState == StreamingEndpointResourceState.Stopping);
+            }
         }
 
         /// <inheritdoc/>
-        public void Start(string streamingEndpointName)
+        public void Start(string streamingEndpointName, bool waitUntilCompleted = false)
         {
-            Task.Run(async () => await StartAsync(streamingEndpointName)).GetAwaiter().GetResult();
+            Task.Run(async () => await StartAsync(streamingEndpointName, waitUntilCompleted)).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task StartAsync(string streamingEndpointName, CancellationToken cancellationToken = default)
+        public async Task StartAsync(string streamingEndpointName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
 
             await StreamingEndpointOperationAsync(streamingEndpointName, "start", HttpMethod.Post, cancellationToken);
+
+            if (waitUntilCompleted)
+            {
+                var streamingEndpoint = await GetAsync(streamingEndpointName);
+                do
+                {
+                    await Task.Delay(DelayStreamingEndpointOperations, cancellationToken);
+                    streamingEndpoint = await GetAsync(streamingEndpointName);
+                }
+                while (streamingEndpoint.Properties.ResourceState == StreamingEndpointResourceState.Starting);
+            }
         }
 
         /// <inheritdoc/>

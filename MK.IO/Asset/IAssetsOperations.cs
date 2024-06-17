@@ -113,7 +113,7 @@ namespace MK.IO.Operations
         /// <param name="containerDeletionPolicy">Deletion policy for the underlying storage container. This determines the behavior when an asset record is deleted. A deletion policy of 'Delete' will result in the associated storage container and all its contents being removed from storage. A deletion policy of 'Retain' will leave the content in-place in your storage account.</param>
         /// <param name="alternateId">An alternate ID of the asset.</param>
         /// <returns></returns>
-        AssetSchema CreateOrUpdate(string assetName, string containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null);
+        AssetSchema CreateOrUpdate(string assetName, string? containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null);
 
         /// <summary>
         /// <para>Create or Update Asset.</para>
@@ -128,7 +128,7 @@ namespace MK.IO.Operations
         /// <param name="alternateId">An alternate ID of the asset.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<AssetSchema> CreateOrUpdateAsync(string assetName, string containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null, CancellationToken cancellationToken = default);
+        Task<AssetSchema> CreateOrUpdateAsync(string assetName, string? containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// List Streaming Locators for Asset. This API call is a convenience method to retrieve

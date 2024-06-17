@@ -1,6 +1,6 @@
-# A .NET client library for MediaKind MK.IO
+# A .NET client SDK for MediaKind MK.IO
 
-This project is an open source client .NET library for [MediaKind MK.IO](https://mk.io).
+This project is an open source .NET SDK for [MediaKind MK.IO](https://mk.io). For maximum compatibility, it targets .NET 9.0, .NET Standard 2.0 and .NET Framework 4.6.2. 
 
 [Link to MK.IO Nuget package](https://www.nuget.org/packages/MK.IO).
 
@@ -20,7 +20,7 @@ This should provide you with your user_id and token. Note that this token is val
 Another way to get the token is to use [Fiddler](https://www.telerik.com/fiddler) when you connect to the MK.IO portal with your browser.
 It is displayed in the header as `x-mkio-token`. For example, you should see it on the second REST call to https://api.mk.io/api/ams/mkiosubscriptionname/stats/.
 
-For more information, please read this [article](https://support.mediakind.com/portal/en/kb/articles/how-to-use-mkio-apis-step-by-step).
+For more information, please read this [article](https://support.mk.io/portal/en/kb/articles/how-to-use-mkio-apis-step-by-step).
 
 ### Supported operations
 
@@ -31,7 +31,7 @@ In the current version, operations are supported for :
 - Streaming locators
 - Storage accounts
 - Content key policies
-- Transforms, including with CVQ presets
+- Transforms, including with CVQ presets and converter presets
 - Jobs
 - Live events
 - Live outputs
@@ -39,7 +39,28 @@ In the current version, operations are supported for :
 - Account filters
 - Streaming policies
 
-### Sample code
+### End-to-end sample code
+
+There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleEncodingAndPublishing.cs).
+
+This sample code does the following :
+
+- upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
+- create the output asset
+- create/update a transform with MK.IO
+- submit a encoding job with MK.IO anbd wait for its completion
+- create a locator with MK.IO
+- create a streaming endpoint with MK.IO if there is none
+- list the streaming urls and test player urls
+- clean the resources
+
+Run the SampleNet8.10 to execute this sample code.
+
+There is another documented end-to-end sample code for live streaming, in file [SimpleLiveStreaming.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleLiveStreaming.cs).
+
+### Other examples
+
+Here is an example on how to use the SDK to manage assets and streaming endpoints :
 
 ```csharp
 using MK.IO;
@@ -77,15 +98,15 @@ while (true)
 // get asset
 var mkasset = client.Assets.Get("myassetname");
 
-// create asset
+// create a first asset, letting MK.IO generates a container name
 var newAssetName = MKIOClient.GenerateUniqueName("asset");
-var newasset = client.Assets.CreateOrUpdate(newAssetName, newAssetName, "storagename", "description of my asset");
+var newasset = client.Assets.CreateOrUpdate(newAssetName, null, "storagename", "description of my asset");
 
-// create asset and use labels to tag it
-newAssetName = MKIOClient.GenerateUniqueName("asset");
-newasset = client.Assets.CreateOrUpdate(
+// create another asset and use labels to tag it. Container name will be the nae of the asset
+var newAssetName2 = MKIOClient.GenerateUniqueName("asset");
+var newasset2 = client.Assets.CreateOrUpdate(
     newAssetName,
-    newAssetName,
+    newAssetName, // container name
     "storagename",
     "description of asset using labels",
     AssetContainerDeletionPolicyType.Retain,
@@ -96,14 +117,14 @@ newasset = client.Assets.CreateOrUpdate(
 // list assets using labels filtering
 var sourceEncodedAssets = client.Assets.List(label: new List<string> { "typeAsset=source" });
 
-// delete asset
+// delete created asset
 client.Assets.Delete(newsasset.Name);
 
 // get streaming locators for asset
-var locatorsAsset = client.Assets.ListStreamingLocators("copy-1b510ee166");
+var locatorsAsset = client.Assets.ListStreamingLocators("asset-1b510ee166");
 
 // Get tracks and directory of an asset
-var tracksAndDir = client.Assets.ListTracksAndDirListing("copy-ef2058b692");
+var tracksAndDir = client.Assets.ListTracksAndDirListing("asset-ef2058b692");
 
 
 // ******************************
@@ -129,18 +150,18 @@ var newSe = client.StreamingEndpoints.Create("streamingendpoint2", "francecentra
             });
 
 // start, stop, delete streaming endpoint
-client.StreamingEndpoints.Start("streamingendpoint1");
-client.StreamingEndpoints.Stop("streamingendpoint1");
+client.StreamingEndpoints.Start("streamingendpoint1", true);
+client.StreamingEndpoints.Stop("streamingendpoint1", true);
 client.StreamingEndpoints.Delete("streamingendpoint1");
 ```
 
 Additional samples are available :
 
-- [live operations](https://github.com/xpouyat/MK.IO/blob/master/SampleLiveOperations.md) 
-- [storage operations](https://github.com/xpouyat/MK.IO/blob/master/SampleStorageOperations.md)
-- [transform and job operations](https://github.com/xpouyat/MK.IO/blob/master/SampleTransformAndJobOperations.md)
-- [account filter and asset filter operations](https://github.com/xpouyat/MK.IO/blob/master/SampleFilterOperations.md)
-- [content key policy and streaming locator operations](https://github.com/xpouyat/MK.IO/blob/master/SampleContentKeyPolicyOperations.md)
+- [live operations](https://github.com/microsoft/MK.IO/blob/main/SampleLiveOperations.md) 
+- [storage operations](https://github.com/microsoft/MK.IO/blob/main/SampleStorageOperations.md)
+- [transform and job operations](https://github.com/microsoft/MK.IO/blob/main/SampleTransformAndJobOperations.md)
+- [account filter and asset filter operations](https://github.com/microsoft/MK.IO/blob/main/SampleFilterOperations.md)
+- [content key policy and streaming locator operations](https://github.com/microsoft/MK.IO/blob/main/SampleContentKeyPolicyOperations.md)
 
 
 Async operations are also supported. For example :
@@ -185,34 +206,11 @@ var newSe = await client.StreamingEndpoints.CreateAsync("streamingendpoint2", "f
             });
 
 // start, stop, delete streaming endpoint
-await client.StreamingEndpoints.StartAsync("streamingendpoint1");
-await client.StreamingEndpoints.StopAsync("streamingendpoint1");
+await client.StreamingEndpoints.StartAsync("streamingendpoint1", true);
+await client.StreamingEndpoints.StopAsync("streamingendpoint1", true);
 await client.StreamingEndpoints.DeleteAsync("streamingendpoint2");
 
 ```
-
-## Contributing
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-## Trademarks
-
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
-
 
 ## Contributing
 

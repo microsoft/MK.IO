@@ -8,6 +8,7 @@ namespace MK.IO.Models
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "@odata.type")]
     [JsonDerivedType(typeof(BuiltInStandardEncoderPreset), typeDiscriminator: "#Microsoft.Media.BuiltInStandardEncoderPreset")]
     [JsonDerivedType(typeof(AudioAnalyzerPreset), typeDiscriminator: "#Microsoft.Media.AudioAnalyzerPreset")]
+    [JsonDerivedType(typeof(BuiltInAssetConverterPreset), typeDiscriminator: "#Microsoft.Media.BuiltInAssetConverterPreset")]
 
     //
     // Summary:

@@ -2,10 +2,6 @@
 
 name: publish
 on:
-  workflow_dispatch: # Allow running the workflow manually from the GitHub UI
-  push:
-    branches:
-      - 'main'       # Run the workflow when pushing to the main branch
   release:
     types:
       - published    # Run the workflow when a new GitHub release is published
@@ -33,7 +29,7 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.x'
-      
+
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
     - run: dotnet build MK.IO\MK.IO.csproj --configuration Release
 
@@ -57,10 +53,12 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v3
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.x'
+
     - name: Run tests
       run: dotnet test --configuration Release
 
@@ -68,7 +66,7 @@ jobs:
     # Publish only when creating a GitHub Release
     # https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
     # You can update this logic if you want to manage releases differently
-    if: github.event_name == 'release'
+    if: github.ref == 'refs/heads/main'
     runs-on: windows-latest
     needs: [ create_nuget, run_test ]
     steps:

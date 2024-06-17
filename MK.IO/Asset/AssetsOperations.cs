@@ -113,19 +113,17 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public AssetSchema CreateOrUpdate(string assetName, string containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null)
+        public AssetSchema CreateOrUpdate(string assetName, string? containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null)
         {
             Task<AssetSchema> task = Task.Run(async () => await CreateOrUpdateAsync(assetName, containerName, storageName, description, containerDeletionPolicy, alternateId, labels));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<AssetSchema> CreateOrUpdateAsync(string assetName, string containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null, CancellationToken cancellationToken = default)
+        public async Task<AssetSchema> CreateOrUpdateAsync(string assetName, string? containerName, string storageName, string? description = null, AssetContainerDeletionPolicyType containerDeletionPolicy = AssetContainerDeletionPolicyType.Retain, string? alternateId = null, Dictionary<string, string>? labels = null, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(assetName, nameof(assetName));
-            Argument.AssertNotContainsSpace(assetName, nameof(assetName));
             Argument.AssertNotMoreThanLength(assetName, nameof(assetName), 260);
-            Argument.AssertNotNullOrEmpty(containerName, nameof(containerName));
             Argument.AssertNotMoreThanLength(containerName, nameof(containerName), 63);
             Argument.AssertRespectRegex(containerName, nameof(containerName), @"^(?=.{3,63}$)[a-z0-9]+(-[a-z0-9]+)*$");
             Argument.AssertNotNullOrEmpty(storageName, nameof(storageName));
@@ -136,7 +134,7 @@ namespace MK.IO.Operations
                 Labels = labels!,
                 Properties = new AssetProperties
                 {
-                    Container = containerName,
+                    Container = containerName!,
                     Description = description!,
                     StorageAccountName = storageName,
                     ContainerDeletionPolicy = containerDeletionPolicy,

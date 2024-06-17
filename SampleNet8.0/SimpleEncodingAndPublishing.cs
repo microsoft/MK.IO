@@ -386,8 +386,14 @@ namespace Sample
         /// <returns></returns>
         private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string? streamingEndpoint = null)
         {
-            Console.WriteLine("Do you want to clean the created resources (assets, job, etc) ? (Y/N)");
-            var response = Console.ReadLine();
+            string? response = null;
+            do
+            {
+                Console.WriteLine("Do you want to clean the created resources ((assets, job, etc) ? (y/n)");
+                response = Console.ReadLine();
+
+            } while (response != "Y" && response != "N" && response != "y" && response != "n");
+
             if (response == "Y" || response == "y")
             {
                 try

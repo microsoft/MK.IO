@@ -31,7 +31,7 @@ In the current version, operations are supported for :
 - Streaming locators
 - Storage accounts
 - Content key policies
-- Transforms, including with CVQ presets
+- Transforms, including with CVQ presets and converter presets
 - Jobs
 - Live events
 - Live outputs
@@ -150,8 +150,8 @@ var newSe = client.StreamingEndpoints.Create("streamingendpoint2", "francecentra
             });
 
 // start, stop, delete streaming endpoint
-client.StreamingEndpoints.Start("streamingendpoint1");
-client.StreamingEndpoints.Stop("streamingendpoint1");
+client.StreamingEndpoints.Start("streamingendpoint1", true);
+client.StreamingEndpoints.Stop("streamingendpoint1", true);
 client.StreamingEndpoints.Delete("streamingendpoint1");
 ```
 

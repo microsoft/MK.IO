@@ -14,8 +14,10 @@ namespace Sample
 
         static async Task MainAsync()
         {
-            await ProgramDemo.SimpleEncodingAndPublishing();
+            //await ProgramDemo.SimpleEncodingAndPublishing();
             // await ProgramGenTesting.GeneralTesting();
+            await ProgramLiveTesting.LiveStreamTesting();
         }
     }
 }
+

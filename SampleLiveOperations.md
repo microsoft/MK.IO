@@ -20,7 +20,7 @@ var list_le = client.LiveEvents.List();
 var liveEvent = client.LiveEvents.Create(MKIOClient.GenerateUniqueName("liveevent"), "francecentral", new LiveEventProperties
 {
     Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
-    StreamOptions = new List<string> { "Default" },
+    StreamOptions = ["Default"],
     Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.PassthroughBasic }
 });
 

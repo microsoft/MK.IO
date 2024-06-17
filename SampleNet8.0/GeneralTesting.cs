@@ -8,9 +8,9 @@ using System.Security.Cryptography;
 
 namespace Sample
 {
-    public class ProgramGenTesting
+    public class GeneralTesting
     {
-        public static async Task GeneralTesting()
+        public static async Task RunAsync()
         {
             Console.WriteLine("General testing that operates MK.IO.");
             

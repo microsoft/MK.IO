@@ -41,7 +41,7 @@ In the current version, operations are supported for :
 
 ### End-to-end sample code
 
-There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](/SampleNet8.0/SimpleEncodingAndPublishing.cs).
+There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleEncodingAndPublishing.cs).
 
 This sample code does the following :
 
@@ -155,11 +155,11 @@ client.StreamingEndpoints.Delete("streamingendpoint1");
 
 Additional samples are available :
 
-- [live operations](https://github.com/microsoft/MK.IO/blob/master/SampleLiveOperations.md) 
-- [storage operations](https://github.com/microsoft/MK.IO/blob/master/SampleStorageOperations.md)
-- [transform and job operations](https://github.com/microsoft/MK.IO/blob/master/SampleTransformAndJobOperations.md)
-- [account filter and asset filter operations](https://github.com/microsoft/MK.IO/blob/master/SampleFilterOperations.md)
-- [content key policy and streaming locator operations](https://github.com/microsoft/MK.IO/blob/master/SampleContentKeyPolicyOperations.md)
+- [live operations](https://github.com/microsoft/MK.IO/blob/main/SampleLiveOperations.md) 
+- [storage operations](https://github.com/microsoft/MK.IO/blob/main/SampleStorageOperations.md)
+- [transform and job operations](https://github.com/microsoft/MK.IO/blob/main/SampleTransformAndJobOperations.md)
+- [account filter and asset filter operations](https://github.com/microsoft/MK.IO/blob/main/SampleFilterOperations.md)
+- [content key policy and streaming locator operations](https://github.com/microsoft/MK.IO/blob/main/SampleContentKeyPolicyOperations.md)
 
 
 Async operations are also supported. For example :
@@ -204,8 +204,8 @@ var newSe = await client.StreamingEndpoints.CreateAsync("streamingendpoint2", "f
             });
 
 // start, stop, delete streaming endpoint
-await client.StreamingEndpoints.StartAsync("streamingendpoint1");
-await client.StreamingEndpoints.StopAsync("streamingendpoint1");
+await client.StreamingEndpoints.StartAsync("streamingendpoint1", true);
+await client.StreamingEndpoints.StopAsync("streamingendpoint1", true);
 await client.StreamingEndpoints.DeleteAsync("streamingendpoint2");
 
 ```

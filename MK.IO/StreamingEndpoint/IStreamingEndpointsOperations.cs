@@ -142,45 +142,51 @@ namespace MK.IO.Operations
         /// </summary>
         /// <param name="streamingEndpointName">The name of the Streaming Endpoint.</param>
         /// <param name="scaleUnit">The scale unit count for this Streaming Endpoint.</param>
-        void Scale(string streamingEndpointName, int scaleUnit);
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
+        void Scale(string streamingEndpointName, int scaleUnit, bool waitUntilCompleted = false);
 
         /// <summary>
         /// Changes the scale of the Streaming Endpoint.
         /// </summary>
         /// <param name="streamingEndpointName">The name of the Streaming Endpoint.</param>
         /// <param name="scaleUnit">The scale unit count for this Streaming Endpoint.</param>
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task ScaleAsync(string streamingEndpointName, int scaleUnit, CancellationToken cancellationToken = default);
+        Task ScaleAsync(string streamingEndpointName, int scaleUnit, bool waitUntilCompleted = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Start a Streaming Endpoint.
         /// This operation transitions your Streaming Endpoint into a running state.
         /// </summary>
         /// <param name="streamingEndpointName">The name of the Streaming Endpoint.</param>
-        void Start(string streamingEndpointName);
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
+        void Start(string streamingEndpointName, bool waitUntilCompleted = false);
 
         /// <summary>
         /// Start a Streaming Endpoint.
         /// This operation transitions your Streaming Endpoint into a running state.
         /// </summary>
         /// <param name="streamingEndpointName">The name of the Streaming Endpoint.</param>
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task StartAsync(string streamingEndpointName, CancellationToken cancellationToken = default);
+        Task StartAsync(string streamingEndpointName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Stop a Streaming Endpoint. Any active playback sessions will be interrupted.
         /// </summary>
         /// <param name="streamingEndpointName">The name of the Streaming Endpoint.</param>
-        void Stop(string streamingEndpointName);
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
+        void Stop(string streamingEndpointName, bool waitUntilCompleted = false);
 
         /// <summary>
         /// Stop a Streaming Endpoint. Any active playback sessions will be interrupted.
         /// </summary>
         /// <param name="streamingEndpointName">The name of the Streaming Endpoint.</param>
+        /// <param name="waitUntilCompleted">Wait until the operation is completed.</param>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task StopAsync(string streamingEndpointName, CancellationToken cancellationToken = default);
+        Task StopAsync(string streamingEndpointName, bool waitUntilCompleted = false, CancellationToken cancellationToken = default);
     }
 }

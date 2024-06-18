@@ -188,13 +188,14 @@ namespace MK.IO.Operations
             Argument.AssertNotContainsSpace(jobName, nameof(jobName));
             Argument.AssertNotMoreThanLength(jobName, nameof(jobName), 63);
             // Job name must start and end with a letter or number and can only contain the following special characters: [-_.]
-            Argument.AssertRespectRegex(jobName, nameof(jobName), @"^[a-zA-Z0-9]([-_.]?[a-zA-Z0-9])*[a-zA-Z0-9]$", @"Job name must start and end with a letter or number and can only contain the following special characters: [-_.]");
+            Argument.AssertRespectRegex(jobName, nameof(jobName), @"^[a-zA-Z0-9]([-_.]*[a-zA-Z0-9])*[a-zA-Z0-9]$", @"Job name must start and end with a letter or number and can only contain the following special characters: [-_.]");
             Argument.AssertNotNull(properties, nameof(properties));
 
             return await CreateOrUpdateAsync(transformName, jobName, properties, Client.CreateObjectPutAsync, cancellationToken);
         }
 
-        internal async Task<JobSchema> CreateOrUpdateAsync(string transformName, string jobName, JobProperties properties, Func<string, string, CancellationToken, Task<string>> func, CancellationToken cancellationToken)
+     
+        internal virtual async Task<JobSchema> CreateOrUpdateAsync(string transformName, string jobName, JobProperties properties, Func<string, string, CancellationToken, Task<string>> func, CancellationToken cancellationToken)
         {
             var url = Client.GenerateApiUrl(_jobApiUrl, transformName, jobName);
             // fix to make sure Odattype is set as we use the generated class

@@ -164,7 +164,7 @@ namespace MK.IO
             return responseContent;
         }
 
-        internal async Task<string> CreateObjectPutAsync(string url, string amsJSONObject, CancellationToken cancellationToken)
+        internal virtual async Task<string> CreateObjectPutAsync(string url, string amsJSONObject, CancellationToken cancellationToken)
         {
             return await CreateObjectInternalAsync(url, amsJSONObject, HttpMethod.Put, cancellationToken);
         }

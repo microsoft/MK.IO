@@ -383,3 +383,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/SampleNet9.0/appsettings.json

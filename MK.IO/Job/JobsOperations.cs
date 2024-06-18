@@ -191,12 +191,6 @@ namespace MK.IO.Operations
             Argument.AssertRespectRegex(jobName, nameof(jobName), @"^[a-zA-Z0-9]([-_.]*[a-zA-Z0-9])*[a-zA-Z0-9]$", @"Job name must start and end with a letter or number and can only contain the following special characters: [-_.]");
             Argument.AssertNotNull(properties, nameof(properties));
 
-            return await CreateOrUpdateAsync(transformName, jobName, properties, Client.CreateObjectPutAsync, cancellationToken);
-        }
-
-     
-        internal virtual async Task<JobSchema> CreateOrUpdateAsync(string transformName, string jobName, JobProperties properties, Func<string, string, CancellationToken, Task<string>> func, CancellationToken cancellationToken)
-        {
             var url = Client.GenerateApiUrl(_jobApiUrl, transformName, jobName);
             // fix to make sure Odattype is set as we use the generated class
             foreach (var o in properties.Outputs)
@@ -205,7 +199,7 @@ namespace MK.IO.Operations
             }
             var content = new JobSchema { Properties = properties };
 
-            string responseContent = await func(url, content.ToJson(), cancellationToken);
+            string responseContent = await Client.CreateObjectPutAsync(url, content.ToJson(), cancellationToken);
             return JsonConvert.DeserializeObject<JobSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with job deserialization");
         }
 
@@ -226,7 +220,16 @@ namespace MK.IO.Operations
             Argument.AssertNotMoreThanLength(jobName, nameof(jobName), 63);
             Argument.AssertNotNull(properties, nameof(properties));
 
-            return await CreateOrUpdateAsync(transformName, jobName, properties, Client.UpdateObjectPatchAsync, cancellationToken);
+              var url = Client.GenerateApiUrl(_jobApiUrl, transformName, jobName);
+            // fix to make sure Odattype is set as we use the generated class
+            foreach (var o in properties.Outputs)
+            {
+                o.OdataType = "#Microsoft.Media.JobOutputAsset";
+            }
+            var content = new JobSchema { Properties = properties };
+
+            string responseContent = await Client.UpdateObjectPatchAsync(url, content.ToJson(), cancellationToken);
+            return JsonConvert.DeserializeObject<JobSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with job deserialization");
         }
 #endif
 

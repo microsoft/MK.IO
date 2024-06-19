@@ -370,6 +370,7 @@ FodyWeavers.xsd
 /SampleNetFramework4.8/appsettings.json
 /SampleCore3.1/appsettings.json
 /SampleNet8.0/appsettings.json
+/SampleNet9.0/appsettings.json
 
 # Local History for Visual Studio Code
 .history/

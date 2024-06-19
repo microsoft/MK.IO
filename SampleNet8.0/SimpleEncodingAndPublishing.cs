@@ -32,6 +32,7 @@ namespace Sample
            {
               "MKIOSubscriptionName": "yourMKIOsubscriptionname",
               "MKIOToken": "yourMKIOtoken",
+              "StorageName": "yourStorageAccountName",
               "TenantId" : "your Azure tenant ID " // optional
            }
           */
@@ -389,7 +390,7 @@ namespace Sample
             string? response = null;
             do
             {
-                Console.WriteLine("Do you want to clean the created resources ((assets, job, etc) ? (y/n)");
+                Console.WriteLine("Do you want to clean the created resources (assets, job, etc) ? (y/n)");
                 response = Console.ReadLine();
 
             } while (response != "Y" && response != "N" && response != "y" && response != "n");

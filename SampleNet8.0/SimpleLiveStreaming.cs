@@ -116,12 +116,11 @@ namespace Sample
         {
             // Create a live event
             LiveEventSchema liveEvent;
-
-            var locationName = await ReturnLocationNameOfSubscriptionAsync(client);
+            var locationName = await client.Account.GetSubscriptionLocationAsync();
 
             if (locationName != null)
             {
-                liveEvent = await client.LiveEvents.CreateAsync(liveEventName, locationName, new LiveEventProperties
+                liveEvent = await client.LiveEvents.CreateAsync(liveEventName, locationName.Name, new LiveEventProperties
                 {
                     Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
                     StreamOptions = ["Default"],
@@ -231,12 +230,12 @@ namespace Sample
 
                 if (response == "Y" || response == "y")
                 {
-                    var locationToUse = await ReturnLocationNameOfSubscriptionAsync(client);
+                    var locationToUse = await client.Account.GetSubscriptionLocationAsync();
                     if (locationToUse != null)
                     {
                         var streamingEndpoint = await client.StreamingEndpoints.CreateAsync(
                            MKIOClient.GenerateUniqueName("endpoint"),
-                           locationToUse,
+                           locationToUse.Name,
                            new StreamingEndpointProperties
                            {
                                Description = "Streaming endpoint created by sample"
@@ -429,20 +428,6 @@ namespace Sample
             });
             Console.WriteLine($"Transform '{transform.Name}' created/updated.");
             return transform;
-        }
-
-        /// <summary>
-        /// Returns the location name of the subscription
-        /// </summary>
-        /// <param name="client">The MK.IO client.</param>
-        /// <returns>The name of the location, otherwise null.</returns>
-        private static async Task<string?> ReturnLocationNameOfSubscriptionAsync(MKIOClient client)
-        {
-            var sub = await client.Account.GetSubscriptionAsync();
-            var locs = await client.Account.ListAllLocationsAsync();
-            var locationOfSub = locs.FirstOrDefault(l => l.Metadata.Id == sub.Spec.LocationId);
-
-            return locationOfSub?.Metadata.Name;
         }
 
         /// <summary>

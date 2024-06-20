@@ -112,6 +112,32 @@ namespace MK.IO.Operations
             return LocationListResponseSchema.FromJson(responseContent).Items;
         }
 
+        /// <inheritdoc/>
+        public LocationMetadataSchema? GetSubscriptionLocation()
+        {
+            var task = Task.Run<LocationMetadataSchema?>(async () => await GetSubscriptionLocationAsync());
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<LocationMetadataSchema?> GetSubscriptionLocationAsync()
+        {
+            // return a string of length "length" containing random characters
+            // let's get location of MK.IO
+            var locationMKIOId = (await GetSubscriptionAsync()).Spec.LocationId;
+            var locationsMKIO = await ListAllLocationsAsync();
+            var locationMKIO = locationsMKIO.FirstOrDefault(l => l.Metadata.Id == locationMKIOId);
+            if (locationMKIO != null)
+            {
+
+                return locationMKIO.Metadata;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
 
         internal string GenerateAccountApiUrl(string urlPath)
         {

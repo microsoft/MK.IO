@@ -289,12 +289,12 @@ namespace Sample
 
                 if (response == "Y" || response == "y")
                 {
-                    var locationToUse = await ReturnLocationNameOfSubscriptionAsync(client);
+                    var locationToUse = await client.Account.GetSubscriptionLocationAsync();
                     if (locationToUse != null)
                     {
                         var streamingEndpoint = await client.StreamingEndpoints.CreateAsync(
                            MKIOClient.GenerateUniqueName("endpoint"),
-                           locationToUse,
+                           locationToUse.Name,
                            new StreamingEndpointProperties
                            {
                                Description = "Streaming endpoint created by sample"
@@ -312,20 +312,6 @@ namespace Sample
                 }
             }
             return createdStreamingEndpointName;
-        }
-
-        /// <summary>
-        /// Returns the location name of the subscription
-        /// </summary>
-        /// <param name="client">The MK.IO client.</param>
-        /// <returns>The name of the location, otherwise null.</returns>
-        private static async Task<string?> ReturnLocationNameOfSubscriptionAsync(MKIOClient client)
-        {
-            var sub = await client.Account.GetSubscriptionAsync();
-            var locs = await client.Account.ListAllLocationsAsync();
-            var locationOfSub = locs.FirstOrDefault(l => l.Metadata.Id == sub.Spec.LocationId);
-
-            return locationOfSub?.Metadata.Name;
         }
 
         /// <summary>

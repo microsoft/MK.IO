@@ -71,5 +71,17 @@ namespace MK.IO.Operations
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<IEnumerable<LocationResponseSchema>> ListAllLocationsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get the location of the MK.IO subscription.
+        /// </summary>
+        /// <returns>Location entity</returns>
+        LocationMetadataSchema? GetSubscriptionLocation();
+
+        /// <summary>
+        /// Get the location of the MK.IO subscription.
+        /// </summary>
+        /// <returns>Location metadata.</returns>
+        Task<LocationMetadataSchema?> GetSubscriptionLocationAsync();
     }
 }

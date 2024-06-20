@@ -25,45 +25,39 @@ var assetFilter = client.AssetFilters.CreateOrUpdate("liveoutput-c4debfe5", MKIO
     {
         Timescale = 10000000
     },
-    Tracks = new List<FilterTrackSelection>()
-    {
-        new FilterTrackSelection
-        {
-            TrackSelections = new List<FilterTrackPropertyCondition>()
-            {
-                new FilterTrackPropertyCondition
-                {
+    Tracks =
+    [
+        new() {
+            TrackSelections =
+            [
+                new() {
                     Property = FilterTrackPropertyType.Type,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
-                    Value = FilterPropertyTypeValue.Video
+                    Value = FilterTrackPropertyTypeValue.Video
                 },
-                new FilterTrackPropertyCondition
-                {
+                new() {
                     Property = FilterTrackPropertyType.Bitrate,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
                     Value = "0-1048576"
                 }
-            },
+            ],
         },
-        new FilterTrackSelection
-        {
-            TrackSelections = new List<FilterTrackPropertyCondition>()
-            {
-                new FilterTrackPropertyCondition
-                    {
+        new() {
+            TrackSelections =
+            [
+                new() {
                     Property = FilterTrackPropertyType.Type,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
                     Value = FilterTrackPropertyTypeValue.Audio
                 },
-                new FilterTrackPropertyCondition
-                {
+                new() {
                     Property = FilterTrackPropertyType.FourCC,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
-                    Value = FilterTrackPropertyFourCCValue.mp4a
+                    Value = "mp4a"
                 }
-            }
+            ]
         }
-    }
+    ]
 });
 
 
@@ -82,45 +76,39 @@ var accountFilter = client.AccountFilters.CreateOrUpdate("filter123", new MediaF
     {
         Timescale = 10000000
     },
-    Tracks = new List<FilterTrackSelection>()
-    {
-        new FilterTrackSelection
-        {
-            TrackSelections = new List<FilterTrackPropertyCondition>()
-            {
-                new FilterTrackPropertyCondition
-                {
+    Tracks =
+    [
+        new() {
+            TrackSelections =
+            [
+                new() {
                     Property = FilterTrackPropertyType.Type,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
                     Value = FilterTrackPropertyTypeValue.Video
                 },
-                new FilterTrackPropertyCondition
-                {
+                new() {
                     Property = FilterTrackPropertyType.Bitrate,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
                     Value = "0-1048576"
                 }
-            },
+            ],
         },
-        new FilterTrackSelection
-        {
-            TrackSelections = new List<FilterTrackPropertyCondition>()
-            {
-                new FilterTrackPropertyCondition
-                    {
+        new() {
+            TrackSelections =
+            [
+                new() {
                     Property = FilterTrackPropertyType.Type,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
                     Value = FilterTrackPropertyTypeValue.Audio
                 },
-                new FilterTrackPropertyCondition
-                {
+                new() {
                     Property = FilterTrackPropertyType.FourCC,
                     Operation = FilterTrackPropertyCompareOperation.Equal,
                     Value = FilterTrackPropertyFourCCValue.mp4a
                 }
-            }
+            ]
         }
-    }
+    ]
 });
 
 client.AccountFilters.Delete("filter123");

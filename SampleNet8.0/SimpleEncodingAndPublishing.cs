@@ -279,8 +279,14 @@ namespace Sample
             }
             else
             {
-                Console.WriteLine("No streaming endpoint found. Do you want to create one and start it? (Y/N)");
-                var response = Console.ReadLine();
+                string? response;
+                do
+                {
+                    Console.WriteLine("No streaming endpoint found. Do you want to create one and start it? (y/n)");
+                    response = Console.ReadLine();
+
+                } while (response != "Y" && response != "N" && response != "y" && response != "n");
+
                 if (response == "Y" || response == "y")
                 {
                     var locationToUse = await ReturnLocationNameOfSubscriptionAsync(client);
@@ -321,7 +327,6 @@ namespace Sample
 
             return locationOfSub?.Metadata.Name;
         }
-
 
         /// <summary>
         /// Lists the streaming Urls for a specified locator name.
@@ -387,7 +392,7 @@ namespace Sample
         /// <returns></returns>
         private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string? streamingEndpoint = null)
         {
-            string? response = null;
+            string? response;
             do
             {
                 Console.WriteLine("Do you want to clean the created resources (assets, job, etc) ? (y/n)");

@@ -19,7 +19,8 @@ namespace MK.IO.Operations
         private const string _accountStatsApiUrl = "api/ams/{0}/stats/";
         private const string _accountApiUrl = "api/accounts/{0}/";
         private const string _accountSubscriptionsUrl = _accountApiUrl + "subscriptions/";
-        private const string _accountSubscriptionUrl = _accountSubscriptionsUrl + "{1}";
+        private const string _accountSubscriptionUrl = _accountSubscriptionsUrl + "{1}/";
+        private const string _accountSubscriptionUsageUrl = _accountSubscriptionUrl + "usage/";
         private const string _locationsApiUrl = "api/locations/";
 
         /// <summary>
@@ -96,6 +97,19 @@ namespace MK.IO.Operations
         {
             string responseContent = await Client.GetObjectContentAsync(GenerateSubscriptionApiUrl(_accountSubscriptionUrl), cancellationToken);
             return SubscriptionResponseSchema.FromJson(responseContent);
+        }
+
+        public SubscriptionMeterUsageListResponseSchema GetSubscriptionUsage()
+        {
+            var task = Task.Run(async () => await GetSubscriptionUsageAsync());
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<SubscriptionMeterUsageListResponseSchema> GetSubscriptionUsageAsync(CancellationToken cancellationToken = default)
+        {
+            string responseContent = await Client.GetObjectContentAsync(GenerateSubscriptionApiUrl(_accountSubscriptionUsageUrl), cancellationToken);
+            return SubscriptionMeterUsageListResponseSchema.FromJson(responseContent);
         }
 
         /// <inheritdoc/>

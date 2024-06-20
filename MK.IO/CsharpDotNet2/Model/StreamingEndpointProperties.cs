@@ -101,9 +101,9 @@ namespace MK.IO.Models
         public DateTime? LastModified { get; private set; }
 
         /// <summary>
-        /// The maximum amount of time that content will be cached, in seconds. This value is superceded by any ETAG values set by the infrastructure.
+        /// The maximum amount of time that content will be cached, in seconds. This value is superseded by any ETAG values set by the infrastructure.
         /// </summary>
-        /// <value>The maximum amount of time that content will be cached, in seconds. This value is superceded by any ETAG values set by the infrastructure.</value>
+        /// <value>The maximum amount of time that content will be cached, in seconds. This value is superseded by any ETAG values set by the infrastructure.</value>
         [DataMember(Name = "maxCacheAge", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "maxCacheAge")]
         public int? MaxCacheAge { get; set; }

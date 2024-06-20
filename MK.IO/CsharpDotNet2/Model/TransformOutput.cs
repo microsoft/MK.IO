@@ -23,9 +23,9 @@ namespace MK.IO.Models
         public string OnError { get; set; }
 
         /// <summary>
-        /// Preset that describes the operations that will be used to modify, transcode, or extract insights from the source file to generate the output. Only BultiInStandardEncoderPreset is supported currently.
+        /// Preset that describes the operations that will be used to modify, transcode, or extract insights from the source file to generate the output.
         /// </summary>
-        /// <value>Preset that describes the operations that will be used to modify, transcode, or extract insights from the source file to generate the output. Only BultiInStandardEncoderPreset is supported currently.</value>
+        /// <value>Preset that describes the operations that will be used to modify, transcode, or extract insights from the source file to generate the output.</value>
         [DataMember(Name = "preset", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "preset")]
         public TransformPreset Preset { get; set; }

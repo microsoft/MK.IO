@@ -1,7 +1,7 @@
 using Moq;
 using MK.IO.Models;
 using MK.IO.Operations;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 
 namespace MK.IO.Tests
@@ -134,7 +134,7 @@ namespace MK.IO.Tests
             var mop = new Mock<JobsOperations>(mockClient2.Object);
 
             // act & assert
-            Assert.Throws<JsonSerializationException>(() => mop.Object.Create("name", "name", _properties));
+            Assert.Throws<JsonException>(() => mop.Object.Create("name", "name", _properties));
 
             // Assert
             mop.Verify();

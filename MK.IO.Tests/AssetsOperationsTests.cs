@@ -1,6 +1,6 @@
 using Moq;
 using MK.IO.Operations;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 
 namespace MK.IO.Tests
@@ -127,7 +127,7 @@ namespace MK.IO.Tests
             var mop = new Mock<AssetsOperations>(mockClient2.Object);
 
             // act & assert
-            Assert.Throws<JsonSerializationException>(() => mop.Object.CreateOrUpdate("assetname", "container", "storagename"));
+            Assert.Throws<JsonException>(() => mop.Object.CreateOrUpdate("assetname", "container", "storagename"));
 
             // Assert
             mockClient2.Verify(); // Verify that CreateOrUpdateAsync was called as expected

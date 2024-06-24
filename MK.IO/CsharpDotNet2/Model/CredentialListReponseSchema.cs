@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 
-
 using System.Text;
 using System.Text.Json;
 
@@ -49,6 +48,5 @@ namespace MK.IO.Models
         {
             return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
-
     }
 }

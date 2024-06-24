@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MK.IO.Models
 {
@@ -17,8 +18,7 @@ namespace MK.IO.Models
             return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
 
-
-        public MetadataLocation Metadata { get; set; }
+        public LocationMetadataSchema Metadata { get; set; }
 
         public LocationSpecSchema Spec { get; set; }
     }
@@ -34,34 +34,28 @@ namespace MK.IO.Models
 
     public class LocationSpecSchema
     {
-        [JsonProperty("customer")]
         public string Customer { get; set; }
 
-        [JsonProperty("extra_config")]
+        [JsonPropertyName("extra_config")]
         public ExtraConfig ExtraConfig { get; set; }
 
-        [JsonProperty("meters")]
         public Meters Meters { get; set; }
     }
 
     public class ExtraConfig
     {
-        [JsonProperty("cdnHostnames")]
         public CdnHostnames CdnHostnames { get; set; }
     }
 
     public class CdnHostnames
     {
-        [JsonProperty("StandardAkamai")]
         public string StandardAkamai { get; set; }
     }
 
     public class Meters
     {
-        [JsonProperty("egressMeterName")]
         public string EgressMeterName { get; set; }
 
-        [JsonProperty("cdnEgressMeterName")]
         public string CdnEgressMeterName { get; set; }
     }
 }

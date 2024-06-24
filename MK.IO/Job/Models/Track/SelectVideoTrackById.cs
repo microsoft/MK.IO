@@ -26,9 +26,9 @@ namespace MK.IO.Models
         internal override string OdataType => "SelectVideoTrackById";
 
         /// <summary>
-        /// Track indentifer to select
+        /// Track identifer to select
         /// </summary>
-        /// <value>Track indentifer to select</value>
+        /// <value>Track identifer to select</value>
         [DataMember(Name = "trackId", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "trackId")]
         public int? TrackId { get; set; }

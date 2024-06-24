@@ -74,7 +74,7 @@ namespace Sample
             }
 
             // list encoded assets (using labels)
-            var encodedAssets = client.Assets.List(label: new List<string> { "typeAsset=encoded" });
+            var encodedAssets = client.Assets.List(label: ["typeAsset=encoded"]);
 
             var specc = client.Assets.ListTracksAndDirListing("ignite-truncated-StandardEncoder-H264SingleBitrate720p-98b7c74252");
 
@@ -209,8 +209,8 @@ namespace Sample
 
             var newpol = client.ContentKeyPolicies.Create(
                 "testpolcreate",
-                new ContentKeyPolicyProperties("My description", new List<ContentKeyPolicyOption>()
-                {
+                new ContentKeyPolicyProperties("My description",
+                [
                     new(
                         "option1",
                         new ContentKeyPolicyWidevineConfiguration("{}"),
@@ -221,7 +221,7 @@ namespace Sample
                             new ContentKeyPolicySymmetricTokenKey(key)
                             )
                         )
-                })
+                ])
                 );
 
             var ckpolprop = await client.ContentKeyPolicies.GetPolicyPropertiesWithSecretsAsync("testpolcreate");
@@ -298,11 +298,11 @@ namespace Sample
                 {
                     Timescale = 10000000,
                 },
-                Tracks = new List<FilterTrackSelection>()
-                {
+                Tracks =
+                [
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -313,11 +313,11 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = "0-1048576"
                             }
-                        },
+                        ],
                     },
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -328,9 +328,9 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = "mp4a"
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             });
 
             client.AssetFilters.Delete("ignite-truncated-StandardEncoder-H264SingleBitrate720p-98b7c74252", assetFilter.Name);
@@ -351,11 +351,11 @@ namespace Sample
                 {
                     Timescale = 10000000,
                 },
-                Tracks = new List<FilterTrackSelection>()
-                {
+                Tracks =
+                [
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -366,11 +366,11 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = "0-1048576"
                             }
-                        },
+                        ],
                     },
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -381,9 +381,9 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = FilterTrackPropertyFourCCValue.mp4a
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             });
 
             client.AccountFilters.Delete(filter.Name);
@@ -396,13 +396,13 @@ namespace Sample
             var tranform = client.Transforms.CreateOrUpdate("CVQ720pTransform", new TransformProperties
             {
                 Description = "desc",
-                Outputs = new List<TransformOutput>
-                {
+                Outputs =
+                [
                     new() {
                         Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
                         RelativePriority = TransformOutputPriorityType.Normal
                     }
-                }
+                ]
             });
 
             // ***************
@@ -451,16 +451,16 @@ namespace Sample
                 Priority = JobPriorityType.Normal,
                 Input = new JobInputHttp(
                     null,
-                    new List<string> {
+                    [
                         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
-                    }),
-                Outputs = new List<JobOutputAsset>()
-                {
+                    ]),
+                Outputs =
+                [
                     new()
                     {
                         AssetName = outputAssetName
                     }
-                }
+                ]
             }
             );
 
@@ -486,7 +486,7 @@ namespace Sample
             var le = client.LiveEvents.Create(MKIOClient.GenerateUniqueName("liveEvent"), "francecentral", new LiveEventProperties
             {
                 Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
-                StreamOptions = new List<string> { "Default" },
+                StreamOptions = ["Default"],
                 Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.PassthroughBasic }
             });
 
@@ -535,7 +535,7 @@ namespace Sample
 
             // create streaming endpoint
 
-            /*
+            
             var newSe = client.StreamingEndpoints.Create("streamingendpointxp2", "francecentral", new StreamingEndpointProperties
             {
                 Description = "my description",
@@ -547,7 +547,7 @@ namespace Sample
                     Name = StreamingEndpointSkuType.Premium
                 }
             });
-            */
+           
 
             // start, stop, delete streaming endpoint
             //client.StreamingEndpoints.Start("streamingendpoint1");

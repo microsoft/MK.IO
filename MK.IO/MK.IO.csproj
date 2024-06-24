@@ -47,7 +47,6 @@
     </None>
     <None Include="..\SampleContentKeyPolicyOperations.md" Link="SampleContentKeyPolicyOperations.md" />
     <None Include="..\SampleFilterOperations.md" Link="SampleFilterOperations.md" />
-    <None Include="..\SampleLiveOperations.md" Link="SampleLiveOperations.md" />
     <None Include="..\SampleStorageOperations.md" Link="SampleStorageOperations.md" />
     <None Include="..\SampleTransformAndJobOperations.md" Link="SampleTransformAndJobOperations.md" />
   </ItemGroup>

@@ -34,6 +34,19 @@ namespace MK.IO.Operations
         Task<UserInfo> GetUserProfileAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Get subscription usage information for current month.
+        /// </summary>
+        /// <returns></returns>
+        SubscriptionMeterUsageListResponseSchema GetSubscriptionUsage();
+
+        /// <summary>
+        /// Get subscription usage information for current month.
+        /// </summary>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task<SubscriptionMeterUsageListResponseSchema> GetSubscriptionUsageAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get the list of all MK.IO subscriptions for the account.
         /// </summary>
         /// <returns></returns>
@@ -71,5 +84,17 @@ namespace MK.IO.Operations
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<IEnumerable<LocationResponseSchema>> ListAllLocationsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get the location of the MK.IO subscription.
+        /// </summary>
+        /// <returns>Location entity</returns>
+        LocationMetadataSchema? GetSubscriptionLocation();
+
+        /// <summary>
+        /// Get the location of the MK.IO subscription.
+        /// </summary>
+        /// <returns>Location metadata.</returns>
+        Task<LocationMetadataSchema?> GetSubscriptionLocationAsync();
     }
 }

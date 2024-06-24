@@ -54,23 +54,24 @@ namespace MK.IO
             return _customerId;
         }
 
-        public MKIOClient(string MKIOSubscriptionName, string MKIOtoken)
+        /// <summary>
+        /// Create a client to operate the resources of a MK.IO subscription.
+        /// </summary>
+        /// <param name="subscriptionName">The MK.IO subscription name</param>
+        /// <param name="token">The MK.IO API Token.</param>
+        public MKIOClient(string subscriptionName, string token)
         {
-            Argument.AssertNotNullOrEmpty(MKIOSubscriptionName, nameof(MKIOSubscriptionName));
-            Argument.AssertNotNullOrEmpty(MKIOtoken, nameof(MKIOtoken));
+            Argument.AssertNotNullOrEmpty(subscriptionName, nameof(subscriptionName));
+            Argument.AssertNotNullOrEmpty(token, nameof(token));
 
-            _subscriptionName = MKIOSubscriptionName;
-            _apiToken = MKIOtoken;
+            _subscriptionName = subscriptionName;
+            _apiToken = token;
+  
             _httpClient = new HttpClient();
-
             // Request headers
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            Initialize();
-        }
-
-        private void Initialize()
-        {
+            // Initialize properties
             Account = new AccountOperations(this);
             StorageAccounts = new StorageAccountsOperations(this);
             Assets = new AssetsOperations(this);
@@ -399,7 +400,6 @@ namespace MK.IO
 
             return url;
         }
-
 
         /// <summary>
         /// Generates a unique name based on a prefix. Useful for creating unique names for assets, locators, etc.

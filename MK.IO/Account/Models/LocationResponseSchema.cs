@@ -17,12 +17,14 @@ namespace MK.IO.Models
             return JsonConvert.SerializeObject(this, ConverterLE.Settings);
         }
 
-
         [JsonProperty("metadata")]
-        public MetadataLocation Metadata { get; set; }
+        public LocationMetadataSchema Metadata { get; set; }
+
+        [JsonProperty("spec")]
+        public LocationSpecSchema Spec { get; set; }
     }
 
-    public class MetadataLocation
+    public class LocationMetadataSchema
     {
         [JsonProperty("id")]
         public Guid Id { get; set; }
@@ -32,5 +34,38 @@ namespace MK.IO.Models
 
         [JsonProperty("displayName")]
         public string DisplayName { get; set; }
+    }
+
+    public class LocationSpecSchema
+    {
+        [JsonProperty("customer")]
+        public string Customer { get; set; }
+
+        [JsonProperty("extra_config")]
+        public ExtraConfig ExtraConfig { get; set; }
+
+        [JsonProperty("meters")]
+        public Meters Meters { get; set; }
+    }
+
+    public class ExtraConfig
+    {
+        [JsonProperty("cdnHostnames")]
+        public CdnHostnames CdnHostnames { get; set; }
+    }
+
+    public class CdnHostnames
+    {
+        [JsonProperty("StandardAkamai")]
+        public string StandardAkamai { get; set; }
+    }
+
+    public class Meters
+    {
+        [JsonProperty("egressMeterName")]
+        public string EgressMeterName { get; set; }
+
+        [JsonProperty("cdnEgressMeterName")]
+        public string CdnEgressMeterName { get; set; }
     }
 }

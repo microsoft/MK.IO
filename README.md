@@ -41,6 +41,8 @@ In the current version, operations are supported for :
 
 ### End-to-end sample code
 
+#### File encoding
+
 There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleEncodingAndPublishing.cs).
 
 This sample code does the following :
@@ -56,7 +58,20 @@ This sample code does the following :
 
 Run the SampleNet8.10 to execute this sample code.
 
-There is another documented end-to-end sample code for live streaming, in file [SimpleLiveStreaming.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleLiveStreaming.cs).
+#### Live streaming
+
+There is a documented end-to-end sample code for live streaming, in file [SimpleLiveStreaming.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleLiveStreaming.cs).
+
+What the sample does :
+
+- create a live event
+- create a live output asset
+- create a live output
+- create a locator
+- create and start a streaming endpoint if there is none
+- list the streaming urls and test player urls.
+- propose to the user to convert the live asset to a mp4 asset and create a download locator to download the mp4 file(s)
+- clean the created resources if the user accepts
 
 ### Other examples
 
@@ -157,7 +172,6 @@ client.StreamingEndpoints.Delete("streamingendpoint1");
 
 Additional samples are available :
 
-- [live operations](https://github.com/microsoft/MK.IO/blob/main/SampleLiveOperations.md) 
 - [storage operations](https://github.com/microsoft/MK.IO/blob/main/SampleStorageOperations.md)
 - [transform and job operations](https://github.com/microsoft/MK.IO/blob/main/SampleTransformAndJobOperations.md)
 - [account filter and asset filter operations](https://github.com/microsoft/MK.IO/blob/main/SampleFilterOperations.md)

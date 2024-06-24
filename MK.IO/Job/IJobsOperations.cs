@@ -134,7 +134,7 @@ namespace MK.IO.Operations
         Task DeleteAsync(string transformName, string jobName, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get an transform by name.
+        /// Get a transform by name.
         /// </summary>
         /// <param name="transformName"></param>
         /// <param name="jobName"></param>
@@ -142,7 +142,7 @@ namespace MK.IO.Operations
         JobSchema Get(string transformName, string jobName);
 
         /// <summary>
-        /// Get an transform by name.
+        /// Get a transform by name.
         /// </summary>
         /// <param name="transformName"></param>
         /// <param name="jobName"></param>

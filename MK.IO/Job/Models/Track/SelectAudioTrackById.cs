@@ -34,9 +34,9 @@ namespace MK.IO.Models
         public AudioTrackChannelMappingType ChannelMapping { get; set; }
 
         /// <summary>
-        /// Track indentifer to select
+        /// Track identifer to select
         /// </summary>
-        /// <value>Track indentifer to select</value>
+        /// <value>Track identifer to select</value>
         [DataMember(Name = "trackId", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "trackId")]
         public int? TrackId { get; set; }

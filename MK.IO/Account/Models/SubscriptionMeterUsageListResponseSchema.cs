@@ -1,7 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MK.IO.Models
 {
@@ -9,21 +10,20 @@ namespace MK.IO.Models
     {
         public static SubscriptionMeterUsageListResponseSchema FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<SubscriptionMeterUsageListResponseSchema>(json, ConverterLE.Settings) ?? throw new Exception("Error with subscription usage deserialization");
+            return JsonSerializer.Deserialize<SubscriptionMeterUsageListResponseSchema>(json, ConverterLE.Settings) ?? throw new Exception("Error with subscription usage deserialization");
         }
 
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
 
-        [JsonProperty("Kind")]
+        [JsonPropertyName("Kind")]
+
         public string Kind { get; set; }
 
-        [JsonProperty("metadata")]
         public SubscriptionMeterUsageMetadataSchema Metadata { get; set; }
 
-        [JsonProperty("spec")]
         public SubscriptionMeterUsageSpecSchema Spec { get; set; }
     }
 }

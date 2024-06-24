@@ -10,20 +10,6 @@ namespace MK.IO
 {
     internal static class ConverterLE
     {
-        /*
-        public static readonly JsonSerializerSettings Settings = new()
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore,
-            Formatting = Newtonsoft.Json.Formatting.Indented,
-            Converters =
-            {
-                new CustomDateTimeConverter(),
-                new CustomTimeSpanConverter()
-            },
-        };
-        */
-
         public static readonly JsonSerializerOptions Settings = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -39,7 +25,6 @@ namespace MK.IO
             },
         };
     }
-
 
     internal class CustomDateTimeNConverter : JsonConverter<DateTime?>
     {

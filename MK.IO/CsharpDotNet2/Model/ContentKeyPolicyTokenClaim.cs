@@ -16,6 +16,11 @@ namespace MK.IO.Models
     public class ContentKeyPolicyTokenClaim
     {
         /// <summary>
+        /// The claim type for the ContentKeyIdentifierClaim.
+        /// </summary>
+        public static readonly string ContentKeyIdentifierClaimType = "urn:microsoft:azure:mediaservices:contentkeyidentifier";
+
+        /// <summary>
         /// Token claim type.
         /// </summary>
         /// <value>Token claim type.</value>

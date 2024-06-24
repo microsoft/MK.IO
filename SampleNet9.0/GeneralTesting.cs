@@ -54,6 +54,7 @@ namespace Sample
             var subs = await client.Account.ListAllSubscriptionsAsync();
             var sub = await client.Account.GetSubscriptionAsync();
             var locs = await client.Account.ListAllLocationsAsync();
+            var monthlyUsage = await client.Account.GetSubscriptionUsageAsync();
 
             // *****************
             // asset operations
@@ -74,7 +75,7 @@ namespace Sample
             }
 
             // list encoded assets (using labels)
-            var encodedAssets = client.Assets.List(label: new List<string> { "typeAsset=encoded" });
+            var encodedAssets = client.Assets.List(label: ["typeAsset=encoded"]);
 
             var specc = client.Assets.ListTracksAndDirListing("ignite-truncated-StandardEncoder-H264SingleBitrate720p-98b7c74252");
 
@@ -209,8 +210,8 @@ namespace Sample
 
             var newpol = client.ContentKeyPolicies.Create(
                 "testpolcreate",
-                new ContentKeyPolicyProperties("My description", new List<ContentKeyPolicyOption>()
-                {
+                new ContentKeyPolicyProperties("My description",
+                [
                     new(
                         "option1",
                         new ContentKeyPolicyWidevineConfiguration("{}"),
@@ -221,7 +222,7 @@ namespace Sample
                             new ContentKeyPolicySymmetricTokenKey(key)
                             )
                         )
-                })
+                ])
                 );
 
             var ckpolprop = await client.ContentKeyPolicies.GetPolicyPropertiesWithSecretsAsync("testpolcreate");
@@ -237,7 +238,7 @@ namespace Sample
             var storage = client.StorageAccounts.Create(new StorageSchema
             {
                 Name = config["StorageName"],
-                Location = config["StorageRegion"],
+                Location = client.Account.GetSubscriptionLocation()!.Name,
                 Description = "my description",
                 AzureStorageConfiguration = new BlobStorageAzureProperties
                 {
@@ -298,11 +299,11 @@ namespace Sample
                 {
                     Timescale = 10000000,
                 },
-                Tracks = new List<FilterTrackSelection>()
-                {
+                Tracks =
+                [
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -313,11 +314,11 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = "0-1048576"
                             }
-                        },
+                        ],
                     },
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -328,9 +329,9 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = "mp4a"
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             });
 
             client.AssetFilters.Delete("ignite-truncated-StandardEncoder-H264SingleBitrate720p-98b7c74252", assetFilter.Name);
@@ -351,11 +352,11 @@ namespace Sample
                 {
                     Timescale = 10000000,
                 },
-                Tracks = new List<FilterTrackSelection>()
-                {
+                Tracks =
+                [
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -366,11 +367,11 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = "0-1048576"
                             }
-                        },
+                        ],
                     },
                     new() {
-                        TrackSelections = new List<FilterTrackPropertyCondition>()
-                        {
+                        TrackSelections =
+                        [
                             new() {
                                 Property = FilterTrackPropertyType.Type,
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
@@ -381,9 +382,9 @@ namespace Sample
                                 Operation = FilterTrackPropertyCompareOperation.Equal,
                                 Value = FilterTrackPropertyFourCCValue.mp4a
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             });
 
             client.AccountFilters.Delete(filter.Name);
@@ -396,13 +397,13 @@ namespace Sample
             var tranform = client.Transforms.CreateOrUpdate("CVQ720pTransform", new TransformProperties
             {
                 Description = "desc",
-                Outputs = new List<TransformOutput>
-                {
+                Outputs =
+                [
                     new() {
                         Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
                         RelativePriority = TransformOutputPriorityType.Normal
                     }
-                }
+                ]
             });
 
             // ***************
@@ -451,16 +452,16 @@ namespace Sample
                 Priority = JobPriorityType.Normal,
                 Input = new JobInputHttp(
                     null,
-                    new List<string> {
+                    [
                         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
-                    }),
-                Outputs = new List<JobOutputAsset>()
-                {
+                    ]),
+                Outputs =
+                [
                     new()
                     {
                         AssetName = outputAssetName
                     }
-                }
+                ]
             }
             );
 
@@ -483,16 +484,16 @@ namespace Sample
 
             // client.LiveEvents.Delete("liveevent4");
 
-            var le = client.LiveEvents.Create(MKIOClient.GenerateUniqueName("liveEvent"), "francecentral", new LiveEventProperties
+            var le = client.LiveEvents.Create(MKIOClient.GenerateUniqueName("liveEvent"), client.Account.GetSubscriptionLocation()!.Name, new LiveEventProperties
             {
                 Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
-                StreamOptions = new List<string> { "Default" },
+                StreamOptions = ["Default"],
                 Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.PassthroughBasic }
             });
 
             /* 
             // NOT IMPLEMENTED
-            le = client.LiveEvents.Update(le.Name, "francecentral", new LiveEventProperties
+            le = client.LiveEvents.Update(le.Name, client.Account.GetSubscriptionLocation()!.Name, new LiveEventProperties
             {
                 Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.SRT },
                 StreamOptions = new List<string> { "Default" },
@@ -535,8 +536,8 @@ namespace Sample
 
             // create streaming endpoint
 
-            /*
-            var newSe = client.StreamingEndpoints.Create("streamingendpointxp2", "francecentral", new StreamingEndpointProperties
+            
+            var newSe = client.StreamingEndpoints.Create("streamingendpointxp2", client.Account.GetSubscriptionLocation()!.Name, new StreamingEndpointProperties
             {
                 Description = "my description",
                 ScaleUnits = 1,
@@ -547,7 +548,7 @@ namespace Sample
                     Name = StreamingEndpointSkuType.Premium
                 }
             });
-            */
+           
 
             // start, stop, delete streaming endpoint
             //client.StreamingEndpoints.Start("streamingendpoint1");

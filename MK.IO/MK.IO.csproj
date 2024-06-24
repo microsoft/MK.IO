@@ -11,13 +11,13 @@
     <Description>A .NET client SDK for MediaKind MK.IO.</Description>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.7.0</Version>
+    <Version>1.7.1</Version>
     <RepositoryUrl>https://github.com/microsoft/MK.IO</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/microsoft/MK.IO/blob/main/README.md</PackageProjectUrl>
-    <AssemblyVersion>1.7.0.0</AssemblyVersion>
-    <FileVersion>1.7.0.0</FileVersion>
-    <Title>A client library for MediaKind MK.IO.</Title>
+    <AssemblyVersion>1.7.1.0</AssemblyVersion>
+    <FileVersion>1.7.1.0</FileVersion>
+    <Title>A .NET client SDK for MediaKind MK.IO.</Title>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageIcon>mkio.png</PackageIcon>
@@ -47,7 +47,6 @@
     </None>
     <None Include="..\SampleContentKeyPolicyOperations.md" Link="SampleContentKeyPolicyOperations.md" />
     <None Include="..\SampleFilterOperations.md" Link="SampleFilterOperations.md" />
-    <None Include="..\SampleLiveOperations.md" Link="SampleLiveOperations.md" />
     <None Include="..\SampleStorageOperations.md" Link="SampleStorageOperations.md" />
     <None Include="..\SampleTransformAndJobOperations.md" Link="SampleTransformAndJobOperations.md" />
   </ItemGroup>
@@ -82,4 +81,11 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+	<InternalsVisibleTo Include="MK.IO.Tests" />
+	  <!-- Make assembly usable for Moq, so Moq an other test code is able to instanciate objects of 'internal' classes -->
+	  <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+		  <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+	  </AssemblyAttribute>
+  </ItemGroup>
 </Project>

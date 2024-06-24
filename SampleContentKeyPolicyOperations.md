@@ -29,11 +29,11 @@ var key = GenerateSymKeyAsBase64();
 // create a new content key policy
 var newpol = client.ContentKeyPolicies.Create(
     "testpolcreate",
-    new ContentKeyPolicyProperties("My description", new List<ContentKeyPolicyOption>()
-    {
-        new ContentKeyPolicyOption(
+    new ContentKeyPolicyProperties("My description",
+    [
+        new(
             "option1",
-            new ContentKeyPolicyConfigurationWidevine("{}"),
+            new ContentKeyPolicyWidevineConfiguration("{}"),
             new ContentKeyPolicyTokenRestriction(
                 "issuer",
                 "audience",
@@ -41,7 +41,7 @@ var newpol = client.ContentKeyPolicies.Create(
                 new ContentKeyPolicySymmetricTokenKey(key)
                 )
             )
-    })
+    ])
     );
 
 

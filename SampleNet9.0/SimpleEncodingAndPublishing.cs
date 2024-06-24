@@ -22,7 +22,8 @@ namespace Sample
     /// </summary>
     public class SimpleEncodingAndPublishing
     {
-        private const string _transformName = "CVQ720pTransform";
+        private const string _transformName = "H264MultipleBitrate720pTransform";
+        private const EncoderNamedPreset _transformPreset = EncoderNamedPreset.H264MultipleBitrate720p;
         private const string _inputMP4FileName = @"Ignite.mp4";
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
@@ -32,6 +33,7 @@ namespace Sample
            {
               "MKIOSubscriptionName": "yourMKIOsubscriptionname",
               "MKIOToken": "yourMKIOtoken",
+              "StorageName": "yourStorageAccountName",
               "TenantId" : "your Azure tenant ID " // optional
            }
           */
@@ -59,7 +61,7 @@ namespace Sample
             _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {_transformName} transform");
 
             // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
-            _ = await CreateOrUpdateTransformAsync(client, _transformName);
+            _ = await CreateOrUpdateTransformAsync(client, _transformName, _transformPreset);
 
             // Submit a job request to MK.IO to apply the specified Transform to a given input video.
             _ = await SubmitJobAsync(client, _transformName, jobName, inputAssetName, outputAssetName, _inputMP4FileName);
@@ -70,6 +72,10 @@ namespace Sample
             if (encodingJob.Properties.State != JobState.Finished)
             {
                 Console.WriteLine("Encoding job cancelled or in error.");
+                if (encodingJob.Properties.Outputs.First() != null && encodingJob.Properties.Outputs.First().Error.Message != null)
+                {
+                    Console.WriteLine(encodingJob.Properties.Outputs.First().Error.Message);
+                }
                 await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName);
             }
             else
@@ -146,7 +152,7 @@ namespace Sample
 
             // User or app must have Storage Blob Data Contributor on the account for the upload to work!
             // Upload a blob (e.g., from a local file)
-            var blobClient = blobContainerClient.GetBlobClient(fileToUpload);
+            var blobClient = blobContainerClient.GetBlobClient(Path.GetFileName(fileToUpload));
             await blobClient.UploadAsync(fileToUpload);
             Console.WriteLine($"File '{fileToUpload}' uploaded to input asset.");
             return inputAsset;
@@ -184,16 +190,16 @@ namespace Sample
         /// <param name="client">The MK.IO client.</param>
         /// <param name="transformName">The transform name.</param>
         /// <returns>The transform.</returns>
-        private static async Task<TransformSchema> CreateOrUpdateTransformAsync(MKIOClient client, string transformName)
+        private static async Task<TransformSchema> CreateOrUpdateTransformAsync(MKIOClient client, string transformName, EncoderNamedPreset _transformPreset)
         {
-            // Create or update a transform for CVQ encoding
+            // Create or update a transform
             var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
             {
-                Description = "Encoding with H264MultipleBitrate720pWithCVQ preset",
+                Description = $"Encoding with {_transformPreset} preset",
                 Outputs =
                 [
                     new() {
-                        Preset = new BuiltInStandardEncoderPreset(EncoderNamedPreset.H264MultipleBitrate720pWithCVQ),
+                        Preset = new BuiltInStandardEncoderPreset(_transformPreset),
                         RelativePriority = TransformOutputPriorityType.Normal
                     }
                 ]
@@ -225,7 +231,7 @@ namespace Sample
                     Input = new JobInputAsset(
                        inputAssetName,
                        [
-                           fileName
+                           Path.GetFileName(fileName)
                        ]),
                     Outputs =
                     [
@@ -278,16 +284,22 @@ namespace Sample
             }
             else
             {
-                Console.WriteLine("No streaming endpoint found. Do you want to create one and start it? (Y/N)");
-                var response = Console.ReadLine();
+                string? response;
+                do
+                {
+                    Console.WriteLine("No streaming endpoint found. Do you want to create one and start it? (y/n)");
+                    response = Console.ReadLine();
+
+                } while (response != "Y" && response != "N" && response != "y" && response != "n");
+
                 if (response == "Y" || response == "y")
                 {
-                    var locationToUse = await ReturnLocationNameOfSubscriptionAsync(client);
+                    var locationToUse = await client.Account.GetSubscriptionLocationAsync();
                     if (locationToUse != null)
                     {
                         var streamingEndpoint = await client.StreamingEndpoints.CreateAsync(
                            MKIOClient.GenerateUniqueName("endpoint"),
-                           locationToUse,
+                           locationToUse.Name,
                            new StreamingEndpointProperties
                            {
                                Description = "Streaming endpoint created by sample"
@@ -306,21 +318,6 @@ namespace Sample
             }
             return createdStreamingEndpointName;
         }
-
-        /// <summary>
-        /// Returns the location name of the subscription
-        /// </summary>
-        /// <param name="client">The MK.IO client.</param>
-        /// <returns>The name of the location, otherwise null.</returns>
-        private static async Task<string?> ReturnLocationNameOfSubscriptionAsync(MKIOClient client)
-        {
-            var sub = await client.Account.GetSubscriptionAsync();
-            var locs = await client.Account.ListAllLocationsAsync();
-            var locationOfSub = locs.FirstOrDefault(l => l.Metadata.Id == sub.Spec.LocationId);
-
-            return locationOfSub?.Metadata.Name;
-        }
-
 
         /// <summary>
         /// Lists the streaming Urls for a specified locator name.
@@ -386,10 +383,10 @@ namespace Sample
         /// <returns></returns>
         private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string? streamingEndpoint = null)
         {
-            string? response = null;
+            string? response;
             do
             {
-                Console.WriteLine("Do you want to clean the created resources ((assets, job, etc) ? (y/n)");
+                Console.WriteLine("Do you want to clean the created resources (assets, job, etc) ? (y/n)");
                 response = Console.ReadLine();
 
             } while (response != "Y" && response != "N" && response != "y" && response != "n");

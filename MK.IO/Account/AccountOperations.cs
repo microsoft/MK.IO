@@ -19,7 +19,8 @@ namespace MK.IO.Operations
         private const string _accountStatsApiUrl = "api/ams/{0}/stats/";
         private const string _accountApiUrl = "api/accounts/{0}/";
         private const string _accountSubscriptionsUrl = _accountApiUrl + "subscriptions/";
-        private const string _accountSubscriptionUrl = _accountSubscriptionsUrl + "{1}";
+        private const string _accountSubscriptionUrl = _accountSubscriptionsUrl + "{1}/";
+        private const string _accountSubscriptionUsageUrl = _accountSubscriptionUrl + "usage/";
         private const string _locationsApiUrl = "api/locations/";
 
         /// <summary>
@@ -98,6 +99,19 @@ namespace MK.IO.Operations
             return SubscriptionResponseSchema.FromJson(responseContent);
         }
 
+        public SubscriptionMeterUsageListResponseSchema GetSubscriptionUsage()
+        {
+            var task = Task.Run(async () => await GetSubscriptionUsageAsync());
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<SubscriptionMeterUsageListResponseSchema> GetSubscriptionUsageAsync(CancellationToken cancellationToken = default)
+        {
+            string responseContent = await Client.GetObjectContentAsync(GenerateSubscriptionApiUrl(_accountSubscriptionUsageUrl), cancellationToken);
+            return SubscriptionMeterUsageListResponseSchema.FromJson(responseContent);
+        }
+
         /// <inheritdoc/>
         public IEnumerable<LocationResponseSchema> ListAllLocations()
         {
@@ -110,6 +124,32 @@ namespace MK.IO.Operations
         {
             string responseContent = await Client.GetObjectContentAsync(Client._baseUrl + _locationsApiUrl, cancellationToken);
             return LocationListResponseSchema.FromJson(responseContent).Items;
+        }
+
+        /// <inheritdoc/>
+        public LocationMetadataSchema? GetSubscriptionLocation()
+        {
+            var task = Task.Run<LocationMetadataSchema?>(async () => await GetSubscriptionLocationAsync());
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<LocationMetadataSchema?> GetSubscriptionLocationAsync()
+        {
+            // return a string of length "length" containing random characters
+            // let's get location of MK.IO
+            var locationMKIOId = (await GetSubscriptionAsync()).Spec.LocationId;
+            var locationsMKIO = await ListAllLocationsAsync();
+            var locationMKIO = locationsMKIO.FirstOrDefault(l => l.Metadata.Id == locationMKIOId);
+            if (locationMKIO != null)
+            {
+
+                return locationMKIO.Metadata;
+            }
+            else
+            {
+                return null;
+            }
         }
 
 

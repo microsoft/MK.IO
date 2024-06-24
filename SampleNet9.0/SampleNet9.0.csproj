@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MK.IO\MK.IO.csproj" />
-    <PackageReference Include="Azure.Identity" Version="1.11.4" />
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />

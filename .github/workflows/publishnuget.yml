@@ -66,7 +66,6 @@ jobs:
     # Publish only when creating a GitHub Release
     # https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
     # You can update this logic if you want to manage releases differently
-    if: github.ref == 'refs/heads/main'
     runs-on: windows-latest
     needs: [ create_nuget, run_test ]
     steps:

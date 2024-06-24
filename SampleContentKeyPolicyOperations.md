@@ -33,7 +33,7 @@ var newpol = client.ContentKeyPolicies.Create(
     {
         new ContentKeyPolicyOption(
             "option1",
-            new ContentKeyPolicyConfigurationWidevine("{}"),
+            new ContentKeyPolicyWidevineConfiguration("{}"),
             new ContentKeyPolicyTokenRestriction(
                 "issuer",
                 "audience",

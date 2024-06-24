@@ -56,7 +56,7 @@ This sample code does the following :
 - list the streaming urls and test player urls
 - clean the resources
 
-Run the SampleNet8.10 to execute this sample code.
+Run the SampleNet8.0 project to execute this sample code.
 
 #### Live streaming
 
@@ -72,6 +72,8 @@ What the sample does :
 - list the streaming urls and test player urls.
 - propose to the user to convert the live asset to a mp4 asset and create a download locator to download the mp4 file(s)
 - clean the created resources if the user accepts
+
+Edit Program.cs file in SampleNet8.0 to uncomment line `await SimpleLiveStreaming.RunAsync();`, comment `await SimpleEncodingAndPublishing.RunAsync();`, and run the sample project.
 
 ### Other examples
 
@@ -92,6 +94,9 @@ var profile = client.Account.GetUserProfile();
 
 // Get subscription stats
 var stats = client.Account.GetSubscriptionStats();
+
+// Get monthly usage of MK.IO subscription
+var monthlyUsage = client.Account.GetSubscriptionUsage();
 
 // *****************
 // asset operations
@@ -153,7 +158,7 @@ var mkse = client.StreamingEndpoints.Get("streamingendpoint1");
 var mkses = client.StreamingEndpoints.List();
 
 // create streaming endpoint
-var newSe = client.StreamingEndpoints.Create("streamingendpoint2", "francecentral", new StreamingEndpointProperties
+var newSe = client.StreamingEndpoints.Create("streamingendpoint2", client.Account.GetSubscriptionLocation()!.Name, new StreamingEndpointProperties
             {
                 Description = "my description",
                 ScaleUnits = 0,
@@ -208,7 +213,8 @@ var mkse = await client.StreamingEndpoints.GetAsync("streamingendpoint1");
 var mkses = await client.StreamingEndpoints.ListAsync();
 
 // create streaming endpoint
-var newSe = await client.StreamingEndpoints.CreateAsync("streamingendpoint2", "francecentral", new StreamingEndpointProperties
+var location = await client.Account.GetSubscriptionLocationAsync();
+var newSe = await client.StreamingEndpoints.CreateAsync("streamingendpoint2", location!.Name, new StreamingEndpointProperties
             {
                 Description = "my description",
                 ScaleUnits = 0,

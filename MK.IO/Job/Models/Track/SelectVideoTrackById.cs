@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 
 namespace MK.IO.Models
 {
-
     /// <summary>
     /// 
     /// </summary>
@@ -26,9 +25,9 @@ namespace MK.IO.Models
         internal override string OdataType => "SelectVideoTrackById";
 
         /// <summary>
-        /// Track identifer to select
+        /// Track identifier to select
         /// </summary>
-        /// <value>Track identifer to select</value>
+        /// <value>Track identifier to select</value>
         [DataMember(Name = "trackId", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "trackId")]
         public int? TrackId { get; set; }

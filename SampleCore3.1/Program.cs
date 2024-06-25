@@ -29,7 +29,7 @@ namespace SampleCore
 
             try
             {
-                var profile = client.Account.GetUserProfile();
+                var profile = client.Management.GetUserProfile();
             }
             catch (ApiException ex)
             {
@@ -39,11 +39,11 @@ namespace SampleCore
 
 
             // Get subscription stats
-            var stats = client.Account.GetSubscriptionStats();
+            var stats = client.Management.GetSubscriptionStats();
 
-            var subs = client.Account.ListAllSubscriptions();
-            var sub = client.Account.GetSubscription();
-            var locs = client.Account.ListAllLocations();
+            var subs = client.Management.ListAllSubscriptions();
+            var sub = client.Management.GetSubscription();
+            var locs = client.Management.ListAllLocations();
 
             var currentLocation = locs.Where(l => l.Metadata.Id == sub.Spec.LocationId).FirstOrDefault();
             Console.WriteLine($"Connected to '{sub.Spec.Name}' MK.IO instance in region '{currentLocation.Metadata.Name}'.");

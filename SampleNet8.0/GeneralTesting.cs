@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Configuration;
 using MK.IO;
 using MK.IO.Models;
+using MK.IO.Management.Models;
 using System.Security.Cryptography;
 
 namespace Sample
@@ -37,10 +38,10 @@ namespace Sample
 
             MKIOClient.GenerateUniqueName("asset");
 
-            UserInfo profile;
+            UserProfileSpecV1 profile;
             try
             {
-                profile = client.Account.GetUserProfile();
+                profile = client.Management.YourProfile.Get();
             }
             catch (ApiException ex)
             {

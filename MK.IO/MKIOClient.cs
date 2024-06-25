@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using MK.IO.Management;
 using MK.IO.Operations;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Security.Principal;
+
 
 #if NET462
 using System.Net.Http;
@@ -49,7 +52,7 @@ namespace MK.IO
         {
             if (default == _customerId)
             {
-                _customerId = Account.GetUserProfile().CustomerId;
+                _customerId = Management.YourProfile.Get().ActiveOrganizationId;//.CustomerId; TODO
             }
             return _customerId;
         }
@@ -73,6 +76,7 @@ namespace MK.IO
 
             // Initialize properties
             Account = new AccountOperations(this);
+            Management = new ManagementOperations(this);
             StorageAccounts = new StorageAccountsOperations(this);
             Assets = new AssetsOperations(this);
             LiveEvents = new LiveEventsOperations(this);
@@ -89,6 +93,10 @@ namespace MK.IO
 
         /// <inheritdoc/>
         public virtual IAccountOperations Account { get; private set; }
+
+        /// <inheritdoc/>
+        public virtual IManagementOperations Management { get; private set; }
+
 
         /// <inheritdoc/>
         public virtual IStorageAccountsOperations StorageAccounts { get; private set; }

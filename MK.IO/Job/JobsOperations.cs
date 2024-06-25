@@ -14,7 +14,7 @@ namespace MK.IO.Operations
     /// <summary>
     /// REST Client for MKIO
     /// https://mk.io/
-    /// 
+    ///
     /// </summary>
     internal class JobsOperations : IJobsOperations
     {
@@ -186,7 +186,7 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(transformName, nameof(transformName));
             Argument.AssertNotNullOrEmpty(jobName, nameof(jobName));
             Argument.AssertNotContainsSpace(jobName, nameof(jobName));
-            Argument.AssertNotMoreThanLength(jobName, nameof(jobName), 63);
+            Argument.AssertNotMoreThanLength(jobName, nameof(jobName), 260);
             // Job name must start and end with a letter or number and can only contain the following special characters: [-_.]
             Argument.AssertRespectRegex(jobName, nameof(jobName), @"^[a-zA-Z0-9]([-_.]*[a-zA-Z0-9])*[a-zA-Z0-9]$", @"Job name must start and end with a letter or number and can only contain the following special characters: [-_.]");
             Argument.AssertNotNull(properties, nameof(properties));
@@ -217,7 +217,7 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(transformName, nameof(transformName));
             Argument.AssertNotNullOrEmpty(jobName, nameof(jobName));
             Argument.AssertNotContainsSpace(jobName, nameof(jobName));
-            Argument.AssertNotMoreThanLength(jobName, nameof(jobName), 63);
+            Argument.AssertNotMoreThanLength(jobName, nameof(jobName), 260);
             Argument.AssertNotNull(properties, nameof(properties));
 
               var url = Client.GenerateApiUrl(_jobApiUrl, transformName, jobName);

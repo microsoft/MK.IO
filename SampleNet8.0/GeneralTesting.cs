@@ -219,14 +219,17 @@ namespace Sample
                             "issuer",
                             "audience",
                             RestrictionTokenType.Jwt,
-                            new ContentKeyPolicySymmetricTokenKey(key)
+                            new ContentKeyPolicySymmetricTokenKey(key),
+                            requiredClaims: new List<ContentKeyPolicyTokenClaim>()
+                            {
+                                ContentKeyPolicyTokenClaim.ContentKeyIdentifierClaim
+                            }
                             )
                         )
                 ])
                 );
 
             var ckpolprop = await client.ContentKeyPolicies.GetPolicyPropertiesWithSecretsAsync("testpolcreate");
-
 
             // *******************
             // storage operations

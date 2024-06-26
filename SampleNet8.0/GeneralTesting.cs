@@ -38,6 +38,7 @@ namespace Sample
 
             MKIOClient.GenerateUniqueName("asset");
 
+            var tokens = client.Management.YourProfile.ListTokens();
             var org = client.Management.YourProfile.ListOrganizations();
 
             UserProfileSpecV1 profile;

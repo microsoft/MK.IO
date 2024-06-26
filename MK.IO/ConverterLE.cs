@@ -37,14 +37,13 @@ namespace MK.IO
                 {
                     return (DateTime?)null;
                 }
-                return (DateTime?)reader.Value;
+                return DateTime.Parse(reader.Value.ToString());// (DateTime?)reader.Value;
             }
             else if (objectType == typeof(DateTime))
             {
                 return (DateTime)reader.Value;
             }
-
-            return DateTime.Parse(reader.Value.ToString());
+            return DateTime.Parse(reader.Value.ToString());// DateTime.Parse(reader.Value.ToString());
         }
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)

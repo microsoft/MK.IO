@@ -33,5 +33,18 @@ namespace MK.IO.Management
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<List<UserOrganizationSchema>> ListOrganizationsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get all non-expired API tokens issued to the current user.
+        /// </summary>
+        /// <returns></returns>
+        List<UserTokenSchema> ListTokens();
+
+        /// <summary>
+        /// Get all non-expired API tokens issued to the current user.
+        /// </summary>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task<List<UserTokenSchema>> ListTokensAsync(CancellationToken cancellationToken = default);
     }
 }

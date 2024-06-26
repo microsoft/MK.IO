@@ -17,6 +17,7 @@ namespace MK.IO.Management
         //
         private const string _yourProfileProfileApiUrl = "api/v1/user/profile";
         private const string _yourProfileOrganizationsApiUrl = "api/v1/user/organizations";
+        private const string _yourProfileTokensApiUrl = "api/v1/user/tokens";
 
         /// <summary>
         /// Gets a reference to the AzureMediaServicesClient
@@ -63,6 +64,20 @@ namespace MK.IO.Management
         {
             string responseContent = await Client.GetObjectContentAsync(Client._baseUrl + _yourProfileOrganizationsApiUrl, cancellationToken);
             return UserOrganizationsListSchema.FromJson(responseContent).Value;
+        }
+
+        /// <inheritdoc/>
+        public List<UserTokenSchema> ListTokens()
+        {
+            var task = Task.Run(async () => await ListTokensAsync());
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<UserTokenSchema>> ListTokensAsync(CancellationToken cancellationToken = default)
+        {
+            string responseContent = await Client.GetObjectContentAsync(Client._baseUrl + _yourProfileTokensApiUrl, cancellationToken);
+            return UserTokenListSchema.FromJson(responseContent).Value;
         }
     }
 }

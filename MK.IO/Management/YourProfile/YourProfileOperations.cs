@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using MK.IO.Management.Models;
+using Newtonsoft.Json;
 
 namespace MK.IO.Management
 {
@@ -78,6 +79,20 @@ namespace MK.IO.Management
         {
             string responseContent = await Client.GetObjectContentAsync(Client._baseUrl + _yourProfileTokensApiUrl, cancellationToken);
             return UserTokenListSchema.FromJson(responseContent).Value;
+        }
+
+        /// <inheritdoc/>
+        public UserTokenSchema RequestNewToken(CreateTokenSchema tokenRequest)
+        {
+            var task = Task.Run(async () => await RequestNewTokenAsync(tokenRequest));
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<UserTokenSchema> RequestNewTokenAsync(CreateTokenSchema tokenRequest, CancellationToken cancellationToken = default)
+        {           
+            string responseContent = await Client.CreateObjectPostAsync(Client._baseUrl + _yourProfileTokensApiUrl, tokenRequest.ToJson(), cancellationToken);
+            return JsonConvert.DeserializeObject<UserTokenSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenSchema deserialization");
         }
     }
 }

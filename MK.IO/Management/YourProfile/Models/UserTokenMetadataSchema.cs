@@ -25,5 +25,12 @@ namespace MK.IO.Management.Models
         /// <value>Token type.</value>
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
+
+        /// <summary>
+        /// JWT.
+        /// </summary>
+        /// <value>Token JWT.</value>
+        [JsonProperty(PropertyName = "JWT")]
+        public string JWT { get; set; }
     }
 }

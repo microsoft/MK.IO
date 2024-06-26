@@ -38,6 +38,13 @@ namespace Sample
 
             MKIOClient.GenerateUniqueName("asset");
 
+            var profile1 = client.Management.YourProfile.GetProfile();
+
+            var toks = new CreateTokenSchema() { Description = "Test token", ExpireDate= DateTime.Now.AddDays(7), Type="full-access", OrganizationId = profile1.ActiveOrganizationId };
+
+            // var token = client.Management.YourProfile.RequestNewToken(toks);
+
+
             var tokens = client.Management.YourProfile.ListTokens();
             var org = client.Management.YourProfile.ListOrganizations();
 

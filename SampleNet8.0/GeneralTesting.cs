@@ -38,10 +38,12 @@ namespace Sample
 
             MKIOClient.GenerateUniqueName("asset");
 
+            var org = client.Management.YourProfile.ListOrganizations();
+
             UserProfileSpecV1 profile;
             try
             {
-                profile = client.Management.YourProfile.Get();
+                profile = client.Management.YourProfile.GetProfile();
             }
             catch (ApiException ex)
             {

@@ -1,11 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
-using MK.IO.Models;
 using MK.IO.Management.Models;
 
 namespace MK.IO.Management
@@ -17,13 +12,26 @@ namespace MK.IO.Management
         /// Get current user profile information.
         /// </summary>
         /// <returns></returns>
-        UserProfileSpecV1 Get();
+        UserProfileSpecV1 GetProfile();
 
         /// <summary>
         /// Get current user profile information.
         /// </summary>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<UserProfileSpecV1> GetAsync(CancellationToken cancellationToken = default);
+        Task<UserProfileSpecV1> GetProfileAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// List user's organizations and any associated invitation.
+        /// </summary>
+        /// <returns></returns>
+        List<UserOrganizationSchema> ListOrganizations();
+
+        /// <summary>
+        /// List user's organizations and any associated invitation.
+        /// </summary>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task<List<UserOrganizationSchema>> ListOrganizationsAsync(CancellationToken cancellationToken = default);
     }
 }

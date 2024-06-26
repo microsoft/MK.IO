@@ -1,8 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System.Text;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace MK.IO.Management.Models
@@ -11,27 +10,21 @@ namespace MK.IO.Management.Models
     /// <summary>
     /// 
     /// </summary>
-    [DataContract]
-    public class ProfileGetSchemaV1
+    public class UserOrganizationsListSchema
     {
         /// <summary>
         /// The kind of record.
         /// </summary>
         /// <value>The kind of record.</value>
-        [JsonProperty("kind")]
+        [JsonProperty(PropertyName = "kind")]
         public string Kind { get; set; }
 
         /// <summary>
-        /// Gets or Sets Metadata
+        /// List of organizations the user can access or has been invited to.
         /// </summary>
-        [JsonProperty("metadata")]
-        public UserMetadata Metadata { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Spec
-        /// </summary>
-        [JsonProperty("spec")]
-        public UserProfileSpecV1 Spec { get; set; }
+        /// <value>List of organizations the user can access or has been invited to.</value>
+        [JsonProperty(PropertyName = "value")]
+        public List<UserOrganizationSchema> Value { get; set; }
 
 
         /// <summary>
@@ -41,10 +34,9 @@ namespace MK.IO.Management.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class ProfileGetSchemaV1 {\n");
+            sb.Append("class UserOrganizationsListSchema {\n");
             sb.Append("  Kind: ").Append(Kind).Append("\n");
-            sb.Append("  Metadata: ").Append(Metadata).Append("\n");
-            sb.Append("  Spec: ").Append(Spec).Append("\n");
+            sb.Append("  Value: ").Append(Value).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -58,9 +50,9 @@ namespace MK.IO.Management.Models
             return JsonConvert.SerializeObject(this, ConverterLE.Settings);
         }
 
-        public static ProfileGetSchemaV1 FromJson(string json)
+        public static UserOrganizationsListSchema FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<ProfileGetSchemaV1>(json, ConverterLE.Settings) ?? throw new Exception("Error with ProfileGetSchemaV1 deserialization");
+            return JsonConvert.DeserializeObject<UserOrganizationsListSchema>(json, ConverterLE.Settings) ?? throw new Exception("Error with UserOrganizationsListSchema deserialization");
         }
     }
 }

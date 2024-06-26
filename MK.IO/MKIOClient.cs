@@ -52,7 +52,7 @@ namespace MK.IO
         {
             if (default == _customerId)
             {
-                _customerId = Management.YourProfile.Get().ActiveOrganizationId;//.CustomerId; TODO
+                _customerId = Management.YourProfile.GetProfile().ActiveOrganizationId;//.CustomerId; TODO
             }
             return _customerId;
         }

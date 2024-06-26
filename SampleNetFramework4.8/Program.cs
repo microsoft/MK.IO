@@ -30,7 +30,7 @@ namespace SampleNetFramework
 
             try
             {
-                var profile = client.Management.YourProfile.Get();
+                var profile = client.Management.YourProfile.GetProfile();
             }
             catch (ApiException ex)
             {

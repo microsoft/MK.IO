@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace MK.IO.Models
 {
-
     /// <summary>
     /// 
     /// </summary>
@@ -30,9 +29,9 @@ namespace MK.IO.Models
         public AudioTrackChannelMappingType ChannelMapping { get; set; }
 
         /// <summary>
-        /// Track identifer to select
+        /// Track identifier to select
         /// </summary>
-        /// <value>Track identifer to select</value>
+        /// <value>Track identifier to select</value>
         public int? TrackId { get; set; }
     }
 }

@@ -10,13 +10,15 @@ namespace MK.IO.Models
     /// </summary>
     public class ContentKeyPolicyTokenRestriction : ContentKeyPolicyRestriction
     {
-        public ContentKeyPolicyTokenRestriction(string issuer, string audience, RestrictionTokenType restrictionTokenType, ContentKeyPolicyVerificationKey primaryVerificationKey)
+        public ContentKeyPolicyTokenRestriction(string issuer, string audience, RestrictionTokenType restrictionTokenType, ContentKeyPolicyVerificationKey primaryVerificationKey,  List<ContentKeyPolicyVerificationKey>? alternateVerificationKeys = null, List<ContentKeyPolicyTokenClaim>? requiredClaims = null, string? openIdConnectDiscoveryDocument = null)
         {
             Issuer = issuer;
             Audience = audience;
             RestrictionTokenType = restrictionTokenType;
             PrimaryVerificationKey = primaryVerificationKey;
-            AlternateVerificationKeys = new List<ContentKeyPolicyVerificationKey>();
+            AlternateVerificationKeys = alternateVerificationKeys ?? [];
+            RequiredClaims = requiredClaims!;
+            OpenIdConnectDiscoveryDocument = openIdConnectDiscoveryDocument!;
         }
 
         [JsonPropertyName("@odata.type")]

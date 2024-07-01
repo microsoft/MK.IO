@@ -56,7 +56,7 @@ namespace MK.IO.Tests
 
         [Theory]
         [InlineData("name with space")]
-        [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa123")]
+        [InlineData("kgMRYYUBi2Le3LAtuVDq220v4914MHud0Tmj6onzumNzkJP9gDPlZNmNunDp7lomsS0DUucyMAcSFzmxHFfH2wTgEVnCpzAamHMNTGyfsbk4WdB9LAlVPmmSlg3vhAduj2VQTsvohfWXqDiBTPaHoSHm9Zt4dbKWlAPxplgh3rdBiRVS45X9XELTgDC1bumc70icB4vQNVQ00cxcP9rkRNFXa2guqQQ5aZ0DiMGnN2qVXoXIvHD7rpdCDMD8WwxRWlaib")] // 261 chars
         [InlineData("job-123&4")]
         [InlineData("job-123.4")]
         [InlineData("-job-123")]
@@ -75,7 +75,7 @@ namespace MK.IO.Tests
         [InlineData("name_123")]
         [InlineData("name.123")]
         [InlineData("nname--123")]
-        [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        [InlineData("kgMRYYUBi2Le3LAtuVDq220v4914MHud0Tmj6onzumNzkJP9gDPlZNmNunDp7lomsS0DUucyMAcSFzmxHFfH2wTgEVnCpzAamHMNTGyfsbk4WdB9LAlVPmmSlg3vhAduj2VQTsvohfWXqDiBTPaHoSHm9Zt4dbKWlAPxplgh3rdBiRVS45X9XELTgDC1bumc70icB4vQNVQ00cxcP9rkRNFXa2guqQQ5aZ0DiMGnN2qVXoXIvHD7rpdCDMD8WwxRWlai")] // 260 chars
         public async Task Create_JobNameOK(string name)
         {
             // Arrange

@@ -1,7 +1,7 @@
 using Moq;
 using MK.IO.Operations;
-using Newtonsoft.Json;
 using MK.IO.Models;
+using System.Text.Json;
 
 
 namespace MK.IO.Tests
@@ -81,7 +81,7 @@ namespace MK.IO.Tests
             var mop = new Mock<ContentKeyPoliciesOperations>(mockClient2.Object);
 
             // act & assert
-            Assert.Throws<InvalidCastException>(() => mop.Object.Create("ckname", new ContentKeyPolicyProperties("description", new List<ContentKeyPolicyOption>())));
+            Assert.Throws<JsonException>(() => mop.Object.Create("ckname", new ContentKeyPolicyProperties("description", new List<ContentKeyPolicyOption>())));
 
             // Assert
             mockClient2.Verify(); // Verify that Create was called as expected

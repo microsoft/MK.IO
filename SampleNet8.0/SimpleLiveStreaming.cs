@@ -22,7 +22,8 @@ namespace Sample
     public class SimpleLiveStreaming
     {
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
-        private const string _transformName = "ConverterAllBitrateInterleaved";
+        private const string _transformName = "CopyAllBitrateInterleavedTransform";
+        private const ConverterNamedPreset _transformPreset = ConverterNamedPreset.CopyAllBitrateInterleaved;
 
         public static async Task RunAsync()
         {
@@ -328,19 +329,23 @@ namespace Sample
                 Console.WriteLine($"Asset '{mp4AssetName}' created.");
 
                 // Create or update the converter transform
-                _ = await CreateOrUpdateConverterTransformAsync(client, _transformName);
+                // See https://docs.mk.io/docs/asset-conversion-transform
+                _ = await CreateOrUpdateConverterTransformAsync(client, _transformName, _transformPreset);
 
                 // Submit the conversion job
                 await SubmitJobAsync(client, _transformName, jobName, outputAssetName, mp4AssetName, "*");
 
                 // Wait for the job to finish
-                await WaitForJobToFinishAsync(client, _transformName, jobName);
+                var job = await WaitForJobToFinishAsync(client, _transformName, jobName);
 
-                // Create a locator for clear streaming
-                _ = await CreateDownloadLocatorAsync(client, mp4AssetName, locatorName);
+                if (job.Properties.State == JobState.Finished)
+                {
+                    // Create a locator for clear streaming
+                    _ = await CreateDownloadLocatorAsync(client, mp4AssetName, locatorName);
 
-                // Display download paths
-                await ListDownloadMp4UrlsAsync(client, locatorName);
+                    // Display download paths
+                    await ListDownloadMp4UrlsAsync(client, locatorName);
+                }
             }
             return mp4AssetName;
         }
@@ -379,7 +384,7 @@ namespace Sample
                     ]
                 }
                 );
-            Console.WriteLine($"Encoding job '{encodingJob.Name}' submitted.");
+            Console.WriteLine($"Processing job '{encodingJob.Name}' submitted.");
             return encodingJob;
         }
 
@@ -399,11 +404,39 @@ namespace Sample
             {
                 await Task.Delay(SleepIntervalMs);
                 job = await client.Jobs.GetAsync(transformName, jobName);
-                Console.WriteLine(job.Properties.State + (job.Properties.Outputs.First().Progress != null ? $" {job.Properties.Outputs.First().Progress}%" : string.Empty));
+                Console.WriteLine($"State: {job.Properties.State}" + (job.Properties.Outputs.First().Progress != null ? $" Progress: {job.Properties.Outputs.First().Progress}%" : string.Empty));
             }
             while (job.Properties.State == JobState.Queued || job.Properties.State == JobState.Scheduled || job.Properties.State == JobState.Processing);
 
+            DisplayJobStatusWhenCompleted(job);
             return job;
+        }
+
+        /// <summary>
+        /// Display information about a job completed (finished, cancelled or failed).
+        /// </summary>
+        /// <param name="job">The job which is finished.</param>
+        private static void DisplayJobStatusWhenCompleted(JobSchema job)
+        {
+            if (job.Properties.State == JobState.Error)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Job failed.");
+                if (job.Properties.Outputs.First() != null && job.Properties.Outputs.First().Error.Message != null)
+                {
+                    Console.WriteLine(job.Properties.Outputs.First().Error.Message);
+                }
+            }
+            else if (job.Properties.State == JobState.Canceled)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Job cancelled.");
+            }
+            else if (job.Properties.State == JobState.Finished)
+            {
+                Console.WriteLine("Job finished.");
+            }
+            Console.ResetColor();
         }
 
         /// <summary>
@@ -412,16 +445,16 @@ namespace Sample
         /// <param name="client">The MK.IO client.</param>
         /// <param name="transformName">The transform name.</param>
         /// <returns>The transform.</returns>
-        private static async Task<TransformSchema> CreateOrUpdateConverterTransformAsync(MKIOClient client, string transformName)
+        private static async Task<TransformSchema> CreateOrUpdateConverterTransformAsync(MKIOClient client, string transformName, ConverterNamedPreset preset)
         {
             // Create or update a transform for CVQ encoding
             var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
             {
-                Description = "Converter with CopyAllBitrateInterleaved preset",
+                Description = $"Converter with {preset} preset",
                 Outputs =
                 [
                     new() {
-                        Preset = new BuiltInAssetConverterPreset(ConverterNamedPreset.CopyAllBitrateInterleaved),
+                        Preset = new BuiltInAssetConverterPreset(preset),
                         RelativePriority = TransformOutputPriorityType.Normal
                     }
                 ]

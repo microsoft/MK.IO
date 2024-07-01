@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 
 namespace MK.IO.Models
 {
-
     /// <summary>
     /// 
     /// </summary>
@@ -24,7 +23,6 @@ namespace MK.IO.Models
         [JsonProperty(PropertyName = "@odata.type")]
         internal override string OdataType => "SelectAudioTrackById";
 
-
         /// <summary>
         /// Optional designation for single channel audio tracks.
         /// </summary>
@@ -34,9 +32,9 @@ namespace MK.IO.Models
         public AudioTrackChannelMappingType ChannelMapping { get; set; }
 
         /// <summary>
-        /// Track identifer to select
+        /// Track identifier to select
         /// </summary>
-        /// <value>Track identifer to select</value>
+        /// <value>Track identifier to select</value>
         [DataMember(Name = "trackId", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "trackId")]
         public int? TrackId { get; set; }

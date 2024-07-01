@@ -38,7 +38,11 @@ var newpol = client.ContentKeyPolicies.Create(
                 "issuer",
                 "audience",
                 RestrictionTokenType.Jwt,
-                new ContentKeyPolicySymmetricTokenKey(key)
+                new ContentKeyPolicySymmetricTokenKey(key),
+                requiredClaims: new List<ContentKeyPolicyTokenClaim>()
+                {
+                    ContentKeyPolicyTokenClaim.ContentKeyIdentifierClaim
+                }
                 )
             )
     ])

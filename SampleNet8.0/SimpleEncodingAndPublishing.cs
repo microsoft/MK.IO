@@ -67,15 +67,12 @@ namespace Sample
             _ = await SubmitJobAsync(client, _transformName, jobName, inputAssetName, outputAssetName, _inputMP4FileName);
 
             // Polls the status of the job and wait for it to finish.
-            var encodingJob = await WaitForJobToFinishAsync(client, _transformName, jobName);
+            var job = await WaitForJobToFinishAsync(client, _transformName, jobName);
 
-            if (encodingJob.Properties.State != JobState.Finished)
+            if (job.Properties.State != JobState.Finished)
             {
-                Console.WriteLine("Encoding job cancelled or in error.");
-                if (encodingJob.Properties.Outputs.First() != null && encodingJob.Properties.Outputs.First().Error.Message != null)
-                {
-                    Console.WriteLine(encodingJob.Properties.Outputs.First().Error.Message);
-                }
+                // Alert the user if issue with the encoding job
+                DisplayJobStatusWhenCompleted(job);
                 await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName);
             }
             else
@@ -242,7 +239,7 @@ namespace Sample
                     ]
                 }
                 );
-            Console.WriteLine($"Encoding job '{encodingJob.Name}' submitted.");
+            Console.WriteLine($"Processing job '{encodingJob.Name}' submitted.");
             return encodingJob;
         }
 
@@ -364,11 +361,38 @@ namespace Sample
             {
                 await Task.Delay(SleepIntervalMs);
                 job = await client.Jobs.GetAsync(transformName, jobName);
-                Console.WriteLine(job.Properties.State + (job.Properties.Outputs.First().Progress != null ? $" {job.Properties.Outputs.First().Progress}%" : string.Empty));
+                Console.WriteLine($"State: {job.Properties.State}"  + (job.Properties.Outputs.First().Progress != null ? $" Progress: {job.Properties.Outputs.First().Progress}%" : string.Empty));
             }
             while (job.Properties.State == JobState.Queued || job.Properties.State == JobState.Scheduled || job.Properties.State == JobState.Processing);
 
             return job;
+        }
+
+        /// <summary>
+        /// Display information about a job completed (finished, cancelled or failed).
+        /// </summary>
+        /// <param name="job">The job which is finished.</param>
+        private static void DisplayJobStatusWhenCompleted(JobSchema job)
+        {
+            if (job.Properties.State == JobState.Error)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Job failed.");
+                if (job.Properties.Outputs.First() != null && job.Properties.Outputs.First().Error.Message != null)
+                {
+                    Console.WriteLine(job.Properties.Outputs.First().Error.Message);
+                }
+            }
+            else if (job.Properties.State == JobState.Canceled)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Job cancelled.");
+            }
+            else if (job.Properties.State == JobState.Finished)
+            {
+                Console.WriteLine("Job finished.");
+            }
+            Console.ResetColor();
         }
 
         /// <summary>

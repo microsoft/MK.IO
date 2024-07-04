@@ -35,6 +35,21 @@ namespace MK.IO.Management
         Task<List<UserOrganizationSchema>> ListOrganizationsAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Get a user token by ID.
+        /// </summary>
+        /// <param name="tokenId">The token Id.</param>
+        /// <returns></returns>
+        UserTokenSchema GetToken(Guid tokenId);
+
+        /// <summary>
+        /// Get a user token by ID.
+        /// </summary>
+        /// <param name="tokenId">The token Id.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task<UserTokenSchema> GetTokenAsync(Guid tokenId, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Get all non-expired API tokens issued to the current user.
         /// </summary>
         /// <returns></returns>
@@ -56,7 +71,7 @@ namespace MK.IO.Management
         /// An API token allows access to MK.IO to anyone who has a copy of it - you should treat these like your car keys and keep them safe.
         /// </summary>
         /// <returns></returns>
-        UserTokenSchema RequestNewToken(CreateTokenSchema tokenRequest);
+        UserTokenWithSecretSchema RequestNewToken(CreateTokenSchema tokenRequest);
 
         /// <summary>
         /// Request a new token granting access to the MK.IO API. There are three types of tokens.
@@ -68,6 +83,19 @@ namespace MK.IO.Management
         /// </summary>
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
-        Task<UserTokenSchema> RequestNewTokenAsync(CreateTokenSchema tokenRequest, CancellationToken cancellationToken = default);
+        Task<UserTokenWithSecretSchema> RequestNewTokenAsync(CreateTokenSchema tokenRequest, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Completely logout of the api by revoking all the tokens of the current user, for all organizations
+        /// </summary>
+        /// <returns></returns>
+        void RevokeAllTokens();
+
+        /// <summary>
+        /// Completely logout of the api by revoking all the tokens of the current user, for all organizations
+        /// </summary>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task RevokeAllTokensAsync(CancellationToken cancellationToken = default);
     }
 }

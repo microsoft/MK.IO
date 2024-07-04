@@ -44,7 +44,7 @@ namespace MK.IO.Management.Models
         /// </summary>
         /// <value>Type of token.</value>
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        public UserTokenType Type { get; set; }
 
 
         /// <summary>

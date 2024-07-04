@@ -40,11 +40,12 @@ namespace Sample
 
             var profile1 = client.Management.YourProfile.GetProfile();
 
-            var toks = new CreateTokenSchema() { Description = "Test token", ExpireDate= DateTime.Now.AddDays(7), Type="full-access", OrganizationId = profile1.ActiveOrganizationId };
+            var toks = new CreateTokenSchema() { Description = "Test token", ExpireDate = DateTime.Now.AddDays(7), Type = UserTokenType.FullAccess, OrganizationId = profile1.ActiveOrganizationId };
+
+            // client.Management.YourProfile.RevokeAllTokens();
 
             // var token = client.Management.YourProfile.RequestNewToken(toks);
-
-
+            
             var tokens = client.Management.YourProfile.ListTokens();
             var org = client.Management.YourProfile.ListOrganizations();
 
@@ -550,7 +551,7 @@ namespace Sample
 
             // create streaming endpoint
 
-            
+
             var newSe = client.StreamingEndpoints.Create("streamingendpointxp2", client.Account.GetSubscriptionLocation()!.Name, new StreamingEndpointProperties
             {
                 Description = "my description",
@@ -562,7 +563,7 @@ namespace Sample
                     Name = StreamingEndpointSkuType.Premium
                 }
             });
-           
+
 
             // start, stop, delete streaming endpoint
             //client.StreamingEndpoints.Start("streamingendpoint1");

@@ -3,6 +3,9 @@
 
 using MK.IO.Management.Models;
 using Newtonsoft.Json;
+#if NET462
+using System.Net.Http;
+#endif
 
 namespace MK.IO.Management
 {
@@ -19,6 +22,8 @@ namespace MK.IO.Management
         private const string _yourProfileProfileApiUrl = "api/v1/user/profile";
         private const string _yourProfileOrganizationsApiUrl = "api/v1/user/organizations";
         private const string _yourProfileTokensApiUrl = "api/v1/user/tokens";
+        private const string _yourProfileTokenApiUrl = _yourProfileTokensApiUrl+ "/{0}";
+
 
         /// <summary>
         /// Gets a reference to the AzureMediaServicesClient
@@ -38,7 +43,7 @@ namespace MK.IO.Management
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
         }
-     
+
         /// <inheritdoc/>
         public UserProfileSpecV1 GetProfile()
         {
@@ -68,6 +73,21 @@ namespace MK.IO.Management
         }
 
         /// <inheritdoc/>
+        public UserTokenSchema GetToken(Guid tokenId)
+        {
+            var task = Task.Run(async () => await GetTokenAsync(tokenId));
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<UserTokenSchema> GetTokenAsync(Guid tokenId, CancellationToken cancellationToken = default)
+        {
+            var url = string.Format(Client._baseUrl + _yourProfileTokenApiUrl, tokenId.ToString());
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
+            return UserTokenSchema.FromJson(responseContent);
+        }
+
+        /// <inheritdoc/>
         public List<UserTokenSchema> ListTokens()
         {
             var task = Task.Run(async () => await ListTokensAsync());
@@ -82,17 +102,30 @@ namespace MK.IO.Management
         }
 
         /// <inheritdoc/>
-        public UserTokenSchema RequestNewToken(CreateTokenSchema tokenRequest)
+        public UserTokenWithSecretSchema RequestNewToken(CreateTokenSchema tokenRequest)
         {
             var task = Task.Run(async () => await RequestNewTokenAsync(tokenRequest));
             return task.GetAwaiter().GetResult();
         }
 
         /// <inheritdoc/>
-        public async Task<UserTokenSchema> RequestNewTokenAsync(CreateTokenSchema tokenRequest, CancellationToken cancellationToken = default)
-        {           
+        public async Task<UserTokenWithSecretSchema> RequestNewTokenAsync(CreateTokenSchema tokenRequest, CancellationToken cancellationToken = default)
+        {
             string responseContent = await Client.CreateObjectPostAsync(Client._baseUrl + _yourProfileTokensApiUrl, tokenRequest.ToJson(), cancellationToken);
-            return JsonConvert.DeserializeObject<UserTokenSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenSchema deserialization");
+            return JsonConvert.DeserializeObject<UserTokenWithSecretSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenWithSecretSchema deserialization");
+        }
+
+        /// <inheritdoc/>
+        public void RevokeAllTokens()
+        {
+            var task = Task.Run(async () => await RevokeAllTokensAsync());
+            task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task RevokeAllTokensAsync(CancellationToken cancellationToken = default)
+        {
+            await Client.ObjectContentAsync(Client._baseUrl + _yourProfileTokensApiUrl, HttpMethod.Delete, cancellationToken);
         }
     }
 }

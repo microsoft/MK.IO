@@ -342,6 +342,14 @@ namespace MK.IO
                     }
                     throw new ApiException("Not Found" + errorDetail, status_, responseContent, null);
                 }
+                if (status_ == 409)
+                {
+                    if (message == null)
+                    {
+                        throw new ApiException("Response was null which was not expected.", status_, null, null);
+                    }
+                    throw new ApiException("Conflict" + errorDetail, status_, responseContent, null);
+                }
                 if (status_ == 429)
                 {
                     if (message == null)

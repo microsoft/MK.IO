@@ -80,7 +80,7 @@ namespace Sample
             var mp4AssetName = await ConvertLiveAssetToMP4Async(client, outputAssetName, config["StorageName"]!);
 
             // Clean up of resources
-            await CleanIfUserAcceptsAsync(client, outputAssetName, mp4AssetName, liveEventName, liveOutputName, createdEndpoint);
+            await CleanIfUserAcceptsAsync(client, [outputAssetName, mp4AssetName], liveEventName, liveOutputName, createdEndpoint);
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace Sample
                     _ = await CreateDownloadLocatorAsync(client, mp4AssetName, locatorName);
 
                     // Display download paths
-                    await ListDownloadMp4UrlsAsync(client, locatorName);
+                    await ListDownloadUrlsAsync(client, locatorName, ".mp4");
                 }
             }
             return mp4AssetName;
@@ -487,15 +487,15 @@ namespace Sample
         /// <param name="client">The MK.IO client.</param>
         /// <param name="locatorName">The locator name.</param>
         /// <returns></returns>
-        private static async Task ListDownloadMp4UrlsAsync(MKIOClient client, string locatorName)
+        private static async Task ListDownloadUrlsAsync(MKIOClient client, string locatorName, string filterFiles)
         {
             // list Streaming Endpoints
             var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
 
             // List the streaming Url
             var paths = await client.StreamingLocators.ListUrlPathsAsync(locatorName);
-            Console.WriteLine($"Mp4 download Urls for locator '{locatorName}':");
-            foreach (var path in paths.DownloadPaths.Where(d => d.EndsWith(".mp4")))
+            Console.WriteLine($"Download Urls for locator '{locatorName}' for {filterFiles} files:");
+            foreach (var path in paths.DownloadPaths.Where(d => d.EndsWith(filterFiles)))
             {
                 foreach (var se in streamingEndpoints)
                 {
@@ -505,17 +505,17 @@ namespace Sample
             }
         }
 
+
         /// <summary>
         /// Cleans the created resources if user accepts.
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
-        /// <param name="outputAssetName">The output asset name.</param>
-        /// <param name="mp4AssetName">The mp4 asset name</param>
+        /// <param name="assetNames">The asset names.</param>
         /// <param name="liveEventName">The live event name.</param>
         /// <param name="liveOutputName">The live output name.</param>
         /// <param name="streamingEndpointName">The streaming endpoint name.</param>
         /// <returns></returns>
-        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string outputAssetName, string? mp4AssetName, string liveEventName, string liveOutputName, string? streamingEndpointName = null)
+        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, List<string> assetNames, string liveEventName, string liveOutputName, string? streamingEndpointName = null)
         {
             string? response;
             do
@@ -536,24 +536,17 @@ namespace Sample
                     Console.WriteLine($"Error deleting live output '{liveOutputName}'. Error: {ex.Message}");
                 }
 
-                try
+                foreach (var assetName in assetNames)
                 {
-                    await client.Assets.DeleteAsync(outputAssetName);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting asset '{outputAssetName}'. Error: {ex.Message}");
-                }
-
-                if (mp4AssetName != null)
                     try
                     {
-                        await client.Assets.DeleteAsync(mp4AssetName);
+                        await client.Assets.DeleteAsync(assetName);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error deleting asset '{mp4AssetName}'. Error: {ex.Message}");
+                        Console.WriteLine($"Error deleting asset '{assetName}'. Error: {ex.Message}");
                     }
+                }
 
                 try
                 {

@@ -49,12 +49,15 @@ This sample code does the following :
 
 - upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
 - create the output asset
-- create/update a transform with MK.IO
-- submit a encoding job with MK.IO anbd wait for its completion
-- create a locator with MK.IO
-- create a streaming endpoint with MK.IO if there is none
-- list the streaming urls and test player urls
-- clean the resources
+- create/update a transform
+- submit an encoding job
+- create/update a transform for thumbnail
+- submit a job for thumbnail
+- create a download locator for the thumbnail and list the Url
+- create a streaming locator for the encoded asset
+- create and start a streaming endpoint if there is none
+- list the streaming urls and test player urls.
+- clean the created resources if the user accepts
 
 Run the SampleNet8.0 project to execute this sample code.
 

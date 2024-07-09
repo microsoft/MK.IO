@@ -24,6 +24,8 @@ namespace MK.IO.Operations
         private const string _streamingLocatorsApiUrl = MKIOClient._streamingLocatorsApiUrl;
         private const string _streamingLocatorApiUrl = _streamingLocatorsApiUrl + "/{1}";
         private const string _streamingLocatorListPathsApiUrl = _streamingLocatorApiUrl + "/listPaths";
+        private const string _streamingLocatorListContentKeysApiUrl = _streamingLocatorApiUrl + "/listContentKeys";
+
 
         /// <summary>
         /// Gets a reference to the AzureMediaServicesClient
@@ -165,6 +167,23 @@ namespace MK.IO.Operations
             var url = Client.GenerateApiUrl(_streamingLocatorListPathsApiUrl, streamingLocatorName);
             string responseContent = await Client.ObjectContentAsync(url, HttpMethod.Post, cancellationToken);
             return JsonConvert.DeserializeObject<StreamingLocatorListPathsResponseSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with streaming locator list paths deserialization");
+        }
+
+        /// <inheritdoc/>
+        public List<StreamingLocatorContentKey> ListContentKeys(string streamingLocatorName)
+        {
+            var task = Task.Run(async () => await ListContentKeysAsync(streamingLocatorName));
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<StreamingLocatorContentKey>> ListContentKeysAsync(string streamingLocatorName, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNullOrEmpty(streamingLocatorName, nameof(streamingLocatorName));
+
+            var url = Client.GenerateApiUrl(_streamingLocatorListContentKeysApiUrl, streamingLocatorName);
+            string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
+            return JsonConvert.DeserializeObject<StreamingLocatorListContentKeysResponseSchema>(responseContent, ConverterLE.Settings).ContentKeys ?? throw new Exception("Error with StreamingLocatorListContentKeysResponseSchema deserialization");
         }
     }
 }

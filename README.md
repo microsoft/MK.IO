@@ -14,7 +14,7 @@ You can create them in the MK.IO portal and revoke them if needed.
 To create one :
 
 1. Open a web browser and log into https://app.mk.io (sign in with Microsoft SSO).
-1. Once you are logged in, click on your email in the drop-down menu in the top right corner. More details [here](https://docs.mk.io/docs/api-tokens).]
+1. Once you are logged in, click on your email in the drop-down menu in the top right corner. More details [here](https://docs.mk.io/docs/api-tokens).
 
 For more information, please read this [article](https://docs.mk.io/docs/personal-access-tokens).
 
@@ -29,14 +29,15 @@ In the current version, operations are supported for :
 - Streaming locators
 - Storage accounts
 - Content key policies
-- Transforms, including with CVQ presets and converter presets
+- Transforms, including with CVQ presets, converter presets and Thumbnail generation
 - Jobs
 - Live events
 - Live outputs
 - Asset filters
 - Account filters
 - Streaming policies
-- Management / your profile
+- Account (some methods were moved to Management/YourProfile)
+- Management/YourProfile
 
 ### End-to-end sample code
 
@@ -51,7 +52,7 @@ This sample code does the following :
 - create/update a transform
 - submit an encoding job
 - create/update a transform for thumbnail
-- submit a job for thumbnail
+- submit a job for thumbnail generation
 - create a download locator for the thumbnail and list the Url
 - create a streaming locator for the encoded asset
 - create and start a streaming endpoint if there is none
@@ -92,7 +93,7 @@ using MK.IO.Models;
 var client = new MKIOClient("yourMKIOSubscriptionName", "yourMKIOPersonalAPIToken");
 
 // get user profile info
-var profile = client.Account.GetUserProfile();
+var profile = client.Account.Management.YourProfile.GetProfile();
 
 // Get subscription stats
 var stats = client.Account.GetSubscriptionStats();

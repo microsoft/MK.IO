@@ -14,9 +14,9 @@ namespace Sample
 
         static async Task MainAsync()
         {
-            // await SimpleEncodingAndPublishing.RunAsync();
+            await SimpleEncodingAndPublishing.RunAsync();
             // await SimpleLiveStreaming.RunAsync();
-            await GeneralTesting.RunAsync();
+            // await GeneralTesting.RunAsync();
         }
     }
 }

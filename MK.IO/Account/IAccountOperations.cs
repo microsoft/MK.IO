@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using MK.IO.Management;
 using MK.IO.Models;
 
 namespace MK.IO.Operations

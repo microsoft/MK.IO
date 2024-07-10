@@ -6,7 +6,6 @@ using System.Net.Http;
 #endif
 using MK.IO.Models;
 using Newtonsoft.Json;
-using System.Net;
 
 namespace MK.IO.Operations
 {

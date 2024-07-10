@@ -22,5 +22,11 @@ namespace MK.IO.Management.Models
         /// </summary>
         [JsonProperty(PropertyName = "spec")]
         public UserTokenSpecSchema Spec { get; set; }
+
+
+        public static UserTokenWithSecretSchema FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<UserTokenWithSecretSchema>(json, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenWithSecretSchema deserialization");
+        }
     }
 }

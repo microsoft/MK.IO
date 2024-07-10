@@ -67,7 +67,7 @@ namespace MK.IO.Management.Models
         /// Email address used for login
         /// </summary>
         /// <value>Email address used for login</value>
-        [JsonProperty("spec")]
+        [JsonProperty("loginEmail")]
         public string LoginEmail { get; set; }
 
         /// <summary>

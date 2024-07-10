@@ -33,7 +33,7 @@ namespace MK.IO.Tests
 
         [Theory]
         [InlineData(null)]
-        public async Task Create_WithNull(string name)
+        public void Create_WithNull(string name)
         {
             // Arrange
             var jobsOperations = new JobsOperations(_mockClient.Object);
@@ -46,7 +46,7 @@ namespace MK.IO.Tests
 
         [Theory]
         [InlineData("")]
-        public async Task Create_WithEmpty(string name)
+        public void Create_WithEmpty(string name)
         {
             // Arrange
             var jobsOperations = new JobsOperations(_mockClient.Object);
@@ -63,7 +63,7 @@ namespace MK.IO.Tests
         [InlineData("job-123.4")]
         [InlineData("-job-123")]
         [InlineData("job-123-")]
-        public async Task Create_JobNameErrorInName(string name)
+        public void Create_JobNameErrorInName(string name)
         {
             // Arrange
             var jobsOperations = new JobsOperations(_mockClient.Object);
@@ -120,7 +120,7 @@ namespace MK.IO.Tests
         [Theory]
         [InlineData("{\"name\":\"live-to-mp4-6a3413a8\",\"id\":\"/subscriptions/52907a2e-ab43-43ba-8b9f-8cb78285f665/resourceGroups/default/providers/Microsoft.Media/mediaservices/mkiotest/transforms/ConverterAllBitrateInterleaved/jobs/live-to-mp4-6a3413a8\",\"type\":\"Microsoft.Media/mediaservices/transforms/jobs\",\"properties\":{\"created\":\"2024-06-18T11:58:47.351891Z\",\"description\":\"Myjobwhichprocesses'asset-ec0688cc'to'asset-ec0688cc-mp4'with'ConverterAllBitrateInterleaved'transform.\",\"lastModified\":\"2024-06-18T11:59:06.511738Z\",\"priority\":\"Normal\",\"state\":\"FinishedXX\",\"input\":{\"files\":[\"*\"],\"assetName\":\"asset-ec0688cc\",\"@odata.type\":\"#Microsoft.Media.JobInputAssetXX\"},\"outputs\":[{\"label\":\"BuiltInAssetConverterPreset_0\",\"state\":\"Finhed\",\"endTime\":\"2024-06-18T11:59:06.394517Z\",\"progress\":100,\"assetName\":\"asset-ec0688cc-mp4\",\"@odata.type\":\"#Microsoft.Media.JobOutputAsset\"}],\"endTime\":\"2024-06-18T11:59:06.394517Z\"},\"systemData\":{\"createdBy\":\"user@domain.com\",\"createdByType\":\"User\",\"createdAt\":\"2024-06-18T11:58:47.351891Z\",\"lastModifiedBy\":\"user@domain.com\",\"lastModifiedByType\":\"User\",\"lastModifiedAt\":\"2024-06-18T11:59:06.511738Z\"},\"supplemental\":{\"operation\":\"get\",\"subscription\":{\"id\":\"bf747f59-771a-4e9b-a6cd-59351c4a71d2\",\"name\":\"mkiotest\"}}}")]
         [InlineData("{\"name\":\"job-7326300f\",\"id\":\"/subscriptions/52907a2e-ab43-43ba-8b9f-8cb78285f665/resourceGroups/default/providers/Microsoft.Media/mediaservices/mkiotest/transforms/simpletransformsd/jobs/job-7326300f\",\"type\":\"Microsoft.Media/mediaservices/transforms/jobs\",\"properties\":{\"created\":\"2024-03-27T15:33:58.451407Z\",\"description\":\"Mysdencodingjob\",\"lastModified\":\"2024-03-27T15:36:43.395374Z\",\"priority\":\"High\",\"state\":\"FinishedXXX\",\"input\":{\"files\":[\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4\"],\"@odata.type\":\"#Microsoft.Media.JobInputHttpXX\"},\"outputs\":[{\"label\":\"BuiltInStandardEncoderPreset_0\",\"state\":\"Finished\",\"endTime\":\"2024-03-27T15:36:36.000000Z\",\"progress\":100,\"assetName\":\"output-b19d8b84\",\"@odata.type\":\"#Microsoft.Media.JobOutputAsset\",\"startTime\":\"2024-03-27T15:36:31.000000Z\"}],\"startTime\":\"2024-03-27T15:36:31.000000Z\",\"endTime\":\"2024-03-27T15:36:36.000000Z\"},\"systemData\":{\"createdBy\":\"user@domain.com\",\"createdByType\":\"User\",\"createdAt\":\"2024-03-27T15:33:58.451407Z\",\"lastModifiedBy\":\"user@domain.com\",\"lastModifiedByType\":\"User\",\"lastModifiedAt\":\"2024-03-27T15:36:43.395374Z\"},\"supplemental\":{\"operation\":\"get\",\"subscription\":{\"id\":\"bf747f59-771a-4e9b-a6cd-59351c4a71d2\",\"name\":\"mkiotest\"}}}")]
-        public async Task Create_DeserializationError(string json)
+        public void Create_DeserializationError(string json)
         {
             var mockClient2 = new Mock<MKIOClient>("subscriptionname", Constants.jwtFakeToken);
 

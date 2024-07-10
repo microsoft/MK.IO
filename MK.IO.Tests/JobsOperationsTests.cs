@@ -1,8 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 using Moq;
 using MK.IO.Models;
 using MK.IO.Operations;
 using Newtonsoft.Json;
-
 
 namespace MK.IO.Tests
 {
@@ -13,7 +15,7 @@ namespace MK.IO.Tests
 
         public JobsOperationsTests()
         {
-            _mockClient = new Mock<MKIOClient>("subscriptionname", "token");
+            _mockClient = new Mock<MKIOClient>("subscriptionname", Constants.jwtFakeToken);
             _properties = new JobProperties()
             {
                 Outputs = [new JobOutputAsset() { AssetName = "name" }]
@@ -95,7 +97,7 @@ namespace MK.IO.Tests
         [InlineData("{\"name\":\"job-7326300f\",\"id\":\"/subscriptions/52907a2e-ab43-43ba-8b9f-8cb78285f665/resourceGroups/default/providers/Microsoft.Media/mediaservices/mkiotest/transforms/simpletransformsd/jobs/job-7326300f\",\"type\":\"Microsoft.Media/mediaservices/transforms/jobs\",\"properties\":{\"created\":\"2024-03-27T15:33:58.451407Z\",\"description\":\"Mysdencodingjob\",\"lastModified\":\"2024-03-27T15:36:43.395374Z\",\"priority\":\"High\",\"state\":\"Finished\",\"input\":{\"files\":[\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4\"],\"@odata.type\":\"#Microsoft.Media.JobInputHttp\"},\"outputs\":[{\"label\":\"BuiltInStandardEncoderPreset_0\",\"state\":\"Finished\",\"endTime\":\"2024-03-27T15:36:36.000000Z\",\"progress\":100,\"assetName\":\"output-b19d8b84\",\"@odata.type\":\"#Microsoft.Media.JobOutputAsset\",\"startTime\":\"2024-03-27T15:36:31.000000Z\"}],\"startTime\":\"2024-03-27T15:36:31.000000Z\",\"endTime\":\"2024-03-27T15:36:36.000000Z\"},\"systemData\":{\"createdBy\":\"user@domain.com\",\"createdByType\":\"User\",\"createdAt\":\"2024-03-27T15:33:58.451407Z\",\"lastModifiedBy\":\"user@domain.com\",\"lastModifiedByType\":\"User\",\"lastModifiedAt\":\"2024-03-27T15:36:43.395374Z\"},\"supplemental\":{\"operation\":\"get\",\"subscription\":{\"id\":\"bf747f59-771a-4e9b-a6cd-59351c4a71d2\",\"name\":\"mkiotest\"}}}")]
         public async Task Create_DeserializationOK(string json)
         {
-            var mockClient2 = new Mock<MKIOClient>("subscriptionname", "token");
+            var mockClient2 = new Mock<MKIOClient>("subscriptionname", Constants.jwtFakeToken);
 
             mockClient2.Setup(client => client.CreateObjectPutAsync(
                 It.IsAny<string>(),
@@ -120,7 +122,7 @@ namespace MK.IO.Tests
         [InlineData("{\"name\":\"job-7326300f\",\"id\":\"/subscriptions/52907a2e-ab43-43ba-8b9f-8cb78285f665/resourceGroups/default/providers/Microsoft.Media/mediaservices/mkiotest/transforms/simpletransformsd/jobs/job-7326300f\",\"type\":\"Microsoft.Media/mediaservices/transforms/jobs\",\"properties\":{\"created\":\"2024-03-27T15:33:58.451407Z\",\"description\":\"Mysdencodingjob\",\"lastModified\":\"2024-03-27T15:36:43.395374Z\",\"priority\":\"High\",\"state\":\"FinishedXXX\",\"input\":{\"files\":[\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4\"],\"@odata.type\":\"#Microsoft.Media.JobInputHttpXX\"},\"outputs\":[{\"label\":\"BuiltInStandardEncoderPreset_0\",\"state\":\"Finished\",\"endTime\":\"2024-03-27T15:36:36.000000Z\",\"progress\":100,\"assetName\":\"output-b19d8b84\",\"@odata.type\":\"#Microsoft.Media.JobOutputAsset\",\"startTime\":\"2024-03-27T15:36:31.000000Z\"}],\"startTime\":\"2024-03-27T15:36:31.000000Z\",\"endTime\":\"2024-03-27T15:36:36.000000Z\"},\"systemData\":{\"createdBy\":\"user@domain.com\",\"createdByType\":\"User\",\"createdAt\":\"2024-03-27T15:33:58.451407Z\",\"lastModifiedBy\":\"user@domain.com\",\"lastModifiedByType\":\"User\",\"lastModifiedAt\":\"2024-03-27T15:36:43.395374Z\"},\"supplemental\":{\"operation\":\"get\",\"subscription\":{\"id\":\"bf747f59-771a-4e9b-a6cd-59351c4a71d2\",\"name\":\"mkiotest\"}}}")]
         public async Task Create_DeserializationError(string json)
         {
-            var mockClient2 = new Mock<MKIOClient>("subscriptionname", "token");
+            var mockClient2 = new Mock<MKIOClient>("subscriptionname", Constants.jwtFakeToken);
 
             mockClient2.Setup(client => client.CreateObjectPutAsync(
                 It.IsAny<string>(),

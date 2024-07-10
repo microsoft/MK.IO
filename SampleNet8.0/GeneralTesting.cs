@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Configuration;
 using MK.IO;
 using MK.IO.Models;
+using MK.IO.Management.Models;
 using System.Security.Cryptography;
 
 namespace Sample
@@ -17,7 +18,7 @@ namespace Sample
             /* you need to add an appsettings.json file with the following content:
              {
                 "MKIOSubscriptionName": "yourMKIOsubscriptionname",
-                "MKIOToken": "yourMKIOtoken"
+                "MKIOToken": "yourMKIOPersonalAPIToken"
              }
             */
 
@@ -37,10 +38,21 @@ namespace Sample
 
             MKIOClient.GenerateUniqueName("asset");
 
-            UserInfo profile;
+            var profile1 = client.Management.YourProfile.GetProfile();
+
+            var toks = new CreateTokenSchema() { Description = "Test token", ExpireDate = DateTime.Now.AddDays(7), Type = UserTokenType.FullAccess, OrganizationId = profile1.ActiveOrganizationId };
+
+            // client.Management.YourProfile.RevokeAllTokens();
+
+            // var token = client.Management.YourProfile.RequestNewToken(toks);
+            
+            var tokens = client.Management.YourProfile.ListTokens();
+            var org = client.Management.YourProfile.ListOrganizations();
+
+            UserProfileSpecV1 profile;
             try
             {
-                profile = client.Account.GetUserProfile();
+                profile = client.Management.YourProfile.GetProfile();
             }
             catch (ApiException ex)
             {
@@ -539,7 +551,7 @@ namespace Sample
 
             // create streaming endpoint
 
-            
+
             var newSe = client.StreamingEndpoints.Create("streamingendpointxp2", client.Account.GetSubscriptionLocation()!.Name, new StreamingEndpointProperties
             {
                 Description = "my description",
@@ -551,7 +563,7 @@ namespace Sample
                     Name = StreamingEndpointSkuType.Premium
                 }
             });
-           
+
 
             // start, stop, delete streaming endpoint
             //client.StreamingEndpoints.Start("streamingendpoint1");

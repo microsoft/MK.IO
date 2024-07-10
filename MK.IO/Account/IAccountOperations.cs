@@ -19,20 +19,7 @@ namespace MK.IO.Operations
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<AccountStats> GetSubscriptionStatsAsync(CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Get user profile information.
-        /// </summary>
-        /// <returns></returns>
-        UserInfo GetUserProfile();
-
-        /// <summary>
-        /// Get user profile information.
-        /// </summary>
-        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
-        /// <returns></returns>
-        Task<UserInfo> GetUserProfileAsync(CancellationToken cancellationToken = default);
-
+    
         /// <summary>
         /// Get subscription usage information for current month.
         /// </summary>

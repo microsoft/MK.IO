@@ -129,5 +129,20 @@ namespace MK.IO.Operations
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<StreamingLocatorListPathsResponseSchema> ListUrlPathsAsync(string streamingLocatorName, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// List Content Keys used by this Streaming Locator.
+        /// </summary>
+        /// <param name="streamingLocatorName">The name of the Streaming Locator.</param>
+        /// <returns></returns>
+        List<StreamingLocatorContentKey> ListContentKeys(string streamingLocatorName);
+
+        /// <summary>
+        /// List Content Keys used by this Streaming Locator.
+        /// </summary>
+        /// <param name="streamingLocatorName">The name of the Streaming Locator.</param>
+        /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
+        /// <returns></returns>
+        Task<List<StreamingLocatorContentKey>> ListContentKeysAsync(string streamingLocatorName, CancellationToken cancellationToken = default);
     }
 }

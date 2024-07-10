@@ -15,9 +15,9 @@ namespace MK.IO.Models
     public class StreamingEndpointsCurrentSku
     {
         /// <summary>
-        /// This is the bandwidth capacity of current streaming unit configuration. Readonly field.
+        /// This is the bandwidth capacity of current streaming unit configuration.
         /// </summary>
-        /// <value>This is the bandwidth capacity of current streaming unit configuration. Readonly field.</value>
+        /// <value>This is the bandwidth capacity of current streaming unit configuration</value>
         [DataMember(Name = "capacity", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "capacity")]
         public int? Capacity { get; private set; } = 600;

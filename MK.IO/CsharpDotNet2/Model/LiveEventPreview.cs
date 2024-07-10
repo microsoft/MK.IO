@@ -22,9 +22,9 @@ namespace MK.IO.Models
         public PreviewAccessControl AccessControl { get; set; }
 
         /// <summary>
-        /// Not currently supported. Will be used to support DRM license aquisition for preview content.
+        /// Not currently supported. Will be used to support DRM license acquisition for preview content.
         /// </summary>
-        /// <value>Not currently supported. Will be used to support DRM license aquisition for preview content.</value>
+        /// <value>Not currently supported. Will be used to support DRM license acquisition for preview content.</value>
         [DataMember(Name = "alternativeMediaId", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "alternativeMediaId")]
         [Obsolete] public string AlternativeMediaId { get; set; }

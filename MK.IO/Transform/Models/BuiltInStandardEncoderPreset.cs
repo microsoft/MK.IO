@@ -8,7 +8,10 @@ namespace MK.IO.Models
 {
     public class BuiltInStandardEncoderPreset : TransformPreset
     {
-
+        /// <summary>
+        /// Constructor for BuiltInStandardEncoderPreset
+        /// </summary>
+        /// <param name="presetName"></param>
         public BuiltInStandardEncoderPreset(EncoderNamedPreset presetName)
         {
             PresetName = presetName;
@@ -17,6 +20,10 @@ namespace MK.IO.Models
         [JsonProperty("@odata.type")]
         internal override string OdataType => "#Microsoft.Media.BuiltInStandardEncoderPreset";
 
+        /// <summary>
+        /// The built-in preset to be used for encoding videos.
+        /// </summary>
+        /// <value>The built-in preset to be used for encoding videos.
         [JsonProperty("presetName")]
         public EncoderNamedPreset PresetName { get; set; }
 

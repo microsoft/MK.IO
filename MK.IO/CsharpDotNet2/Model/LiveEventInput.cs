@@ -22,12 +22,18 @@ namespace MK.IO.Models
         public InputAccessControl AccessControl { get; set; }
 
         /// <summary>
-        /// A UUID in string form to uniquely identify the stream.          This can be specified at creation time but cannot be updated.          If omitted or null, the service will generate a unique value.
+        /// For RTMP, a UUID in string form to uniquely identify the stream.
+        /// For SRT, an arbitrary string of between 10 and 79 characters, used as the passphrase.
+        /// This can be specified at creation time but cannot be updated.
+        /// If omitted or null, the service will generate a unique value.
         /// </summary>
-        /// <value>A UUID in string form to uniquely identify the stream.          This can be specified at creation time but cannot be updated.          If omitted or null, the service will generate a unique value.</value>
+        /// <value>For RTMP, a UUID in string form to uniquely identify the stream.
+        /// For SRT, an arbitrary string of between 10 and 79 characters, used as the passphrase.
+        /// This can be specified at creation time but cannot be updated.
+        /// If omitted or null, the service will generate a unique value.</value>
         [DataMember(Name = "accessToken", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "accessToken")]
-        public Guid? AccessToken { get; set; }
+        public string AccessToken { get; set; }
 
         /// <summary>
         /// Populated server-side. The input endpoints for the live event.
@@ -46,9 +52,13 @@ namespace MK.IO.Models
         public TimeSpan? KeyFrameIntervalDuration { get; set; }
 
         /// <summary>
-        /// The input protocol for the live event.          This is specified at creation time and cannot be updated.         Must be one of RTMP or SRT. fmp4 smooth input is not supported.         
+        /// The input protocol for the live event.
+        /// This is specified at creation time and cannot be updated.
+        /// Must be one of RTMP or SRT. FragmentedMp4 is not supported.         
         /// </summary>
-        /// <value>The input protocol for the live event.          This is specified at creation time and cannot be updated.         Must be one of RTMP or SRT. fmp4 smooth input is not supported.         </value>
+        /// <value>The input protocol for the live event.
+        /// This is specified at creation time and cannot be updated.
+        /// Must be one of RTMP or SRT. FragmentedMp4 is not supported.</value>
         [DataMember(Name = "streamingProtocol", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "streamingProtocol")]
         public LiveEventInputProtocol StreamingProtocol { get; set; }

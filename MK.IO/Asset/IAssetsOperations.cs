@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using MK.IO.Models;
-using System.Threading;
 
 namespace MK.IO.Operations
 {

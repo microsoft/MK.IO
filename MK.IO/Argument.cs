@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.RegularExpressions;
 
 namespace MK.IO
@@ -84,6 +85,23 @@ namespace MK.IO
             if (value != null && !Regex.IsMatch(value, regexPattern))
             {
                 throw new ArgumentException($"Value does not respect regex pattern {regexPattern}." + tip != null ? System.Environment.NewLine + tip : "", name);
+            }
+        }
+
+        /// <summary>
+        /// Assert that value is a JWT token.
+        /// </summary>
+        /// <param name="authToken"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public static void AssertJwtToken(string authToken, string name)
+        {
+            try
+            {
+                var jwtSecurityToken = new JwtSecurityToken(authToken);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("Value is not a JWT Token. Please read https://docs.mk.io/docs/personal-access-tokens to learn how to generate a personal access token.", name);
             }
         }
     }

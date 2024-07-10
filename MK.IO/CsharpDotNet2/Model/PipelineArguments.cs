@@ -12,23 +12,23 @@ namespace MK.IO.Models
     /// 
     /// </summary>
     [DataContract]
-    public class StreamingEndpointsCurrentSku
+    public class PipelineArguments
     {
         /// <summary>
-        /// This is the bandwidth capacity of current streaming unit configuration.
+        /// Not currently supported. Arguments to each operation in the AI pipeline
         /// </summary>
-        /// <value>This is the bandwidth capacity of current streaming unit configuration</value>
-        [DataMember(Name = "capacity", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "capacity")]
-        public int? Capacity { get; private set; } = 600;
+        /// <value>Not currently supported. Arguments to each operation in the AI pipeline</value>
+        [DataMember(Name = "arguments", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "arguments")]
+        public Dictionary<string, Object> Arguments { get; set; }
 
         /// <summary>
-        /// The name of the SKU. Will default to 'Standard' if the sku configuration is not provided.
+        /// Not currently supported. The name of the AI pipeline the Transform will execute.
         /// </summary>
-        /// <value>The name of the SKU. Will default to 'Standard' if the sku configuration is not provided.</value>
+        /// <value>Not currently supported. The name of the AI pipeline the Transform will execute.</value>
         [DataMember(Name = "name", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "name")]
-        public StreamingEndpointSkuType Name { get; set; } = StreamingEndpointSkuType.Standard;
+        public string Name { get; set; }
 
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace MK.IO.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class StreamingEndpointsCurrentSku {\n");
-            sb.Append("  Capacity: ").Append(Capacity).Append("\n");
+            sb.Append("class PipelineArguments {\n");
+            sb.Append("  Arguments: ").Append(Arguments).Append("\n");
             sb.Append("  Name: ").Append(Name).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
@@ -51,7 +51,7 @@ namespace MK.IO.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
     }

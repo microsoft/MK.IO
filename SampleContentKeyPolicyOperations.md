@@ -8,7 +8,7 @@ using MK.IO.Models;
 // MK.IO Client creation
 // **********************
 
-var client = new MKIOClient("mkiosubscriptionname", "mkiotoken");
+var client = new MKIOClient("yourMKIOSubscriptionName", "yourMKIOPersonalAPIToken");
 
 // ******************************
 // content key policy operations

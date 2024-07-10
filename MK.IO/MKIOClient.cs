@@ -61,15 +61,16 @@ namespace MK.IO
         /// Create a client to operate the resources of a MK.IO subscription.
         /// </summary>
         /// <param name="subscriptionName">The MK.IO subscription name</param>
-        /// <param name="token">The MK.IO API Token.</param>
-        public MKIOClient(string subscriptionName, string token)
+        /// <param name="token">The MK.IO JWT API Token.</param>
+        public MKIOClient(string subscriptionName, string jwtToken)
         {
             Argument.AssertNotNullOrEmpty(subscriptionName, nameof(subscriptionName));
-            Argument.AssertNotNullOrEmpty(token, nameof(token));
-
+            Argument.AssertNotNullOrEmpty(jwtToken, nameof(jwtToken));
+            Argument.AssertJwtToken(jwtToken, nameof(jwtToken));
+            
             _subscriptionName = subscriptionName;
-            _apiToken = token;
-  
+            _apiToken = jwtToken;
+
             _httpClient = new HttpClient();
             // Request headers
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -164,7 +165,7 @@ namespace MK.IO
                 RequestUri = new Uri(url),
                 Method = httpMethod,
             };
-            request.Headers.Add("x-mkio-token", _apiToken);
+            request.Headers.Add("Authorization", $"Bearer {_apiToken}");
 
             using HttpResponseMessage amsRequestResult = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken).ConfigureAwait(false);
             string responseContent = await amsRequestResult.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -197,7 +198,7 @@ namespace MK.IO
                 RequestUri = new Uri(url),
                 Method = httpMethod,
             };
-            request.Headers.Add("x-mkio-token", _apiToken);
+            request.Headers.Add("Authorization", $"Bearer {_apiToken}");
             request.Content = new StringContent(amsJSONObject, System.Text.Encoding.UTF8, "application/json");
 
             using HttpResponseMessage amsRequestResult = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
@@ -350,6 +351,14 @@ namespace MK.IO
                     }
                     throw new ApiException("Not Found" + errorDetail, status_, responseContent, null);
                 }
+                if (status_ == 409)
+                {
+                    if (message == null)
+                    {
+                        throw new ApiException("Response was null which was not expected.", status_, null, null);
+                    }
+                    throw new ApiException("Conflict" + errorDetail, status_, responseContent, null);
+                }
                 if (status_ == 429)
                 {
                     if (message == null)
@@ -421,5 +430,7 @@ namespace MK.IO
 
             return (string.IsNullOrEmpty(prefix) ? string.Empty : prefix + "-") + Guid.NewGuid().ToString("N").Substring(0, length);
         }
+
+      
     }
 }

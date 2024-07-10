@@ -16,7 +16,7 @@ namespace MK.IO.Tests
 
         [Theory]
         [InlineData(null)]
-        public async Task CreateClient_WithNull(string name)
+        public void CreateClient_WithNull(string name)
         {
 
             // act & assert
@@ -26,7 +26,7 @@ namespace MK.IO.Tests
 
         [Theory]
         [InlineData("AGDTSBDH45DGD")]
-        public async Task CreateClient_WithNotAJwt(string token)
+        public void CreateClient_WithNotAJwt(string token)
         {
 
             // act & assert

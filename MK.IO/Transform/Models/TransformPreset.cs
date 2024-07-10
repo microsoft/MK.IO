@@ -8,7 +8,7 @@ namespace MK.IO.Models
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "@odata.type")]
     [JsonDerivedType(typeof(BuiltInStandardEncoderPreset), typeDiscriminator: "#Microsoft.Media.BuiltInStandardEncoderPreset")]
     [JsonDerivedType(typeof(BuiltInAssetConverterPreset), typeDiscriminator: "#Microsoft.Media.BuiltInAssetConverterPreset")]
-    [JsonDerivedType(typeof(ThumbnailGeneratorPreset), typeDiscriminator: "#Microsoft.Media.ThumbnailGeneratorPreset")]
+    [JsonDerivedType(typeof(ThumbnailGeneratorPreset), typeDiscriminator: "#MediaKind.ThumbnailGeneratorPreset")]
 
     //
     // Summary:

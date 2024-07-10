@@ -15,9 +15,9 @@ namespace Sample
     /// - create the output asset
     /// - create/update a transform
     /// - submit an encoding job
-    /// - create/update a transform for thumbnail
-    /// - submit a job for thumbnail
-    /// - create a download locator for the thumbnail and list the Url
+    /// - create/update a transform for thumbnails
+    /// - submit a job to generate a thumbnails sprite
+    /// - create a download locator for the thumbnails sprite and thumbnails vtt and list the Urls
     /// - create a streaming locator for the encoded asset
     /// - create and start a streaming endpoint if there is none
     /// - list the streaming urls and test player urls.
@@ -42,7 +42,8 @@ namespace Sample
            }
           */
 
-            Console.WriteLine("Sample that uploads a file in a new asset, does a video encoding to multiple bitrate with MK.IO and publish the output asset for clear streaming.");
+            Console.WriteLine("Sample for MK.IO that uploads a file in a new asset, does a video encoding to multiple bitrate, generate a thumbnails sprite and publish the output asset for clear streaming.");
+            Console.WriteLine();
 
             // Load settings from the appsettings.json file and check them
             IConfigurationRoot config = LoadAndCheckSettings();
@@ -103,7 +104,7 @@ namespace Sample
                     _ = await CreateDownloadLocatorAsync(client, outputThumbnailAssetName, locatorThumbnailName);
 
                     // Display download paths
-                    await ListDownloadUrlsAsync(client, locatorThumbnailName, ".png");
+                    await ListDownloadUrlsAsync(client, locatorThumbnailName);
                 }
 
                 // Create a locator for clear streaming
@@ -116,7 +117,7 @@ namespace Sample
                 await ListStreamingUrlsAsync(client, locatorName);
 
                 // Clean resources
-                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName, outputThumbnailAssetName], [(_transformName, jobName),(_transformThumbnailName, jobThumbnailName)], createdEndpoint);
+                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName, outputThumbnailAssetName], [(_transformName, jobName), (_transformThumbnailName, jobThumbnailName)], createdEndpoint);
             }
         }
 
@@ -248,13 +249,17 @@ namespace Sample
         private static async Task<TransformSchema> CreateOrUpdateThumbnailTransformAsync(MKIOClient client, string transformName)
         {
             // https://docs.mk.io/docs/thumbnails-generation
+            // Sprite configuration
             var thumbnailConfig = new List<ThumbnailGeneratorConfiguration>
             {
                 new() {
-                    Format = "Png",
-                    Height = "50%",
-                    Width = "50%",
-                    Start = "PT10S"
+                    Format = "Jpeg",
+                    Start = "PT0S",
+                    Range = "100%",
+                    Step = "1%",
+                    Width = "10%",
+                    Height = "10%",
+                    SpriteColumn = 10
                 }
             };
 
@@ -424,6 +429,7 @@ namespace Sample
         /// <returns>The job when processing is finished/failed/cancelled.</returns>
         private static async Task<JobSchema> WaitForJobToFinishAsync(MKIOClient client, string transformName, string jobName)
         {
+            Console.WriteLine();
             const int SleepIntervalMs = 10 * 1000;
             JobSchema job;
 
@@ -434,7 +440,8 @@ namespace Sample
                 Console.WriteLine($"State: {job.Properties.State}" + (job.Properties.Outputs.First().Progress != null ? $" Progress: {job.Properties.Outputs.First().Progress}%" : string.Empty));
             }
             while (job.Properties.State == JobState.Queued || job.Properties.State == JobState.Scheduled || job.Properties.State == JobState.Processing);
-
+            
+            Console.WriteLine();
             return job;
         }
 
@@ -489,15 +496,15 @@ namespace Sample
         /// <param name="client">The MK.IO client.</param>
         /// <param name="locatorName">The locator name.</param>
         /// <returns></returns>
-        private static async Task ListDownloadUrlsAsync(MKIOClient client, string locatorName, string filterFiles)
+        private static async Task ListDownloadUrlsAsync(MKIOClient client, string locatorName)
         {
             // list Streaming Endpoints
             var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
 
             // List the streaming Url
             var paths = await client.StreamingLocators.ListUrlPathsAsync(locatorName);
-            Console.WriteLine($"Download Urls for locator '{locatorName}' for {filterFiles} files:");
-            foreach (var path in paths.DownloadPaths.Where(d => d.EndsWith(filterFiles)))
+            Console.WriteLine($"Download Urls for locator '{locatorName}' :");
+            foreach (var path in paths.DownloadPaths)
             {
                 foreach (var se in streamingEndpoints)
                 {
@@ -515,7 +522,7 @@ namespace Sample
         /// <param name="transformAndjobNames"></param>
         /// <param name="streamingEndpoint"></param>
         /// <returns></returns>
-        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, List<string> assetNames, List<(string,string)> transformAndjobNames, string? streamingEndpoint = null)
+        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, List<string> assetNames, List<(string, string)> transformAndjobNames, string? streamingEndpoint = null)
         {
             string? response;
             do

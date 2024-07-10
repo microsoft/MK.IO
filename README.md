@@ -51,9 +51,9 @@ This sample code does the following :
 - create the output asset
 - create/update a transform
 - submit an encoding job
-- create/update a transform for thumbnail
-- submit a job for thumbnail generation
-- create a download locator for the thumbnail and list the Url
+- create/update a transform for thumbnails
+- submit a job to generate a thumbnails sprite
+- create a download locator for the thumbnails sprite and thumbnails vtt and list the Urls
 - create a streaming locator for the encoded asset
 - create and start a streaming endpoint if there is none
 - list the streaming urls and test player urls.

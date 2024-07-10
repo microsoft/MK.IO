@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using System.Runtime.Serialization;
+using System.Text.Json;
 
 namespace MK.IO.Models
 {
@@ -16,8 +15,6 @@ namespace MK.IO.Models
         /// The content keys used by this streaming locator
         /// </summary>
         /// <value>The content keys used by this streaming locator</value>
-        [DataMember(Name = "contentKeys", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "contentKeys")]
         public List<StreamingLocatorContentKey> ContentKeys { get; set; }
 
 
@@ -27,7 +24,7 @@ namespace MK.IO.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
     }
 }

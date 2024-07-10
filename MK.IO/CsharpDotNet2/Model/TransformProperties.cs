@@ -45,8 +45,6 @@ namespace MK.IO.Models
         /// <summary>
         /// Gets or Sets Pipeline
         /// </summary>
-        [DataMember(Name = "pipeline", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "pipeline")]
         public PipelineArguments Pipeline { get; set; }
 
 

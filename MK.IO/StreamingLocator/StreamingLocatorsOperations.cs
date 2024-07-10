@@ -184,7 +184,7 @@ namespace MK.IO.Operations
 
             var url = Client.GenerateApiUrl(_streamingLocatorListContentKeysApiUrl, streamingLocatorName);
             string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
-            return JsonConvert.DeserializeObject<StreamingLocatorListContentKeysResponseSchema>(responseContent, ConverterLE.Settings).ContentKeys ?? throw new Exception("Error with StreamingLocatorListContentKeysResponseSchema deserialization");
+            return JsonSerializer.Deserialize<StreamingLocatorListContentKeysResponseSchema>(responseContent, ConverterLE.Settings).ContentKeys ?? throw new Exception("Error with StreamingLocatorListContentKeysResponseSchema deserialization");
         }
     }
 }

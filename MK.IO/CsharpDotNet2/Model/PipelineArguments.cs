@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -18,16 +18,12 @@ namespace MK.IO.Models
         /// Not currently supported. Arguments to each operation in the AI pipeline
         /// </summary>
         /// <value>Not currently supported. Arguments to each operation in the AI pipeline</value>
-        [DataMember(Name = "arguments", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "arguments")]
         public Dictionary<string, Object> Arguments { get; set; }
 
         /// <summary>
         /// Not currently supported. The name of the AI pipeline the Transform will execute.
         /// </summary>
         /// <value>Not currently supported. The name of the AI pipeline the Transform will execute.</value>
-        [DataMember(Name = "name", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
 
@@ -51,8 +47,7 @@ namespace MK.IO.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
-
     }
 }

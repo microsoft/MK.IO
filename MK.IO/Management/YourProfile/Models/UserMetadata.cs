@@ -3,7 +3,7 @@
 
 using System.Text;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace MK.IO.Management.Models
 {
@@ -18,7 +18,6 @@ namespace MK.IO.Management.Models
         /// The unique identifier of the user.
         /// </summary>
         /// <value>The unique identifier of the user.</value>
-        [JsonProperty("id")]
         public Guid? Id { get; set; }
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace MK.IO.Management.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
     }
 }

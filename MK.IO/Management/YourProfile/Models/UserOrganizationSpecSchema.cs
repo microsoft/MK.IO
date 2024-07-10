@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace MK.IO.Management.Models
 {
@@ -14,7 +14,6 @@ namespace MK.IO.Management.Models
         /// <summary>
         /// Gets or Sets Invite
         /// </summary>
-        [JsonProperty(PropertyName = "invite")]
         public UserOrganizationPendingInviteSchema Invite { get; set; }
     }
 }

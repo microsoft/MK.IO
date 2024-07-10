@@ -3,7 +3,7 @@
 
 using System.Text;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace MK.IO.Management.Models
 {
@@ -18,70 +18,60 @@ namespace MK.IO.Management.Models
         /// Currently selected organization.
         /// </summary>
         /// <value>Currently selected organization.</value>
-        [JsonProperty("activeOrganizationId")]
         public Guid ActiveOrganizationId { get; set; }
 
         /// <summary>
         /// Avatar.
         /// </summary>
         /// <value>Avatar.</value>
-        [JsonProperty("avatar")]
         public string Avatar { get; set; }
 
         /// <summary>
         /// Company.
         /// </summary>
         /// <value>Company.</value>
-        [JsonProperty("company")]
         public string Company { get; set; }
 
         /// <summary>
         /// Contact email address
         /// </summary>
         /// <value>Contact email address</value>
-        [JsonProperty("contactEmail")]
         public string ContactEmail { get; set; }
 
         /// <summary>
         /// Country.
         /// </summary>
         /// <value>Country.</value>
-        [JsonProperty("country")]
         public string Country { get; set; }
 
         /// <summary>
         /// Is this user active?
         /// </summary>
         /// <value>Is this user active?</value>
-        [JsonProperty("isActive")]
         public bool? IsActive { get; set; }
 
         /// <summary>
         /// Job Role.
         /// </summary>
         /// <value>Job Role.</value>
-        [JsonProperty("jobRole")]
         public string JobRole { get; set; }
 
         /// <summary>
         /// Email address used for login
         /// </summary>
         /// <value>Email address used for login</value>
-        [JsonProperty("spec")]
         public string LoginEmail { get; set; }
 
         /// <summary>
         /// Full name.
         /// </summary>
         /// <value>Full name.</value>
-        [JsonProperty("name")]
         public string Name { get; set; }
 
         /// <summary>
         /// Phone number including international dialling code
         /// </summary>
         /// <value>Phone number including international dialling code</value>
-        [JsonProperty("phoneNumber")]
         public string PhoneNumber { get; set; }
 
 
@@ -113,8 +103,7 @@ namespace MK.IO.Management.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
-
     }
 }

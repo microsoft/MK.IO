@@ -1,8 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace MK.IO.Models
 {
@@ -19,21 +20,19 @@ namespace MK.IO.Models
             Thumbnails = thumbnails;
         }
 
-        [JsonProperty("@odata.type")]
+        [JsonPropertyName("@odata.type")]
         internal override string OdataType => "#MediaKind.ThumbnailGeneratorPreset";
 
         /// <summary>
         /// Used to create the output filename as `{BaseFilename}_{Label}{Index}{Extension}`.  The default is the name of the input file.  If the name of the input file is too long then it will be truncated to 64 characters.
         /// </summary>
         /// <value>Used to create the output filename as `{BaseFilename}_{Label}{Index}{Extension}`.  The default is the name of the input file.  If the name of the input file is too long then it will be truncated to 64 characters.</value>
-        [JsonProperty("baseFilename")]
         public string? BaseFilename { get; set; }
 
         /// <summary>
         /// The set of thumbnails to be produced.
         /// </summary>
         /// <value>The set of thumbnails to be produced.</value>
-        [JsonProperty("thumbnails")]
         public List<ThumbnailGeneratorConfiguration> Thumbnails { get; set; }
 
 
@@ -58,7 +57,7 @@ namespace MK.IO.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
     }
 }

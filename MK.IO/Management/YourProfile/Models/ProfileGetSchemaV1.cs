@@ -3,7 +3,7 @@
 
 using System.Text;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace MK.IO.Management.Models
 {
@@ -18,19 +18,16 @@ namespace MK.IO.Management.Models
         /// The kind of record.
         /// </summary>
         /// <value>The kind of record.</value>
-        [JsonProperty("kind")]
         public string Kind { get; set; }
 
         /// <summary>
         /// Gets or Sets Metadata
         /// </summary>
-        [JsonProperty("metadata")]
         public UserMetadata Metadata { get; set; }
 
         /// <summary>
         /// Gets or Sets Spec
         /// </summary>
-        [JsonProperty("spec")]
         public UserProfileSpecV1 Spec { get; set; }
 
 
@@ -55,12 +52,12 @@ namespace MK.IO.Management.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
 
         public static ProfileGetSchemaV1 FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<ProfileGetSchemaV1>(json, ConverterLE.Settings) ?? throw new Exception("Error with ProfileGetSchemaV1 deserialization");
+            return JsonSerializer.Deserialize<ProfileGetSchemaV1>(json, ConverterLE.Settings) ?? throw new Exception("Error with ProfileGetSchemaV1 deserialization");
         }
     }
 }

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace MK.IO.Management.Models
 {
@@ -14,13 +14,16 @@ namespace MK.IO.Management.Models
         /// <summary>
         /// Gets or Sets Metadata
         /// </summary>
-        [JsonProperty(PropertyName = "metadata")]
         public UserTokenWithSecretMetadataSchema Metadata { get; set; }
 
         /// <summary>
         /// Gets or Sets Spec
         /// </summary>
-        [JsonProperty(PropertyName = "spec")]
         public UserTokenSpecSchema Spec { get; set; }
+
+        public static UserTokenWithSecretSchema FromJson(string json)
+        {
+            return JsonSerializer.Deserialize<UserTokenWithSecretSchema>(json, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenWithSecretSchema deserialization");
+        }
     }
 }

@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace MK.IO.Management.Models
 {
@@ -16,14 +16,12 @@ namespace MK.IO.Management.Models
         /// The kind of record.
         /// </summary>
         /// <value>The kind of record.</value>
-        [JsonProperty(PropertyName = "kind")]
         public string Kind { get; set; }
 
         /// <summary>
         /// Token list.
         /// </summary>
         /// <value>Token list.</value>
-        [JsonProperty(PropertyName = "value")]
         public List<UserTokenSchema> Value { get; set; }
 
 
@@ -47,13 +45,12 @@ namespace MK.IO.Management.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonSerializer.Serialize(this, ConverterLE.Settings);
         }
 
         public static UserTokenListSchema FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<UserTokenListSchema>(json, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenListSchema deserialization");
+            return JsonSerializer.Deserialize<UserTokenListSchema>(json, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenListSchema deserialization");
         }
-
     }
 }

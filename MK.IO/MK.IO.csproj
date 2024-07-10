@@ -60,19 +60,19 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0-preview.3.24172.9" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0-preview.6.24327.7" />
    </ItemGroup>
 
   <!-- Conditionally obtain references for the netstandard2.0 target -->
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0-preview.3.24172.9" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0-preview.6.24327.7" />
   </ItemGroup>
 
   <!-- Conditionally obtain references for the netstandard2.1 target -->
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0-preview.3.24172.9" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0-preview.6.24327.7" />
   </ItemGroup>
 
   <ItemGroup>

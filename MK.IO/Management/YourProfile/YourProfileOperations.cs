@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using MK.IO.Management.Models;
-using Newtonsoft.Json;
+using System.Text.Json;
 #if NET462
 using System.Net.Http;
 #endif
@@ -112,7 +112,7 @@ namespace MK.IO.Management
         public async Task<UserTokenWithSecretSchema> RequestNewTokenAsync(CreateTokenSchema tokenRequest, CancellationToken cancellationToken = default)
         {
             string responseContent = await Client.CreateObjectPostAsync(Client._baseUrl + _yourProfileTokensApiUrl, tokenRequest.ToJson(), cancellationToken);
-            return JsonConvert.DeserializeObject<UserTokenWithSecretSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with UserTokenWithSecretSchema deserialization");
+            return UserTokenWithSecretSchema.FromJson(responseContent) ?? throw new Exception("Error with UserTokenWithSecretSchema deserialization");
         }
 
         /// <inheritdoc/>

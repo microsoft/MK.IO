@@ -12,6 +12,13 @@ namespace SampleCore
     {
         static void Main(string[] args)
         {
+            /* you need to add an appsettings.json file with the following content:
+            {
+              "MKIOSubscriptionName": "yourMKIOsubscriptionname",
+              "MKIOToken": "yourMKIOPersonalAPIToken",
+            }
+            */
+
             // load settings from appsettings.json
             IConfigurationRoot config = new ConfigurationBuilder()
              .AddJsonFile("appsettings.json")

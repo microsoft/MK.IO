@@ -36,7 +36,7 @@ namespace Sample
             /* you need to add an appsettings.json file with the following content:
            {
               "MKIOSubscriptionName": "yourMKIOsubscriptionname",
-              "MKIOToken": "yourMKIOtoken",
+              "MKIOToken": "yourMKIOPersonalAPIToken",
               "StorageName": "yourStorageAccountName",
               "TenantId" : "your Azure tenant ID " // optional
            }

@@ -13,6 +13,13 @@ namespace SampleNetFramework
         // Sample app to demonstrate how to use the MK.IO SDK with .Net framework 4.8
         static void Main(string[] args)
         {
+            /* you need to add an appsettings.json file with the following content:
+            {
+              "MKIOSubscriptionName": "yourMKIOsubscriptionname",
+              "MKIOToken": "yourMKIOPersonalAPIToken",
+            }
+            */
+
             // load settings from appsettings.json
             IConfigurationRoot config = new ConfigurationBuilder()
              .AddJsonFile("appsettings.json")

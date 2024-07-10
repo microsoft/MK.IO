@@ -66,11 +66,11 @@ namespace MK.IO.Models
         /// <summary>
         /// The name of the streaming policy used by this streaming locator.
         /// You may specify a custom policy by name, or used one of the predefined policies.
+        /// To get the list of valid policy options use the `GET /api/ams/{project_name}/contentKeyPolicies` endpoint.
         /// </summary>
-        /// <value>
-        /// The name of the streaming policy used by this streaming locator.
+        /// <value>The name of the streaming policy used by this streaming locator.
         /// You may specify a custom policy by name, or used one of the predefined policies.
-        /// </value>
+        /// To get the list of valid policy options use the `GET /api/ams/{project_name}/contentKeyPolicies` endpoint.</value>
         public string StreamingPolicyName { get; set; }
 
 

@@ -6,21 +6,19 @@ This project is an open source .NET SDK for [MediaKind MK.IO](https://mk.io). Fo
 
 ## Usage (C#, .NET)
 
-### MK.IO API Token
+### MK.IO Personal API Token
 
-You need the MK.IO API token `mkiotoken` to connect to the API.
+You need to use the new MK.IO Personal Access Tokens to connect to the API. This is a Json Web Token (JWT) also called Personal API Token.
+You can create them in the MK.IO portal and revoke them if needed.
 
-To do so,
+To create one :
 
-1. Open a web browser and log into https://mk.io (sign in with Microsoft SSO).
-1. Once you are logged in, open a second tab on the same browser and open this link in the new tab: https://api.mk.io/auth/token/
+1. Open a web browser and log into https://app.mk.io (sign in with Microsoft SSO).
+1. Once you are logged in, click on your email in the drop-down menu in the top right corner. More details [here](https://docs.mk.io/docs/api-tokens).
 
-This should provide you with your user_id and token. Note that this token is valid for 1 year.
+For more information, please read this [article](https://docs.mk.io/docs/personal-access-tokens).
 
-Another way to get the token is to use [Fiddler](https://www.telerik.com/fiddler) when you connect to the MK.IO portal with your browser.
-It is displayed in the header as `x-mkio-token`. For example, you should see it on the second REST call to https://api.mk.io/api/ams/mkiosubscriptionname/stats/.
-
-For more information, please read this [article](https://support.mk.io/portal/en/kb/articles/how-to-use-mkio-apis-step-by-step).
+This SDK also brings token management features for the MK.IO API. You can use the SDK to create, list, revoke, and get details of your personal API tokens, using client.Management.YourProfile.
 
 ### Supported operations
 
@@ -31,13 +29,15 @@ In the current version, operations are supported for :
 - Streaming locators
 - Storage accounts
 - Content key policies
-- Transforms, including with CVQ presets and converter presets
+- Transforms, including with CVQ presets, converter presets and Thumbnail generation
 - Jobs
 - Live events
 - Live outputs
 - Asset filters
 - Account filters
 - Streaming policies
+- Account (some methods were moved to Management/YourProfile)
+- Management/YourProfile
 
 ### End-to-end sample code
 
@@ -49,12 +49,15 @@ This sample code does the following :
 
 - upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
 - create the output asset
-- create/update a transform with MK.IO
-- submit a encoding job with MK.IO anbd wait for its completion
-- create a locator with MK.IO
-- create a streaming endpoint with MK.IO if there is none
-- list the streaming urls and test player urls
-- clean the resources
+- create/update a transform
+- submit an encoding job
+- create/update a transform for thumbnail
+- submit a job for thumbnail generation
+- create a download locator for the thumbnail and list the Url
+- create a streaming locator for the encoded asset
+- create and start a streaming endpoint if there is none
+- list the streaming urls and test player urls.
+- clean the created resources if the user accepts
 
 Run the SampleNet8.0 project to execute this sample code.
 
@@ -87,10 +90,10 @@ using MK.IO.Models;
 // MK.IO Client creation
 // **********************
 
-var client = new MKIOClient("mkiosubscriptionname", "mkiotoken");
+var client = new MKIOClient("yourMKIOSubscriptionName", "yourMKIOPersonalAPIToken");
 
 // get user profile info
-var profile = client.Account.GetUserProfile();
+var profile = client.Account.Management.YourProfile.GetProfile();
 
 // Get subscription stats
 var stats = client.Account.GetSubscriptionStats();

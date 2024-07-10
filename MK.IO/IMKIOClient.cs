@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using MK.IO.Management;
 using MK.IO.Operations;
 
 namespace MK.IO
@@ -16,6 +17,11 @@ namespace MK.IO
         /// Gets the ISubscriptionOperations.
         /// </summary>
         IAccountOperations Account { get; }
+
+        /// <summary>
+        /// Management operations
+        /// </summary>
+        IManagementOperations Management { get; }
 
         /// <summary>
         /// The Storage Accounts API provides a means of defining and retrieving Storage Accounts, and associating and managing Storage Credentials for a Storage Account.

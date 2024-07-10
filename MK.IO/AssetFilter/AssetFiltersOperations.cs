@@ -7,7 +7,6 @@ using System.Net;
 using System.Text.Json;
 #if NET462
 using System.Net.Http;
-using System.Threading;
 #endif
 
 namespace MK.IO.Operations

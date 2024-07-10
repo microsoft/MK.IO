@@ -10,12 +10,15 @@ using MK.IO.Models;
 namespace Sample
 {
     /// <summary>
-    /// Sample code for MK.IO using MK.IO .NET SDK that does the following
+    /// Sample code for MK.IO using MK.IO .NET SDK that does the following:
     /// - upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
     /// - create the output asset
     /// - create/update a transform
     /// - submit an encoding job
-    /// - create a locator
+    /// - create/update a transform for thumbnail
+    /// - submit a job for thumbnail
+    /// - create a download locator for the thumbnail and list the Url
+    /// - create a streaming locator for the encoded asset
     /// - create and start a streaming endpoint if there is none
     /// - list the streaming urls and test player urls.
     /// - clean the created resources if the user accepts
@@ -24,6 +27,7 @@ namespace Sample
     {
         private const string _transformName = "H264MultipleBitrate720pTransform";
         private const EncoderNamedPreset _transformPreset = EncoderNamedPreset.H264MultipleBitrate720p;
+        private const string _transformThumbnailName = "ThumbnailTransform";
         private const string _inputMP4FileName = @"Ignite.mp4";
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
@@ -32,7 +36,7 @@ namespace Sample
             /* you need to add an appsettings.json file with the following content:
            {
               "MKIOSubscriptionName": "yourMKIOsubscriptionname",
-              "MKIOToken": "yourMKIOtoken",
+              "MKIOToken": "yourMKIOPersonalAPIToken",
               "StorageName": "yourStorageAccountName",
               "TenantId" : "your Azure tenant ID " // optional
            }
@@ -50,6 +54,10 @@ namespace Sample
             string outputAssetName = $"output-{uniqueId}";
             string jobName = $"job-{uniqueId}";
             string locatorName = $"locator-{uniqueId}";
+
+            string outputThumbnailAssetName = $"{outputAssetName}-thumbnail";
+            string jobThumbnailName = $"{jobName}-thumbnail";
+            string locatorThumbnailName = $"{locatorName}-thumbnail";
 
             // MK.IO Client creation
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
@@ -73,10 +81,31 @@ namespace Sample
             {
                 // Alert the user if issue with the encoding job
                 DisplayJobStatusWhenCompleted(job);
-                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName);
+                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName], [(_transformName, jobName)]);
             }
             else
             {
+                // Output asset to host the thumbnail.
+                _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputThumbnailAssetName, $"Thumbnail asset from {outputAssetName} using {_transformThumbnailName} transform");
+
+                // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
+                _ = await CreateOrUpdateThumbnailTransformAsync(client, _transformThumbnailName);
+
+                // Submit a job request to MK.IO to apply the specified Transform to a given input video.
+                _ = await SubmitJobAsync(client, _transformThumbnailName, jobThumbnailName, outputAssetName, outputThumbnailAssetName, Path.GetFileNameWithoutExtension(_inputMP4FileName) + ".ism");
+
+                // Polls the status of the job and wait for it to finish.
+                var thumbnailJob = await WaitForJobToFinishAsync(client, _transformThumbnailName, jobThumbnailName);
+
+                if (thumbnailJob.Properties.State == JobState.Finished)
+                {
+                    // Create a locator for clear streaming
+                    _ = await CreateDownloadLocatorAsync(client, outputThumbnailAssetName, locatorThumbnailName);
+
+                    // Display download paths
+                    await ListDownloadUrlsAsync(client, locatorThumbnailName, ".png");
+                }
+
                 // Create a locator for clear streaming
                 _ = await CreateStreamingLocatorAsync(client, outputAssetName, locatorName);
 
@@ -86,7 +115,8 @@ namespace Sample
                 // Display streaming paths and test player urls
                 await ListStreamingUrlsAsync(client, locatorName);
 
-                await CleanIfUserAcceptsAsync(client, inputAssetName, outputAssetName, _transformName, jobName, createdEndpoint);
+                // Clean resources
+                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName, outputThumbnailAssetName], [(_transformName, jobName),(_transformThumbnailName, jobThumbnailName)], createdEndpoint);
             }
         }
 
@@ -147,6 +177,9 @@ namespace Sample
                 )
                 );
 
+            // We wait 2 seconds to let time to MK.IO create the container
+            await Task.Delay(2000);
+
             // User or app must have Storage Blob Data Contributor on the account for the upload to work!
             // Upload a blob (e.g., from a local file)
             var blobClient = blobContainerClient.GetBlobClient(Path.GetFileName(fileToUpload));
@@ -201,6 +234,43 @@ namespace Sample
                     }
                 ]
             });
+
+            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
+            return transform;
+        }
+
+        /// <summary>
+        /// Creates or updates the Transform for thumbnail creation.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="transformName">The transform name.</param>
+        /// <returns>The transform.</returns>
+        private static async Task<TransformSchema> CreateOrUpdateThumbnailTransformAsync(MKIOClient client, string transformName)
+        {
+            // https://docs.mk.io/docs/thumbnails-generation
+            var thumbnailConfig = new List<ThumbnailGeneratorConfiguration>
+            {
+                new() {
+                    Format = "Png",
+                    Height = "50%",
+                    Width = "50%",
+                    Start = "PT10S"
+                }
+            };
+
+            // Create or update a transform
+            var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
+            {
+                Description = $"Thumbnail transform",
+                Outputs =
+                [
+                    new() {
+                        Preset = new ThumbnailGeneratorPreset(thumbnailConfig),
+                        RelativePriority = TransformOutputPriorityType.Normal
+                    }
+                ]
+            });
+
             Console.WriteLine($"Transform '{transform.Name}' created/updated.");
             return transform;
         }
@@ -215,7 +285,7 @@ namespace Sample
         /// <param name="outputAssetName">The output asset name.</param>
         /// <param name="fileName">The filename in the input asset name.</param>
         /// <returns>The job.</returns>
-        private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string transformName, string jobName, string inputAssetName, string outputAssetName, string fileName)
+        private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string transformName, string jobName, string inputAssetName, string outputAssetName, string? fileName)
         {
             // Create the encoding job
             var encodingJob = await client.Jobs.CreateAsync(
@@ -228,13 +298,13 @@ namespace Sample
                     Input = new JobInputAsset(
                        inputAssetName,
                        [
-                           Path.GetFileName(fileName)
+                           fileName != null ? Path.GetFileName(fileName): ""
                        ]),
                     Outputs =
                     [
                        new JobOutputAsset()
                        {
-                           AssetName= outputAssetName
+                           AssetName = outputAssetName
                        }
                     ]
                 }
@@ -361,7 +431,7 @@ namespace Sample
             {
                 await Task.Delay(SleepIntervalMs);
                 job = await client.Jobs.GetAsync(transformName, jobName);
-                Console.WriteLine($"State: {job.Properties.State}"  + (job.Properties.Outputs.First().Progress != null ? $" Progress: {job.Properties.Outputs.First().Progress}%" : string.Empty));
+                Console.WriteLine($"State: {job.Properties.State}" + (job.Properties.Outputs.First().Progress != null ? $" Progress: {job.Properties.Outputs.First().Progress}%" : string.Empty));
             }
             while (job.Properties.State == JobState.Queued || job.Properties.State == JobState.Scheduled || job.Properties.State == JobState.Processing);
 
@@ -396,16 +466,56 @@ namespace Sample
         }
 
         /// <summary>
+        /// Creates a download locator on the asset.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="outputAssetName">The output asset name.</param>
+        /// <param name="locatorName">The locator name.</param>
+        /// <returns>The streaming locator.</returns>
+        private static async Task<StreamingLocatorSchema> CreateDownloadLocatorAsync(MKIOClient client, string outputAssetName, string locatorName)
+        {
+            return await client.StreamingLocators.CreateAsync(
+                 locatorName,
+                 new StreamingLocatorProperties
+                 {
+                     AssetName = outputAssetName,
+                     StreamingPolicyName = PredefinedStreamingPolicy.DownloadOnly
+                 });
+        }
+
+        /// <summary>
+        /// Lists the download Urls for a specified locator name.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="locatorName">The locator name.</param>
+        /// <returns></returns>
+        private static async Task ListDownloadUrlsAsync(MKIOClient client, string locatorName, string filterFiles)
+        {
+            // list Streaming Endpoints
+            var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
+
+            // List the streaming Url
+            var paths = await client.StreamingLocators.ListUrlPathsAsync(locatorName);
+            Console.WriteLine($"Download Urls for locator '{locatorName}' for {filterFiles} files:");
+            foreach (var path in paths.DownloadPaths.Where(d => d.EndsWith(filterFiles)))
+            {
+                foreach (var se in streamingEndpoints)
+                {
+                    Console.WriteLine($"      Url : https://{se.Properties.HostName}{path}");
+                }
+                Console.WriteLine();
+            }
+        }
+
+        /// <summary>
         /// Cleans the created resources if user accepts.
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="inputAssetName"></param>
-        /// <param name="outputAssetName"></param>
-        /// <param name="transformName"></param>
-        /// <param name="jobName"></param>
+        /// <param name="assetNames"></param>
+        /// <param name="transformAndjobNames"></param>
         /// <param name="streamingEndpoint"></param>
         /// <returns></returns>
-        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, string inputAssetName, string outputAssetName, string transformName, string jobName, string? streamingEndpoint = null)
+        private static async Task CleanIfUserAcceptsAsync(MKIOClient client, List<string> assetNames, List<(string,string)> transformAndjobNames, string? streamingEndpoint = null)
         {
             string? response;
             do
@@ -417,40 +527,37 @@ namespace Sample
 
             if (response == "Y" || response == "y")
             {
-                try
+                foreach (var assetName in assetNames)
                 {
-                    await client.Assets.DeleteAsync(inputAssetName);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Unexpected error deleting asset '{inputAssetName}'. Error: {ex.Message}");
-                }
-
-                try
-                {
-                    await client.Assets.DeleteAsync(outputAssetName);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting asset '{outputAssetName}'. Error: {ex.Message}");
+                    try
+                    {
+                        await client.Assets.DeleteAsync(assetName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Unexpected error deleting asset '{assetName}'. Error: {ex.Message}");
+                    }
                 }
 
-                try
+                foreach (var transformAndjobName in transformAndjobNames)
                 {
-                    await client.Jobs.DeleteAsync(transformName, jobName);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting asset '{outputAssetName}'. Error: {ex.Message}");
-                }
+                    try
+                    {
+                        await client.Jobs.DeleteAsync(transformAndjobName.Item1, transformAndjobName.Item2);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error deleting job '{transformAndjobName.Item2}'. Error: {ex.Message}");
+                    }
 
-                try
-                {
-                    await client.Transforms.DeleteAsync(transformName);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting transform '{transformName}'. Error: {ex.Message}");
+                    try
+                    {
+                        await client.Transforms.DeleteAsync(transformAndjobName.Item1);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error deleting transform '{transformAndjobName.Item1}'. Error: {ex.Message}");
+                    }
                 }
 
                 if (streamingEndpoint != null)

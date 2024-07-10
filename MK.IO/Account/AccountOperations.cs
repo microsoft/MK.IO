@@ -15,7 +15,6 @@ namespace MK.IO.Operations
         //
         // subscription operations
         //
-        private const string _accountProfileApiUrl = "api/profile/";
         private const string _accountStatsApiUrl = "api/ams/{0}/stats/";
         private const string _accountApiUrl = "api/accounts/{0}/";
         private const string _accountSubscriptionsUrl = _accountApiUrl + "subscriptions/";
@@ -41,6 +40,8 @@ namespace MK.IO.Operations
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
         }
+           
+
 
         /// <inheritdoc/>
         public AccountStats GetSubscriptionStats()
@@ -55,20 +56,6 @@ namespace MK.IO.Operations
             var url = Client.GenerateApiUrl(_accountStatsApiUrl);
             string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return AccountStats.FromJson(responseContent);
-        }
-
-        /// <inheritdoc/>
-        public UserInfo GetUserProfile()
-        {
-            var task = Task.Run(async () => await GetUserProfileAsync());
-            return task.GetAwaiter().GetResult();
-        }
-
-        /// <inheritdoc/>
-        public async Task<UserInfo> GetUserProfileAsync(CancellationToken cancellationToken = default)
-        {
-            string responseContent = await Client.GetObjectContentAsync(Client._baseUrl + _accountProfileApiUrl, cancellationToken);
-            return AccountProfile.FromJson(responseContent).Spec;
         }
 
         /// <inheritdoc/>

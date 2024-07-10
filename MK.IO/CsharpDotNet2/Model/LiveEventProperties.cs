@@ -58,10 +58,9 @@ namespace MK.IO.Models
         public DateTime? LastModified { get; private set; }
 
         /// <summary>
-        /// Not currently supported. The name of the pipeline the LiveEvent will execute.
+        /// Gets or Sets Pipeline
         /// </summary>
-        /// <value>Not currently supported. The name of the pipeline the LiveEvent will execute.</value>
-        [Obsolete] public string Pipeline { get; set; }
+        public PipelineArguments Pipeline { get; set; }
 
         /// <summary>
         /// Gets or Sets Preview

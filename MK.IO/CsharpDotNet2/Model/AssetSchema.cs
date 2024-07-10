@@ -21,9 +21,13 @@ namespace MK.IO.Models
         public string Id { get; private set; }
 
         /// <summary>
-        /// A dictionary of labels associated with the resource. Maximum number of labels: 32. Maximum length of a label or value: 256 characters.
+        /// A dictionary of labels associated with the resource.
+        /// Maximum number of labels: 32.
+        /// Maximum length of a label or value: 256 characters.
+        /// Label: alphanumeric, hyphens and underscores.
+        /// Value: alphanumeric, hyphens, underscores and spaces.
         /// </summary>
-        /// <value>A dictionary of labels associated with the resource. Maximum number of labels: 32. Maximum length of a label or value: 256 characters.</value>
+        /// <value>A dictionary of labels associated with the resource. Maximum number of labels: 32. Maximum length of a label or value: 256 characters. Label: alphanumeric, hyphens and underscores. Value: alphanumeric, hyphens, underscores and spaces.</value>
         public Dictionary<string, string> Labels { get; set; }
 
         /// <summary>

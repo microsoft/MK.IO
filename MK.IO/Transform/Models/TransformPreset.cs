@@ -9,7 +9,7 @@ namespace MK.IO.Models
     [JsonConverter(typeof(JsonSubtypes), "@odata.type")]
     [JsonSubtypes.KnownSubType(typeof(BuiltInStandardEncoderPreset), "#Microsoft.Media.BuiltInStandardEncoderPreset")]
     [JsonSubtypes.KnownSubType(typeof(BuiltInAssetConverterPreset), "#Microsoft.Media.BuiltInAssetConverterPreset")]
-    [JsonSubtypes.KnownSubType(typeof(ThumbnailGeneratorPreset), "#Microsoft.Media.ThumbnailGeneratorPreset")]
+    [JsonSubtypes.KnownSubType(typeof(ThumbnailGeneratorPreset), "#MediaKind.ThumbnailGeneratorPreset")]
 
     //
     // Summary:

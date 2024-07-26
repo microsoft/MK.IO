@@ -127,11 +127,12 @@ namespace MK.IO.Operations
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
             Argument.AssertNotNullOrEmpty(liveOutputName, nameof(liveOutputName));
-            Argument.AssertNotMoreThanLength(liveOutputName, nameof(liveOutputName), 260);
+            Argument.AssertNotMoreThanLength(liveOutputName, nameof(liveOutputName), 256);
             Argument.AssertNotNull(properties, nameof(properties));
+            Argument.AssertNotMoreThanLength(properties.Description, nameof(properties.Description), 4096);
+            Argument.AssertRespectRegex(properties.ManifestName, nameof(properties.ManifestName), @"^[a-zA-Z0-9\\-]+[a-zA-Z0-9]$");
 
             var url = Client.GenerateApiUrl(_liveOutputApiUrl, liveEventName, liveOutputName);
-            //tags ??= new Dictionary<string, string>();
             var content = new LiveOutputSchema { Properties = properties };
             string responseContent = await Client.CreateObjectPutAsync(url, content.ToJson(), cancellationToken);
             return JsonConvert.DeserializeObject<LiveOutputSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with live output deserialization");

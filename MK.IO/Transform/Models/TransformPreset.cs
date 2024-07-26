@@ -10,6 +10,8 @@ namespace MK.IO.Models
     [JsonSubtypes.KnownSubType(typeof(BuiltInStandardEncoderPreset), "#Microsoft.Media.BuiltInStandardEncoderPreset")]
     [JsonSubtypes.KnownSubType(typeof(BuiltInAssetConverterPreset), "#Microsoft.Media.BuiltInAssetConverterPreset")]
     [JsonSubtypes.KnownSubType(typeof(ThumbnailGeneratorPreset), "#MediaKind.ThumbnailGeneratorPreset")]
+    [JsonSubtypes.KnownSubType(typeof(TrackInserterPreset), "#MediaKind.TrackInserterPreset")]
+    [JsonSubtypes.KnownSubType(typeof(AIPipelinePreset), "#MediaKind.AIPipelinePreset")]
 
     //
     // Summary:

@@ -59,7 +59,7 @@ namespace MK.IO.Models
         /// <value>If the JobOutput is in a Processing state, this contains the Job completion percentage. The value is an estimate and not intended to be used to predict Job completion times.</value>
         [DataMember(Name = "progress", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "progress")]
-        public int? Progress { get; set; }
+        public int? Progress { get; set; } = 0;
 
         /// <summary>
         /// The UTC date and time at which this Output began processing.
@@ -75,7 +75,7 @@ namespace MK.IO.Models
         /// <value>The current state of the job.</value>
         [DataMember(Name = "state", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "state")]
-        public string State { get; set; }
+        public JobState State { get; set; } = JobState.Queued;
 
 
         /// <summary>

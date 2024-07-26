@@ -147,9 +147,12 @@ namespace MK.IO.Operations
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
             Argument.AssertNotContainsSpace(liveEventName, nameof(liveEventName));
-            Argument.AssertNotMoreThanLength(liveEventName, nameof(liveEventName), 260);
+            Argument.AssertNotLessThanLength(liveEventName, nameof(liveEventName), 2);
+            Argument.AssertNotMoreThanLength(liveEventName, nameof(liveEventName), 32);
             Argument.AssertNotNullOrEmpty(location, nameof(location));
             Argument.AssertNotNull(properties, nameof(properties));
+            Argument.AssertNotMoreThanLength(properties.Description, nameof(properties.Description), 4096);
+            Argument.AssertTagsNullOrCompliant(tags, 16, 64);
 
             if (properties.Encoding == null)
             {

@@ -51,7 +51,7 @@ namespace MK.IO.Models
         /// <value>The name of the DRM streaming policy for the live event preview. Defaults to Predefined_ClearStreamingOnly and no other value is presently supported.</value>
         [DataMember(Name = "streamingPolicyName", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "streamingPolicyName")]
-        public string StreamingPolicyName { get; set; }
+        public string StreamingPolicyName { get; set; } = PredefinedStreamingPolicy.ClearStreamingOnly;
 
 
         /// <summary>

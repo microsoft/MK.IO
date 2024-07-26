@@ -54,14 +54,13 @@ namespace MK.IO.Models
         /// <summary>
         /// The input protocol for the live event.
         /// This is specified at creation time and cannot be updated.
-        /// Must be one of RTMP or SRT. FragmentedMp4 is not supported.         
         /// </summary>
         /// <value>The input protocol for the live event.
         /// This is specified at creation time and cannot be updated.
-        /// Must be one of RTMP or SRT. FragmentedMp4 is not supported.</value>
+        /// </value>
         [DataMember(Name = "streamingProtocol", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "streamingProtocol")]
-        public LiveEventInputProtocol StreamingProtocol { get; set; }
+        public LiveEventInputProtocol StreamingProtocol { get; set; } = LiveEventInputProtocol.RTMP;
 
         /// <summary>
         /// The metadata endpoints for the live event.

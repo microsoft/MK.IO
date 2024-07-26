@@ -73,6 +73,21 @@ namespace MK.IO
         }
 
         /// <summary>
+        /// Asserts that the value does not have a length lower than the specified value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="name"></param>
+        /// <param name="length"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public static void AssertNotLessThanLength(string? value, string name, int length)
+        {
+            if (value != null && value.Length < length)
+            {
+                throw new ArgumentException($"Value length cannot be less than {length}.", name);
+            }
+        }
+
+        /// <summary>
         /// Assert that value is conform to regex pattern.
         /// </summary>
         /// <param name="value"></param>
@@ -102,6 +117,23 @@ namespace MK.IO
             catch (Exception ex)
             {
                 throw new ArgumentException("Value is not a JWT Token. Please read https://docs.mk.io/docs/personal-access-tokens to learn how to generate a personal access token.", name);
+            }
+        }
+
+        internal static void AssertTagsNullOrCompliant(Dictionary<string, string>? tags, int maxNumber, int maxLength)
+        {
+            if (tags != null)
+            {
+                if (tags.Count > maxNumber)
+                {
+                    throw new ArgumentException($"Tags are limited to {maxNumber} entries.");
+                }
+
+                foreach (var tag in tags)
+                {
+                    AssertNotMoreThanLength(tag.Key, "tag.Key", maxLength);
+                    AssertNotMoreThanLength(tag.Value, "tag.Value", maxLength);
+                }
             }
         }
     }

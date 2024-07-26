@@ -15,6 +15,9 @@ namespace MK.IO.Models
         /// <param name="baseFileName">Used to create the output filename as `{BaseFilename}_{Label}{Index}{Extension}`.  The default is the name of the input file.  If the name of the input file is too long then it will be truncated to 64 characters.</param>
         public ThumbnailGeneratorPreset(List<ThumbnailGeneratorConfiguration> thumbnails, string baseFileName = null)
         {
+            Argument.AssertNotMoreThanLength(baseFileName, nameof(baseFileName), 64);
+            Argument.AssertRespectRegex(baseFileName, nameof(baseFileName), @"^[A-Za-z0-9_-]+$");
+
             BaseFilename = baseFileName;
             Thumbnails = thumbnails;
         }

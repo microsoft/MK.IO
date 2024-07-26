@@ -2,32 +2,24 @@
 // Licensed under the MIT License.
 
 using Newtonsoft.Json;
-using System.Runtime.Serialization;
 using System.Text;
 
 namespace MK.IO.Models
 {
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class UtcClipTime : JobInputTime
+    public class AIPipelinePreset : TransformPreset
     {
-        public UtcClipTime(DateTime time)
-        {
-            Time = time;
-        }
-
+        /// <summary>
+        /// The discriminator for derived types. Must be set to #MediaKind.AIPipelinePreset
+        /// </summary>
+        /// <value>The discriminator for derived types. Must be set to #MediaKind.AIPipelinePreset</value>
         [JsonProperty("@odata.type")]
-        internal override string OdataType => "#Microsoft.Media.UtcClipTime";
+        internal override string OdataType => "#MediaKind.AIPipelinePreset";
 
         /// <summary>
-        /// The time position on the timeline of the input media based on UTC time.
+        /// Gets or Sets Pipeline
         /// </summary>
-        /// <value>The time position on the timeline of the input media based on UTC time.</value>
-        [DataMember(Name = "time", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "time")]
-        public DateTime? Time { get; set; }
+        [JsonProperty(PropertyName = "pipeline")]
+        public PipelineArguments Pipeline { get; set; }
 
 
         /// <summary>
@@ -37,9 +29,9 @@ namespace MK.IO.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class UtcClipTime {\n");
+            sb.Append("class AIPipelinePreset {\n");
             sb.Append("  OdataType: ").Append(OdataType).Append("\n");
-            sb.Append("  Time: ").Append(Time).Append("\n");
+            sb.Append("  Pipeline: ").Append(Pipeline).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -50,7 +42,7 @@ namespace MK.IO.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
     }

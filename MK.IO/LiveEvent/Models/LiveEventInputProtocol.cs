@@ -11,7 +11,7 @@ namespace MK.IO.Models
     /// The input protocol for the live event.
     /// This is specified at creation time and cannot be updated.
     /// </summary>
-    /// <value>Must be one of RTMP or SRT. fmp4 smooth input is not supported.</value>
+    /// <value>The input protocol for the live event. This is specified at creation time and cannot be updated.</value>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum LiveEventInputProtocol
     {
@@ -20,6 +20,12 @@ namespace MK.IO.Models
         /// </summary>
         [EnumMember(Value = "RTMP")]
         RTMP,
+
+        /// <summary>
+        /// Enum RTMPS for value: RTMPS
+        /// </summary>
+        [EnumMember(Value = "RTMPS")]
+        RTMPS,
 
         /// <summary>
         /// Enum SRT for value: SRT

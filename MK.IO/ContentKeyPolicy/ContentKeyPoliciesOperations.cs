@@ -140,7 +140,9 @@ namespace MK.IO.Operations
         {
             Argument.AssertNotNullOrEmpty(contentKeyPolicyName, nameof(contentKeyPolicyName));
             Argument.AssertNotContainsSpace(contentKeyPolicyName, nameof(contentKeyPolicyName));
+            Argument.AssertNotMoreThanLength(contentKeyPolicyName, nameof(contentKeyPolicyName), 260);
             Argument.AssertNotNull(properties, nameof(properties));
+            Argument.AssertNotMoreThanLength(properties.Description, nameof(properties.Description), 1024);
 
             var url = Client.GenerateApiUrl(_contentKeyPolicyApiUrl, contentKeyPolicyName);
             var content = new ContentKeyPolicySchema { Properties = properties };

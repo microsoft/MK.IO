@@ -5,6 +5,7 @@ using Moq;
 using MK.IO.Models;
 using MK.IO.Operations;
 using Newtonsoft.Json;
+using System.Xml.Linq;
 
 namespace MK.IO.Tests
 {
@@ -112,8 +113,9 @@ namespace MK.IO.Tests
         }
 
         [Theory]
+        [InlineData("n")] // 1 char
         [InlineData("name with space")]
-        [InlineData("kgMRYYUBi2Le3LAtuVDq220v4914MHud0Tmj6onzumNzkJP9gDPlZNmNunDp7lomsS0DUucyMAcSFzmxHFfH2wTgEVnCpzAamHMNTGyfsbk4WdB9LAlVPmmSlg3vhAduj2VQTsvohfWXqDiBTPaHoSHm9Zt4dbKWlAPxplgh3rdBiRVS45X9XELTgDC1bumc70icB4vQNVQ00cxcP9rkRNFXa2guqQQ5aZ0DiMGnN2qVXoXIvHD7rpdCDMD8WwxRWlaib")] // 261 chars
+        [InlineData("2VQTsvohfWXqDiBTPaHoSHm9Zt4dbKWlb")] // 33 chars
         public void Create_LiveEventErrorInName(string name)
         {
             // Arrange
@@ -124,11 +126,12 @@ namespace MK.IO.Tests
         }
 
         [Theory]
+        [InlineData("n1")]
         [InlineData("name-123")]
         [InlineData("name_123")]
         [InlineData("name.123")]
         [InlineData("nname--123")]
-        [InlineData("kgMRYYUBi2Le3LAtuVDq220v4914MHud0Tmj6onzumNzkJP9gDPlZNmNunDp7lomsS0DUucyMAcSFzmxHFfH2wTgEVnCpzAamHMNTGyfsbk4WdB9LAlVPmmSlg3vhAduj2VQTsvohfWXqDiBTPaHoSHm9Zt4dbKWlAPxplgh3rdBiRVS45X9XELTgDC1bumc70icB4vQNVQ00cxcP9rkRNFXa2guqQQ5aZ0DiMGnN2qVXoXIvHD7rpdCDMD8WwxRWlai")] // 260 chars
+        [InlineData("2VQTsvohfWXqDiBTPaHoSHm9Zt4dbKWl")] // 32 chars
         public async Task Create_LiveEventNameOK(string name)
         {
             // Arrange
@@ -187,6 +190,54 @@ namespace MK.IO.Tests
 
             // act & assert
             Assert.Throws<JsonSerializationException>(() => mop.Object.Create("name", "name", _properties));
+
+            // Assert
+            mop.Verify();
+        }
+
+        [Theory]
+        [InlineData(64, 17)]
+        [InlineData(65, 16)]
+        public void Create_LiveEventErrorInTags(int sizeValue, int numberEntries)
+        {
+            // Arrange
+            var liveEventsOperations = new LiveEventsOperations(_mockClient.Object);
+
+            var tags = new Dictionary<string, string>();
+            for (int i = 0; i < numberEntries; i++)
+            {
+                tags.Add(MKIOClient.GenerateUniqueName(null, sizeValue), MKIOClient.GenerateUniqueName(null, sizeValue));
+            }
+
+            // act & assert
+            Assert.Throws<ArgumentException>(() => liveEventsOperations.Create("name", "francecentral", _properties, tags));
+        }
+
+        [Theory]
+        [InlineData(64, 16)]
+        public void Create_LiveEventNoErrorInTags(int sizeValue, int numberEntries)
+        {
+            var mockClient2 = new Mock<MKIOClient>("subscriptionname", Constants.jwtFakeToken);
+
+            mockClient2.Setup(client => client.CreateObjectPutAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()
+                )
+            )
+                .Returns(Task.FromResult("{}"))
+                .Verifiable("CreateObjectPutAsync was not called with the expected parameters.");
+
+            var mop = new Mock<LiveEventsOperations>(mockClient2.Object);
+
+            var tags = new Dictionary<string, string>();
+            for (int i = 0; i < numberEntries; i++)
+            {
+                tags.Add(MKIOClient.GenerateUniqueName(null, sizeValue), MKIOClient.GenerateUniqueName(null, sizeValue));
+            }
+
+            // Act
+            mop.Object.Create("name", "name", _properties, tags);
 
             // Assert
             mop.Verify();

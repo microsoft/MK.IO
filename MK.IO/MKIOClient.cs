@@ -421,16 +421,19 @@ namespace MK.IO
         /// <summary>
         /// Generates a unique name based on a prefix. Useful for creating unique names for assets, locators, etc.
         /// </summary>
-        /// <param name="prefix">Prefix of the name</param>
-        /// <param name="length">Lenght of the unique name (without the '-' before)</param>
+        /// <param name="prefix">Prefix of the name (optional)</param>
+        /// <param name="length">Length of the unique name after the prefix (and '-'). For example, with 8 and a prefix 'asset', name will be something like 'asset-12345678'</param>
         /// <returns></returns>
-        public static string GenerateUniqueName(string prefix, int length = 8)
+        public static string GenerateUniqueName(string? prefix, int length = 8)
         {
             // return a string of length "length" containing random characters
+            string unique = Guid.NewGuid().ToString("N");
 
-            return (string.IsNullOrEmpty(prefix) ? string.Empty : prefix + "-") + Guid.NewGuid().ToString("N").Substring(0, length);
+            while (unique.Length < length)
+            {
+                unique += Guid.NewGuid().ToString("N");
+            }
+            return (string.IsNullOrEmpty(prefix) ? string.Empty : prefix + "-") + unique.Substring(0, length);
         }
-
-      
     }
 }

@@ -168,6 +168,9 @@ namespace Sample
             );
             Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
 
+            // We wait 2 seconds to let time to MK.IO create the container
+            await Task.Delay(2000);
+
             // Create an interactive browser credential which will use the system authentication broker
             var blobContainerClient = new BlobContainerClient(
                 new Uri($"https://{inputAsset.Properties.StorageAccountName}.blob.core.windows.net/{inputAsset.Properties.Container}"),
@@ -177,9 +180,6 @@ namespace Sample
                 }
                 )
                 );
-
-            // We wait 2 seconds to let time to MK.IO create the container
-            await Task.Delay(2000);
 
             // User or app must have Storage Blob Data Contributor on the account for the upload to work!
             // Upload a blob (e.g., from a local file)

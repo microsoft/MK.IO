@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Text.RegularExpressions;
 
 namespace MK.IO
@@ -110,11 +110,8 @@ namespace MK.IO
         /// <exception cref="ArgumentException"></exception>
         public static void AssertJwtToken(string authToken, string name)
         {
-            try
-            {
-                var jwtSecurityToken = new JwtSecurityToken(authToken);
-            }
-            catch (Exception ex)
+            var jsonWebTokenHandler = new JsonWebTokenHandler();
+            if (!jsonWebTokenHandler.CanReadToken(authToken))
             {
                 throw new ArgumentException("Value is not a JWT Token. Please read https://docs.mk.io/docs/personal-access-tokens to learn how to generate a personal access token.", name);
             }

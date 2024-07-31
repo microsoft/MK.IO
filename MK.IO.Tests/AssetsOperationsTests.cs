@@ -134,5 +134,53 @@ namespace MK.IO.Tests
             // Assert
             mockClient2.Verify(); // Verify that CreateOrUpdateAsync was called as expected
         }
+
+        [Theory]
+        [InlineData(256,33)]
+        [InlineData(257,32)]
+        public void Create_AssetErrorInTags(int sizeValue, int numberEntries)
+        {
+            // Arrange
+            var assetsOperations = new AssetsOperations(mockClient.Object);
+
+            var tags = new Dictionary<string, string>();
+            for (int i = 0; i < numberEntries; i++)
+            {
+                tags.Add(MKIOClient.GenerateUniqueName(null, sizeValue), MKIOClient.GenerateUniqueName(null, sizeValue));
+            }
+
+            // act & assert
+            Assert.Throws<ArgumentException>(() => assetsOperations.CreateOrUpdate("name", "containername", "storagename", labels: tags));
+        }
+
+        [Theory]
+        [InlineData(256, 32)]
+        public void Create_AssetNoErrorInTags(int sizeValue, int numberEntries)
+        {
+            var mockClient2 = new Mock<MKIOClient>("subscriptionname", Constants.jwtFakeToken);
+
+            var tags = new Dictionary<string, string>();
+            for (int i = 0; i < numberEntries; i++)
+            {
+                tags.Add(MKIOClient.GenerateUniqueName(null, sizeValue), MKIOClient.GenerateUniqueName(null, sizeValue));
+            }
+
+            mockClient2.Setup(client => client.CreateObjectPutAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()
+                )
+            )
+                .Returns(Task.FromResult("{}"))
+                .Verifiable("CreateObjectPutAsync was not called with the expected parameters.");
+
+            var mop = new Mock<AssetsOperations>(mockClient2.Object);
+
+            // Act
+            mop.Object.CreateOrUpdate("name", "containername", "storagename", labels: tags);
+
+            // Assert
+            mockClient2.Verify(); // Verify that CreateOrUpdateAsync was called as expected
+        }
     }
 }

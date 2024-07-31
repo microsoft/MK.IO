@@ -54,6 +54,7 @@ namespace MK.IO.Operations
         public async Task<StorageResponseSchema> CreateAsync(StorageSchema storage, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNull(storage, nameof(storage));
+            Argument.AssertNotMoreThanLength(storage.Description, nameof(storage.Description), 1024);
             var storageSchema = new StorageRequestSchema()
             {
                 Spec = storage

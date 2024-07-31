@@ -38,14 +38,14 @@ namespace MK.IO.Models
         /// </summary>
         /// <value>The compression quality for JPEG images.  Between 0-100, default: 70.</value>
         [JsonProperty(PropertyName = "quality")]
-        public int? Quality { get; set; }
+        public int? Quality { get; set; } = 70;
 
         /// <summary>
         /// Either an ISO8601 duration, or a percentage of the asset duration, or the value '1'.  The default is '1', a single thumbnail is produced.
         /// </summary>
         /// <value>Either an ISO8601 duration, or a percentage of the asset duration, or the value '1'.  The default is '1', a single thumbnail is produced.</value>
         [JsonProperty(PropertyName = "range")]
-        public string Range { get; set; }
+        public string Range { get; set; } = "1";
 
         /// <summary>
         /// The number of columns used if you want a thumbnail sprite image.  Default: Single image output files.
@@ -59,14 +59,14 @@ namespace MK.IO.Models
         /// </summary>
         /// <value>Either an ISO8601 duration, or a percentage of the asset duration.  Default: PT10S.</value>
         [JsonProperty(PropertyName = "start")]
-        public string Start { get; set; }
+        public string Start { get; set; } = "PT10S";
 
         /// <summary>
         /// The intervals at which thumbnails are generated. Either an ISO8601 duration, or a percentage of the asset duration.
         /// </summary>
         /// <value>The intervals at which thumbnails are generated. Either an ISO8601 duration, or a percentage of the asset duration.</value>
         [JsonProperty(PropertyName = "step")]
-        public string Step { get; set; }
+        public string Step { get; set; } = "10%";
 
         /// <summary>
         /// Either an integer size in pixels, or a percentage of the input resolution. If only one of width/height is present, the aspect ratio from the source is preserved.

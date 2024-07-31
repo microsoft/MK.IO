@@ -129,6 +129,7 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(streamingLocatorName, nameof(streamingLocatorName));
             Argument.AssertNotMoreThanLength(streamingLocatorName, nameof(streamingLocatorName), 260);
             Argument.AssertNotNull(properties, nameof(properties));
+            Argument.AssertNotMoreThanLength(properties.DefaultContentKeyPolicyName, nameof(properties.DefaultContentKeyPolicyName), 260);
 
             var url = Client.GenerateApiUrl(_streamingLocatorApiUrl, streamingLocatorName);
             var content = new StreamingLocatorSchema { Properties = properties };

@@ -25,16 +25,16 @@ namespace MK.IO.Models
         public string AssetName { get; set; }
 
         /// <summary>
-        /// (NOT IMPLEMENTED) Defines a point on the timeline of the input media at which processing will end. Defaults to the end of the input media.
+        /// Defines a point on the timeline of the input media at which processing will end. Defaults to the end of the input media.
         /// </summary>
-        /// <value>(NOT IMPLEMENTED) Defines a point on the timeline of the input media at which processing will end. Defaults to the end of the input media.</value>
+        /// <value>Defines a point on the timeline of the input media at which processing will end. Defaults to the end of the input media.</value>
         [JsonProperty(PropertyName = "end")]
-        [Obsolete] public JobInputTime? End { get; set; }
+        public JobInputTime? End { get; set; }
 
         /// <summary>
-        /// List of files. Required for JobInputAsset.
+        /// List of files.
         /// </summary>
-        /// <value>List of files. Required for JobInputAsset.</value>
+        /// <value>List of files.</value>
         [JsonProperty(PropertyName = "files")]
         public List<string> Files { get; set; }
 
@@ -53,10 +53,10 @@ namespace MK.IO.Models
         public string Label { get; set; }
 
         /// <summary>
-        /// (NOT IMPLEMENTED) Defines a point on the timeline of the input media at which processing will start. Defaults to the beginning of the input media.
+        /// Defines a point on the timeline of the input media at which processing will start. Defaults to the beginning of the input media.
         /// </summary>
-        /// <value>(NOT IMPLEMENTED) Defines a point on the timeline of the input media at which processing will start. Defaults to the beginning of the input media.</value>
+        /// <value>Defines a point on the timeline of the input media at which processing will start. Defaults to the beginning of the input media.</value>
         [JsonProperty("start")]
-        [Obsolete] public JobInputTime? Start { get; set; }
+        public JobInputTime? Start { get; set; }
     }
 }

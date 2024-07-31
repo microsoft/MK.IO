@@ -143,23 +143,36 @@ namespace MK.IO.Operations
         }
 
         /// <inheritdoc/>
-        public async Task<LiveEventSchema> CreateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags, CancellationToken cancellationToken = default)
+        public async Task<LiveEventSchema> CreateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags = null, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNullOrEmpty(liveEventName, nameof(liveEventName));
             Argument.AssertNotContainsSpace(liveEventName, nameof(liveEventName));
-            Argument.AssertNotMoreThanLength(liveEventName, nameof(liveEventName), 260);
+            Argument.AssertNotLessThanLength(liveEventName, nameof(liveEventName), 2);
+            Argument.AssertNotMoreThanLength(liveEventName, nameof(liveEventName), 32);
             Argument.AssertNotNullOrEmpty(location, nameof(location));
             Argument.AssertNotNull(properties, nameof(properties));
+            Argument.AssertNotMoreThanLength(properties.Description, nameof(properties.Description), 4096);
+            Argument.AssertTagsNullOrCompliant(tags, 16, 64);
 
-            return await CreateOrUpdateAsync(liveEventName, location, properties, tags, Client.CreateObjectPutAsync, cancellationToken);
-        }
+            if (properties.Encoding == null)
+            {
+                throw new ArgumentException("Encoding property should not be null.");
+            }
 
-        internal async Task<LiveEventSchema> CreateOrUpdateAsync(string liveEventName, string location, LiveEventProperties properties, Dictionary<string, string>? tags, Func<string, string, CancellationToken, Task<string>> func, CancellationToken cancellationToken)
-        {
+            // SRT not supported for pass-through
+            if (
+                (properties.Encoding.EncodingType == LiveEventEncodingType.PassthroughBasic || properties.Encoding.EncodingType == LiveEventEncodingType.PassthroughStandard)
+                &&
+                (properties.Input != null && properties.Input.StreamingProtocol == LiveEventInputProtocol.SRT)
+                )
+            {
+                throw new ArgumentException("SRT is not supported for pass-through encoding.");
+            }
+
             var url = Client.GenerateApiUrl(_liveEventApiUrl, liveEventName);
             tags ??= new Dictionary<string, string>();
             var content = new LiveEventSchema { Location = location, Tags = tags, Properties = properties };
-            string responseContent = await func(url, content.ToJson(), cancellationToken);
+            string responseContent = await Client.CreateObjectPutAsync(url, content.ToJson(), cancellationToken);
             return JsonConvert.DeserializeObject<LiveEventSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with live event deserialization");
         }
 

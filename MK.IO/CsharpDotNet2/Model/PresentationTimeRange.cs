@@ -60,7 +60,7 @@ namespace MK.IO.Models
         /// <value>Defines the unit of time for all the values in this object. The value is expressed in ticks per second.         The default value of 10,000,000 increments per second (or 10 MHz) is used if this parameter is not specified. IF you're a video         engineer doing Serious Business, consider setting this to 48,000 or 90,000 representing 90Khz and 48Khz respectively. If you're          a mere mortal, a value of 1 is sensible and would represent seconds.                  For example, with a timescale set to \"1\", the startTimestamp and endTimestamp values are expressed in seconds. So a startTimestamp of         10 and an endTimestamp of 20 would represent a 10 second window of content. Segments overlapping this window would be included in the          output.         </value>
         [DataMember(Name = "timescale", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "timescale")]
-        public int? Timescale { get; set; }
+        public int? Timescale { get; set; } = 10000000;
 
 
         /// <summary>

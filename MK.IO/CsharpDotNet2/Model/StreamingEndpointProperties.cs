@@ -35,7 +35,7 @@ namespace MK.IO.Models
         /// <value>Indicates if CDN is enabled for the streaming endpoint.</value>
         [DataMember(Name = "cdnEnabled", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "cdnEnabled")]
-        public bool? CdnEnabled { get; set; }
+        public bool? CdnEnabled { get; set; } = false;
 
         /// <summary>
         /// If CDN is enabled, the optional CDN profile name for the streaming endpoint.

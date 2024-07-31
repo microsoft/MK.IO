@@ -151,9 +151,11 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotContainsSpace(streamingEndpointName, nameof(streamingEndpointName));
             Argument.AssertNotMoreThanLength(streamingEndpointName, nameof(streamingEndpointName), 24);
-            Argument.AssertRespectRegex(streamingEndpointName, nameof(streamingEndpointName), @"^[a-zA-Z0-9-]+$");
+            Argument.AssertRespectRegex(streamingEndpointName, nameof(streamingEndpointName), @"^[a-zA-Z0-9]+(-*[a-zA-Z0-9])*$");
             Argument.AssertNotNullOrEmpty(location, nameof(location));
             Argument.AssertNotNull(properties, nameof(properties));
+            Argument.AssertNotMoreThanLength(properties.Description, nameof(properties.Description), 1024);
+            Argument.AssertNotMoreThanLength(properties.CdnProfile, nameof(properties.CdnProfile), 100);
 
             var url = Client.GenerateApiUrl(_streamingEndpointApiUrl + "?autoStart=" + autoStart.ToString(), streamingEndpointName);
             tags ??= new Dictionary<string, string>();

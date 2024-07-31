@@ -121,8 +121,13 @@ namespace MK.IO.Operations
             Argument.AssertNotNullOrEmpty(assetName, nameof(assetName));
             Argument.AssertNotMoreThanLength(assetName, nameof(assetName), 260);
             Argument.AssertNotMoreThanLength(containerName, nameof(containerName), 63);
+            Argument.AssertNotLessThanLength(containerName, nameof(containerName), 3);
             Argument.AssertRespectRegex(containerName, nameof(containerName), @"^(?=.{3,63}$)[a-z0-9]+(-[a-z0-9]+)*$");
             Argument.AssertNotNullOrEmpty(storageName, nameof(storageName));
+            Argument.AssertNotMoreThanLength(storageName, nameof(storageName), 255);
+            Argument.AssertNotMoreThanLength(description, nameof(description), 4096);
+            Argument.AssertNotMoreThanLength(alternateId, nameof(alternateId), 64);
+            Argument.AssertTagsNullOrCompliant(labels, 32, 256);
 
             var url = Client.GenerateApiUrl(_assetApiUrl, assetName);
             AssetSchema content = new()

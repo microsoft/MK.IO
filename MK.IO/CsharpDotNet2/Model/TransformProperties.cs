@@ -46,13 +46,6 @@ namespace MK.IO.Models
         [JsonProperty(PropertyName = "outputs")]
         public List<TransformOutput> Outputs { get; set; }
 
-        /// <summary>
-        /// Gets or Sets Pipeline
-        /// </summary>
-        [DataMember(Name = "pipeline", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "pipeline")]
-        public PipelineArguments Pipeline { get; set; }
-
 
         /// <summary>
         /// Get the string presentation of the object
@@ -66,7 +59,6 @@ namespace MK.IO.Models
             sb.Append("  Description: ").Append(Description).Append("\n");
             sb.Append("  LastModified: ").Append(LastModified).Append("\n");
             sb.Append("  Outputs: ").Append(Outputs).Append("\n");
-            sb.Append("  Pipeline: ").Append(Pipeline).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }

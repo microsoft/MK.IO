@@ -20,7 +20,7 @@ namespace MK.IO.Models
         /// <value>The number of fragments per HLS segment.</value>
         [DataMember(Name = "fragmentsPerTsSegment", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "fragmentsPerTsSegment")]
-        public int? FragmentsPerTsSegment { get; set; }
+        public int? FragmentsPerTsSegment { get; set; } = 1;
 
 
         /// <summary>

@@ -92,7 +92,7 @@ namespace MK.IO.Models
         /// <value>The current state of the job.</value>
         [DataMember(Name = "state", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "state")]
-        public JobState State { get; private set; }
+        public JobState State { get; private set; } = JobState.Queued;
 
 
         /// <summary>

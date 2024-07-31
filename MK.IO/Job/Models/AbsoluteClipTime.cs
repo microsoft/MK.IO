@@ -22,9 +22,9 @@ namespace MK.IO.Models
         internal override string OdataType => "#Microsoft.Media.AbsoluteClipTime";
 
         /// <summary>
-        /// The time position on the timeline of the input media. It is usually specified as an ISO8601 period. e.g PT30S for 30 seconds.
+        /// The time position on the timeline of the input media. Specified as an ISO8601 period. e.g PT30S for 30 seconds.
         /// </summary>
-        /// <value>The time position on the timeline of the input media. It is usually specified as an ISO8601 period. e.g PT30S for 30 seconds.</value>
+        /// <value>The time position on the timeline of the input media. Specified as an ISO8601 period. e.g PT30S for 30 seconds.</value>
         [DataMember(Name = "time", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "time")]
         public TimeSpan Time { get; set; }

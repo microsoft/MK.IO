@@ -4,7 +4,6 @@
 using Moq;
 using MK.IO.Operations;
 using Newtonsoft.Json;
-using System.Xml.Linq;
 
 namespace MK.IO.Tests
 {

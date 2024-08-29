@@ -15,12 +15,12 @@ namespace MK.IO.Models
     public class FirstQuality
     {
         /// <summary>
-        /// Not yet implemented. Denotes the target video bitrate to be used when starting playback of an HLS video manifest.          If the defined bitrate exactly matches a bitrate in the video manifest, that playlist will be presented first among the available representations in the manifest.         If the defined bitrate is between quality levels, we take the closest of the adjacent playlists and move them to the top, ignoring sequencing for other playlists.         If the defined quality exceeds that of the bitrates in the manifest, we order largest to smallest.          If the defined bitrate underruns the bitrates in the manifest, we order smallest to largest.          
+        /// Denotes the target video bitrate to be used when starting playback of an HLS manifest.         The video representation with the bitrate closest to the defined bitrate will be presented first among the available representations in the HLS manifest.
         /// </summary>
-        /// <value>Not yet implemented. Denotes the target video bitrate to be used when starting playback of an HLS video manifest.          If the defined bitrate exactly matches a bitrate in the video manifest, that playlist will be presented first among the available representations in the manifest.         If the defined bitrate is between quality levels, we take the closest of the adjacent playlists and move them to the top, ignoring sequencing for other playlists.         If the defined quality exceeds that of the bitrates in the manifest, we order largest to smallest.          If the defined bitrate underruns the bitrates in the manifest, we order smallest to largest.          </value>
+        /// <value>Denotes the target video bitrate to be used when starting playback of an HLS manifest.         The video representation with the bitrate closest to the defined bitrate will be presented first among the available representations in the HLS manifest.</value>
         [DataMember(Name = "bitrate", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "bitrate")]
-        [Obsolete] public int? Bitrate { get; set; }
+        public int? Bitrate { get; set; }
 
 
         /// <summary>

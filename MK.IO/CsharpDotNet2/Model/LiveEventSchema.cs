@@ -38,9 +38,9 @@ namespace MK.IO.Models
         public LiveEventProperties Properties { get; set; }
 
         /// <summary>
-        /// A dictionary of tags associated with the live event. Maximum number of tags: 16. Maximum length of a tag: 256 characters.
+        /// A dictionary of tags associated with the live event. Maximum number of tags: 16. Maximum length of a tag: 64 characters.
         /// </summary>
-        /// <value>A dictionary of tags associated with the live event. Maximum number of tags: 16. Maximum length of a tag: 256 characters.</value>
+        /// <value>A dictionary of tags associated with the live event. Maximum number of tags: 16. Maximum length of a tag: 64 characters.</value>
         [DataMember(Name = "tags", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "tags")]
         public Dictionary<string, string> Tags { get; set; }

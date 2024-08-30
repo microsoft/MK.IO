@@ -41,7 +41,7 @@ In the current version, operations are supported for :
 
 ### End-to-end sample code
 
-#### File encoding
+#### Video encoding and publishing
 
 There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [SimpleEncodingAndPublishing.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/SimpleEncodingAndPublishing.cs).
 
@@ -49,8 +49,28 @@ This sample code does the following :
 
 - upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
 - create the output asset
-- create/update a transform
+- create/update an encoding transform
 - submit an encoding job
+- create a streaming locator for the encoded asset
+- create and start a streaming endpoint if there is none
+- list the streaming urls and test player urls.
+- clean the created resources if the user accepts
+
+Run the `SampleNet8.0` project to execute this sample code.
+
+#### Advanced video encoding and publishing
+
+There is a documented end-to-end sample code available in the SampleNet8.0 project, in file [AdvancedEncodingAndPublishing.cs](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/AdvancedEncodingAndPublishing.cs).
+
+This sample code does the following :
+
+- upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
+- create the output asset
+- create/update an encoding transform
+- submit an encoding job
+- create/update a transform for vtt file insertion as text track
+- upload a [WebVTT file](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/Ignite.vtt) to a new asset (file was generated separately using [Video Indexer](https://vi.microsoft.com))
+- submit a job to generate the text track in the encoded asset
 - create/update a transform for thumbnails
 - submit a job to generate a thumbnails sprite
 - create a download locator for the thumbnails sprite and thumbnails vtt and list the Urls
@@ -59,7 +79,7 @@ This sample code does the following :
 - list the streaming urls and test player urls.
 - clean the created resources if the user accepts
 
-Run the SampleNet8.0 project to execute this sample code.
+Edit Program.cs file in SampleNet8.0 to uncomment the line `await AdvancedEncodingAndPublishing.RunAsync();`, comment `await SimpleEncodingAndPublishing.RunAsync();`, and run the `SampleNet8.0` project.
 
 #### Live streaming
 
@@ -76,7 +96,7 @@ What the sample does :
 - propose to the user to convert the live asset to a mp4 asset and create a download locator to download the mp4 file(s)
 - clean the created resources if the user accepts
 
-Edit Program.cs file in SampleNet8.0 to uncomment line `await SimpleLiveStreaming.RunAsync();`, comment `await SimpleEncodingAndPublishing.RunAsync();`, and run the sample project.
+Edit Program.cs file in SampleNet8.0 to uncomment the line `await SimpleLiveStreaming.RunAsync();`, comment `await SimpleEncodingAndPublishing.RunAsync();`, and run the `SampleNet8.0` project.
 
 ### Other examples
 

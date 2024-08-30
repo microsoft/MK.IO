@@ -15,16 +15,25 @@ namespace Sample
     /// - create the output asset
     /// - create/update a transform
     /// - submit an encoding job
+    /// - create/update a transform for vtt file insertion as text track
+    /// - upload the vtt file to a new asset
+    /// - submit a job to generate the text track
+    /// - create/update a transform for thumbnails
+    /// - submit a job to generate a thumbnails sprite
+    /// - create a download locator for the thumbnails sprite and thumbnails vtt and list the Urls
     /// - create a streaming locator for the encoded asset
     /// - create and start a streaming endpoint if there is none
     /// - list the streaming urls and test player urls.
     /// - clean the created resources if the user accepts
     /// </summary>
-    public class SimpleEncodingAndPublishing
+    public class AdvancedEncodingAndPublishing
     {
         private const string _transformEncodingName = "H264MultipleBitrate720pTransform";
         private const EncoderNamedPreset _encodingPreset = EncoderNamedPreset.H264MultipleBitrate720p;
+        private const string _transformThumbnailName = "ThumbnailTransform";
+        private const string _transformTextTrackName = "TextTrackInserterTransform";
         private const string _inputMP4FileName = @"Ignite.mp4";
+        private const string _inputVTTFileName = @"Ignite.vtt";
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
         public static async Task RunAsync()
@@ -38,7 +47,7 @@ namespace Sample
            }
           */
 
-            Console.WriteLine("Sample for MK.IO that uploads a file in a new asset, does a video encoding to multiple bitrate and publishes the output asset for clear streaming.");
+            Console.WriteLine("Sample for MK.IO that uploads a file in a new asset, does a video encoding to multiple bitrate, inserts a VTT as text track, generates a thumbnails sprite and publishes the output asset for clear streaming.");
             Console.WriteLine();
 
             // Load settings from the appsettings.json file and check them
@@ -49,11 +58,20 @@ namespace Sample
             string uniqueId = MKIOClient.GenerateUniqueName(string.Empty);
             string inputAssetName = $"input-{uniqueId}";
             string outputAssetName = $"output-{uniqueId}";
-            string jobName = $"job-{uniqueId}";
+            string jobName = $"job-{uniqueId}-encoding";
             string locatorName = $"locator-{uniqueId}";
+
+            string outputThumbnailAssetName = $"{outputAssetName}-thumbnail";
+            string jobThumbnailName = $"job-{uniqueId}-thumbnail";
+            string locatorThumbnailName = $"{locatorName}-thumbnail";
+
+            string inputVTTAssetName = $"{inputAssetName}-webvtt";
+            string jobNameTextTrack = $"job-{uniqueId}-texttrackinsertion";
 
             // MK.IO Client creation
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
+
+            // Main video encoding ------------------------------------------------------------------------------------------------------------------------------------------
 
             // Create a new input Asset and upload the specified local video file into it. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
             _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputAssetName, _inputMP4FileName);
@@ -78,6 +96,47 @@ namespace Sample
             }
             else
             {
+                // WebVTT file inserted as text track -----------------------------------------------------------------------------------------------------------------------
+                // See https://docs.mk.io/docs/webvtt-subtitle-side-loading
+
+                // Create a new input Asset and upload the specified local VTT file into it. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
+                _ = await CreateOrUpdateTransformTextTrackAsync(client, _transformTextTrackName);
+
+                _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputVTTAssetName, _inputVTTFileName);
+
+                // Submit a job request to MK.IO to apply the specified Transform to a given input video.
+                _ = await SubmitJobAsync(client, _transformTextTrackName, jobNameTextTrack, inputVTTAssetName, outputAssetName, _inputVTTFileName);
+
+                // Polls the status of the job and wait for it to finish.
+                _ = await WaitForJobToFinishAsync(client, _transformTextTrackName, jobNameTextTrack);
+
+
+                // Thumbnails sprite generation -----------------------------------------------------------------------------------------------------------------------------
+                // See https://docs.mk.io/docs/thumbnails-generation
+
+                // Output asset to host the thumbnail.
+                _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputThumbnailAssetName, $"Thumbnail asset from {outputAssetName} using {_transformThumbnailName} transform");
+
+                // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
+                _ = await CreateOrUpdateThumbnailTransformAsync(client, _transformThumbnailName);
+
+                // Submit a job request to MK.IO to apply the specified Transform to a given input video.
+                _ = await SubmitJobAsync(client, _transformThumbnailName, jobThumbnailName, outputAssetName, outputThumbnailAssetName, Path.GetFileNameWithoutExtension(_inputMP4FileName) + ".ism");
+
+                // Polls the status of the job and wait for it to finish.
+                var thumbnailJob = await WaitForJobToFinishAsync(client, _transformThumbnailName, jobThumbnailName);
+
+                if (thumbnailJob.Properties.State == JobState.Finished)
+                {
+                    // Create a locator for clear streaming
+                    _ = await CreateDownloadLocatorAsync(client, outputThumbnailAssetName, locatorThumbnailName);
+
+                    // Display download paths
+                    await ListDownloadUrlsAsync(client, locatorThumbnailName);
+                }
+
+                // Publishing video asset -----------------------------------------------------------------------------------------------------------------------------------
+
                 // Create a locator for clear streaming
                 _ = await CreateStreamingLocatorAsync(client, outputAssetName, locatorName);
 
@@ -88,7 +147,7 @@ namespace Sample
                 await ListStreamingUrlsAsync(client, locatorName);
 
                 // Clean resources
-                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName], [(_transformEncodingName, jobName)], createdEndpoint);
+                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName, outputThumbnailAssetName], [(_transformEncodingName, jobName), (_transformTextTrackName, jobNameTextTrack), (_transformThumbnailName, jobThumbnailName)], createdEndpoint);
             }
         }
 
@@ -203,6 +262,87 @@ namespace Sample
                 [
                     new() {
                         Preset = new BuiltInStandardEncoderPreset(encoderPreset),
+                        RelativePriority = TransformOutputPriorityType.Normal
+                    }
+                ]
+            });
+
+            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
+            return transform;
+        }
+
+        /// <summary>
+        /// Creates or updates the text track insertion Transform.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="transformName">The transform name.</param>
+        /// <returns>The transform.</returns>
+        private static async Task<TransformSchema> CreateOrUpdateTransformTextTrackAsync(MKIOClient client, string transformName)
+        {
+            // https://docs.mk.io/docs/add-a-track-to-a-vod-asset
+
+            var trackInserter = new TextTrack()
+            {
+                DisplayName = "English",
+                LanguageCode = "en-US",
+                TrackName = "English",
+                PlayerVisibility = TextTrackPlayerVisibility.Visible,
+                HlsSettings = new HlsSettings()
+                {
+                    Characteristics = "public.accessibility.transcribes-spoken-dialog",
+                    Default = true,
+                    Forced = false
+                }
+            };
+
+            // Create or update a transform
+            var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
+            {
+                Description = $"Text track inserter transform",
+                Outputs =
+                [
+                    new() {
+                        Preset = new TrackInserterPreset([trackInserter]),
+                        RelativePriority = TransformOutputPriorityType.Normal
+                    }
+                ]
+            });
+
+            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
+            return transform;
+        }
+
+        /// <summary>
+        /// Creates or updates the Transform for thumbnail creation.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="transformName">The transform name.</param>
+        /// <returns>The transform.</returns>
+        private static async Task<TransformSchema> CreateOrUpdateThumbnailTransformAsync(MKIOClient client, string transformName)
+        {
+            // https://docs.mk.io/docs/thumbnails-generation
+            // Sprite configuration
+            var thumbnailConfig = new List<ThumbnailGeneratorConfiguration>
+            {
+                new() {
+                    Format = "Jpeg",
+                    Start = "PT0S",
+                    Range = "100%",
+                    Step = "1%",
+                    Width = "10%",
+                    Height = "10%",
+                    SpriteColumn = 10
+                }
+            };
+
+            // Create or update a transform
+            var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
+            {
+                Description = $"Thumbnail transform",
+                Outputs =
+                [
+                    new() {
+                        Preset = new ThumbnailGeneratorPreset(thumbnailConfig),
                         RelativePriority = TransformOutputPriorityType.Normal
                     }
                 ]
@@ -402,6 +542,48 @@ namespace Sample
                 Console.WriteLine("Job finished.");
             }
             Console.ResetColor();
+        }
+
+        /// <summary>
+        /// Creates a download locator on the asset.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="outputAssetName">The output asset name.</param>
+        /// <param name="locatorName">The locator name.</param>
+        /// <returns>The streaming locator.</returns>
+        private static async Task<StreamingLocatorSchema> CreateDownloadLocatorAsync(MKIOClient client, string outputAssetName, string locatorName)
+        {
+            return await client.StreamingLocators.CreateAsync(
+                 locatorName,
+                 new StreamingLocatorProperties
+                 {
+                     AssetName = outputAssetName,
+                     StreamingPolicyName = PredefinedStreamingPolicy.DownloadOnly
+                 });
+        }
+
+        /// <summary>
+        /// Lists the download Urls for a specified locator name.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="locatorName">The locator name.</param>
+        /// <returns></returns>
+        private static async Task ListDownloadUrlsAsync(MKIOClient client, string locatorName)
+        {
+            // list Streaming Endpoints
+            var streamingEndpoints = await client.StreamingEndpoints.ListAsync();
+
+            // List the streaming Url
+            var paths = await client.StreamingLocators.ListUrlPathsAsync(locatorName);
+            Console.WriteLine($"Download Urls for locator '{locatorName}' :");
+            foreach (var path in paths.DownloadPaths)
+            {
+                foreach (var se in streamingEndpoints)
+                {
+                    Console.WriteLine($"      Url : https://{se.Properties.HostName}{path}");
+                }
+                Console.WriteLine();
+            }
         }
 
         /// <summary>

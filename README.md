@@ -69,7 +69,7 @@ This sample code does the following :
 - create/update an encoding transform
 - submit an encoding job
 - create/update a transform for vtt file insertion as text track
-- upload a [WebVTT file](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/Ignite.vtt) to a new asset (file was generated separately using [Video Indexer](https://vi.microsoft.com))
+- upload a [WebVTT file](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/Ignite.vtt) to a new asset (file was generated separately using [Azure AI Video Indexer](https://vi.microsoft.com))
 - submit a job to generate the text track in the encoded asset
 - create/update a transform for thumbnails
 - submit a job to generate a thumbnails sprite

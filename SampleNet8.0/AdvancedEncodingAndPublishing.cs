@@ -16,7 +16,7 @@ namespace Sample
     /// - create/update a transform
     /// - submit an encoding job
     /// - create/update a transform for vtt file insertion as text track
-    /// - upload the vtt file to a new asset
+    /// - upload the vtt file to a new asset (file was generated separately using Azure AI Video Indexer https://vi.microsoft.com)
     /// - submit a job to generate the text track
     /// - create/update a transform for thumbnails
     /// - submit a job to generate a thumbnails sprite

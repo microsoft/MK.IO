@@ -7,9 +7,12 @@ using System.Text;
 
 namespace MK.IO.Models
 {
-    public class TrackInserterPresetTextTrack : TrackInserter
+    public class TextTrack : TrackInserter
     {
-
+        /// <summary>
+        /// The discriminator for derived types. Must be set to #MediaKind.TextTrack
+        /// </summary>
+        /// <value>The discriminator for derived types. Must be set to #MediaKind.TextTrack</value>
         [JsonProperty("@odata.type")]
         internal override string OdataType => "#MediaKind.TextTrack";
 
@@ -42,7 +45,7 @@ namespace MK.IO.Models
         /// <value>When PlayerVisibility is set to 'Visible', the track will be present in the DASH manifest or HLS playlist when requested by a client. When the PlayerVisibility is set to 'Hidden', the track will not be available to the client. The default value is 'Visible'.</value>
         [DataMember(Name = "playerVisibility", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "playerVisibility")]
-        public TrackInserterPresetTextTrackPlayerVisibility PlayerVisibility { get; set; } = TrackInserterPresetTextTrackPlayerVisibility.Visible;
+        public TextTrackPlayerVisibility PlayerVisibility { get; set; } = TextTrackPlayerVisibility.Visible;
 
         /// <summary>
         /// The name of the track in the manifest.
@@ -60,7 +63,7 @@ namespace MK.IO.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class TrackInserterPresetTextTrack {\n");
+            sb.Append("class TextTrack {\n");
             sb.Append("  OdataType: ").Append(OdataType).Append("\n");
             sb.Append("  DisplayName: ").Append(DisplayName).Append("\n");
             sb.Append("  HlsSettings: ").Append(HlsSettings).Append("\n");
@@ -70,6 +73,7 @@ namespace MK.IO.Models
             sb.Append("}\n");
             return sb.ToString();
         }
+
 
 
         /// <summary>

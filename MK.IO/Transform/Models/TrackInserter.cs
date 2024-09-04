@@ -3,11 +3,12 @@
 
 using JsonSubTypes;
 using Newtonsoft.Json;
+
 namespace MK.IO.Models
 {
 
     [JsonConverter(typeof(JsonSubtypes), "@odata.type")]
-    [JsonSubtypes.KnownSubType(typeof(TrackInserterPresetTextTrack), "#MediaKind.TextTrack")]
+    [JsonSubtypes.KnownSubType(typeof(TextTrack), "#MediaKind.TextTrack")]
         
     //
     // Summary:

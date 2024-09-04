@@ -13,7 +13,7 @@ namespace MK.IO.Models
         /// </summary>
         /// <param name="thumbnails">The set of thumbnails to be produced.</param>
         /// <param name="baseFileName">Used to create the output filename as `{BaseFilename}_{Label}{Index}{Extension}`.  The default is the name of the input file.  If the name of the input file is too long then it will be truncated to 64 characters.</param>
-        public ThumbnailGeneratorPreset(List<ThumbnailGeneratorConfiguration> thumbnails, string baseFileName = null)
+        public ThumbnailGeneratorPreset(List<ThumbnailGeneratorConfiguration> thumbnails, string? baseFileName = null)
         {
             Argument.AssertNotMoreThanLength(baseFileName, nameof(baseFileName), 64);
             Argument.AssertRespectRegex(baseFileName, nameof(baseFileName), @"^[A-Za-z0-9_-]+$");

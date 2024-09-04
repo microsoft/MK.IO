@@ -67,7 +67,7 @@ namespace MK.IO
             Argument.AssertNotNullOrEmpty(subscriptionName, nameof(subscriptionName));
             Argument.AssertNotNullOrEmpty(jwtToken, nameof(jwtToken));
             Argument.AssertJwtToken(jwtToken, nameof(jwtToken));
-            
+
             _subscriptionName = subscriptionName;
             _apiToken = jwtToken;
 
@@ -219,7 +219,7 @@ namespace MK.IO
                     HttpResponseMessage amsRequestResultWait = await _httpClient.GetAsync(monitorUrl, cancellationToken).ConfigureAwait(false);
                     string responseContentWait = await amsRequestResultWait.Content.ReadAsStringAsync().ConfigureAwait(false);
                     dynamic data = JsonConvert.DeserializeObject(responseContentWait);
-                    notComplete = data.status == "InProgress";
+                    notComplete = (data != null && data!.status == "InProgress");
                 }
                 while (notComplete);
             }

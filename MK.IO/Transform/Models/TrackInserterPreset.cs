@@ -14,7 +14,7 @@ namespace MK.IO.Models
         /// </summary>
         /// <param name="tracks">The set of tracks to be inserted.  Currently limited to one.</param>
         /// <param name="baseFileName">Used to create the output filename as `{BaseFilename}.cmft`.  The default is the name of the input .vtt file minus the extension, e.g. `subtitles.vtt` -> `subtitles.cmft`.</param>
-        public TrackInserterPreset(List<TrackInserter> tracks, string baseFileName = null)
+        public TrackInserterPreset(List<TrackInserter> tracks, string? baseFileName = null)
         {
             Argument.AssertNotMoreThanLength(baseFileName, nameof(baseFileName), 64);
             Argument.AssertRespectRegex(baseFileName, nameof(baseFileName), @"^[A-Za-z0-9_-]+$");
@@ -36,7 +36,7 @@ namespace MK.IO.Models
         /// <value>Used to create the output filename as `{BaseFilename}.cmft`.  The default is the name of the input .vtt file minus the extension, e.g. `subtitles.vtt` -> `subtitles.cmft`.</value>
         [DataMember(Name = "baseFilename", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "baseFilename")]
-        public string BaseFilename { get; set; }
+        public string? BaseFilename { get; set; }
 
         /// <summary>
         /// The set of tracks to be inserted.  Currently limited to one.

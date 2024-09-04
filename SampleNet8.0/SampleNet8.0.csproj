@@ -8,13 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Ignite.mp4" />
-    <None Remove="Ignite.vtt" />
-    <None Remove="switch.mp4" />
-    <None Remove="transcript.vtt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Ignite.mp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

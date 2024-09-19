@@ -36,7 +36,7 @@ namespace MK.IO.Models
         /// <value>The name of the policy</value>
         [DataMember(Name = "policyName", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "policyName")]
-        public string PolicyName { get; private set; }
+        public string PolicyName { get; set; }
 
         /// <summary>
         /// Not currently supported. The tracks which use this content key
@@ -52,7 +52,7 @@ namespace MK.IO.Models
         /// <value>The streaming locator content key type</value>
         [DataMember(Name = "type", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "type")]
-        public StreamingLocatorContentKeyType Type { get; private set; }
+        public StreamingLocatorContentKeyType Type { get; set; }
 
         /// <summary>
         /// The value of the content key

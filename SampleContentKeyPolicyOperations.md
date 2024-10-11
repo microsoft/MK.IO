@@ -57,7 +57,7 @@ var newpol = client.ContentKeyPolicies.Create(
 var mklocators = client.StreamingLocators.List();
 
 // list all locators of a specified asset
-var mklocatorsasset= client.Assets.ListStreamingLocators("myassetname");
+var mklocatorsasset = client.Assets.ListStreamingLocators("myassetname");
 
 var mklocator = client.StreamingLocators.Create(
     MKIOClient.GenerateUniqueName("locator"),

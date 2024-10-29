@@ -139,6 +139,14 @@ namespace MK.IO.Models
         [JsonProperty(PropertyName = "sku")]
         public StreamingEndpointsCurrentSku Sku { get; set; }
 
+        /// <summary>
+        /// The style of URL associated to the streaming endpoint. Default is 'AMS'.
+        /// </summary>
+        /// <value>The style of URL associated to the streaming endpoint. Default is 'AMS'.</value>
+        [DataMember(Name = "urlStyle", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "urlStyle")]
+        public string UrlStyle { get; set; } = "AMS";
+
 
         /// <summary>
         /// Get the string presentation of the object
@@ -163,6 +171,7 @@ namespace MK.IO.Models
             sb.Append("  ResourceState: ").Append(ResourceState).Append("\n");
             sb.Append("  ScaleUnits: ").Append(ScaleUnits).Append("\n");
             sb.Append("  Sku: ").Append(Sku).Append("\n");
+            sb.Append("  UrlStyle: ").Append(UrlStyle).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }

@@ -2,12 +2,22 @@
 // Licensed under the MIT License.
 
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Text;
 
 namespace MK.IO.Models
 {
     public class AIPipelinePreset : TransformPreset
     {
+
+        /// <summary>
+        /// Constructor for AIPipelinePreset
+        /// </summary>
+        /// <param name="pipeline">Pipeline.</param>
+        public AIPipelinePreset(PipelineArguments pipeline)
+        {
+            Pipeline = pipeline;
+        }
         /// <summary>
         /// The discriminator for derived types. Must be set to #MediaKind.AIPipelinePreset
         /// </summary>

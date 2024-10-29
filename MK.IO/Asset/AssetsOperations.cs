@@ -15,6 +15,7 @@ namespace MK.IO.Operations
         private const string _assetApiUrl = _assetsApiUrl + "/{1}";
         private const string _assetListStreamingLocatorsApiUrl = _assetApiUrl + "/listStreamingLocators";
         private const string _assetListTracksAndDirectoryApiUrl = _assetApiUrl + "/storage/";
+        private const string _assetGetFileAccessInfoApiUrl = _assetApiUrl + "/getFileAccessInfo";
 
         /// <summary>
         /// Gets a reference to the AzureMediaServicesClient
@@ -194,6 +195,23 @@ namespace MK.IO.Operations
             var url = Client.GenerateApiUrl(_assetListTracksAndDirectoryApiUrl, assetName);
             string responseContent = await Client.GetObjectContentAsync(url, cancellationToken);
             return JsonConvert.DeserializeObject<AssetStorageResponseSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with asset storage deserialization");
+        }
+
+        /// <inheritdoc/>
+        public AssetFileAccessInfoSchema GetFileAccessInfo(string assetName)
+        {
+            var task = Task.Run(async () => await GetFileAccessInfoAsync(assetName));
+            return task.GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc/>
+        public async Task<AssetFileAccessInfoSchema> GetFileAccessInfoAsync(string assetName, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNullOrEmpty(assetName, nameof(assetName));
+
+            var url = Client.GenerateApiUrl(_assetGetFileAccessInfoApiUrl, assetName);
+            string responseContent = await Client.CreateObjectPostAsync(url, string.Empty, cancellationToken);
+            return JsonConvert.DeserializeObject<AssetFileAccessInfoSchema>(responseContent, ConverterLE.Settings) ?? throw new Exception("Error with asset file access info deserialization");
         }
     }
 }

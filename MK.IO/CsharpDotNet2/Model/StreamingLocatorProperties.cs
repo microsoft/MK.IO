@@ -31,6 +31,14 @@ namespace MK.IO.Models
         public string AssetName { get; set; }
 
         /// <summary>
+        /// Optional content ID. Only valid when an external key server is used.
+        /// </summary>
+        /// <value>Optional content ID. Only valid when an external key server is used.</value>
+        [DataMember(Name = "contentId", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "contentId")]
+        public string ContentId { get; set; }
+
+        /// <summary>
         /// The content keys used by this streaming locator
         /// </summary>
         /// <value>The content keys used by this streaming locator</value>
@@ -45,6 +53,14 @@ namespace MK.IO.Models
         [DataMember(Name = "defaultContentKeyPolicyName", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "defaultContentKeyPolicyName")]
         public string DefaultContentKeyPolicyName { get; set; }
+
+        /// <summary>
+        /// Manifest filename used with streaming endpoints that have urlStyle set to 'Aquila'.
+        /// </summary>
+        /// <value>Manifest filename used with streaming endpoints that have urlStyle set to 'Aquila'.</value>
+        [DataMember(Name = "defaultManifestFilename", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "defaultManifestFilename")]
+        public string DefaultManifestFilename { get; set; }
 
         /// <summary>
         /// The end time of the streaming locator
@@ -101,8 +117,10 @@ namespace MK.IO.Models
             sb.Append("class StreamingLocatorProperties {\n");
             sb.Append("  AlternativeMediaId: ").Append(AlternativeMediaId).Append("\n");
             sb.Append("  AssetName: ").Append(AssetName).Append("\n");
+            sb.Append("  ContentId: ").Append(ContentId).Append("\n");
             sb.Append("  ContentKeys: ").Append(ContentKeys).Append("\n");
             sb.Append("  DefaultContentKeyPolicyName: ").Append(DefaultContentKeyPolicyName).Append("\n");
+            sb.Append("  DefaultManifestFilename: ").Append(DefaultManifestFilename).Append("\n");
             sb.Append("  EndTime: ").Append(EndTime).Append("\n");
             sb.Append("  Filters: ").Append(Filters).Append("\n");
             sb.Append("  StartTime: ").Append(StartTime).Append("\n");

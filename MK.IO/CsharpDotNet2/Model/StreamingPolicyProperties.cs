@@ -15,6 +15,14 @@ namespace MK.IO.Models
     public class StreamingPolicyProperties
     {
         /// <summary>
+        /// The custom catalog configuration.
+        /// </summary>
+        /// <value>The custom catalog configuration.</value>
+        [DataMember(Name = "catalog", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "catalog")]
+        public Dictionary<string, Object> Catalog { get; set; }
+
+        /// <summary>
         /// Gets or Sets CommonEncryptionCbcs
         /// </summary>
         [DataMember(Name = "commonEncryptionCbcs", EmitDefaultValue = false)]
@@ -59,6 +67,7 @@ namespace MK.IO.Models
         {
             var sb = new StringBuilder();
             sb.Append("class StreamingPolicyProperties {\n");
+            sb.Append("  Catalog: ").Append(Catalog).Append("\n");
             sb.Append("  CommonEncryptionCbcs: ").Append(CommonEncryptionCbcs).Append("\n");
             sb.Append("  CommonEncryptionCenc: ").Append(CommonEncryptionCenc).Append("\n");
             sb.Append("  DefaultContentKeyPolicyName: ").Append(DefaultContentKeyPolicyName).Append("\n");

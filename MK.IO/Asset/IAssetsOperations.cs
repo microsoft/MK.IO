@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using MK.IO.Models;
+using Newtonsoft.Json.Linq;
 
 namespace MK.IO.Operations
 {
@@ -184,5 +185,24 @@ namespace MK.IO.Operations
         /// <param name="cancellationToken">Optional System.Threading.CancellationToken to propagate notifications that the operation should be cancelled.</param>
         /// <returns></returns>
         Task<AssetStorageResponseSchema> ListTracksAndDirListingAsync(string assetName, CancellationToken cancellationToken = default);
+
+
+
+        /// <summary>
+        /// This endpoint returns the information needed to access files within your asset.
+        /// The storage account containing the asset must be configured with a valid SAS token.
+        /// </summary>
+        /// <param name="assetName">The name of the asset.</param>
+        /// <returns>AssetFileAccessInfoSchema</returns>
+        AssetFileAccessInfoSchema GetFileAccessInfo(string assetName);
+
+
+        /// <summary>
+        /// This endpoint returns the information needed to access files within your asset.
+        /// The storage account containing the asset must be configured with a valid SAS token.
+        /// </summary>
+        /// <param name="assetName">The name of the asset.</param>
+        /// <returns>AssetFileAccessInfoSchema</returns>
+        Task<AssetFileAccessInfoSchema> GetFileAccessInfoAsync(string assetName, CancellationToken cancellationToken = default);
     }
 }

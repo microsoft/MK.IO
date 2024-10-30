@@ -24,7 +24,7 @@ namespace Sample
     {
         private const string _transformEncodingName = "H264MultipleBitrate720pTransform";
         private const EncoderNamedPreset _encodingPreset = EncoderNamedPreset.H264MultipleBitrate720p;
-        private const string _inputMP4FileName = @"Ignite.mp4";
+        private const string _blobUriMP4 = "https://amsxpfrstorage.blob.core.windows.net/aaa-input/pen.mp4";
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
         public static async Task RunAsync()
@@ -56,7 +56,7 @@ namespace Sample
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
 
             // Create a new input Asset and upload the specified local video file into it. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputAssetName, _inputMP4FileName);
+            _ = await CreateInputAssetFromBlobAsync(client, config["TenantId"]!, inputAssetName, new Uri(_blobUriMP4));
 
             // Output from the encoding Job must be written to an Asset, so let's create one. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
             _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {_transformEncodingName} transform");
@@ -65,7 +65,7 @@ namespace Sample
             _ = await CreateOrUpdateTransformAsync(client, _transformEncodingName, _encodingPreset);
 
             // Submit a job request to MK.IO to apply the specified Transform to a given input video.
-            _ = await SubmitJobAsync(client, _transformEncodingName, jobName, inputAssetName, outputAssetName, _inputMP4FileName);
+            _ = await SubmitJobAsync(client, _transformEncodingName, jobName, inputAssetName, outputAssetName, new Uri(_blobUriMP4).Segments[2].TrimEnd('/'));
 
             // Polls the status of the job and wait for it to finish.
             var job = await WaitForJobToFinishAsync(client, _transformEncodingName, jobName);
@@ -157,6 +157,61 @@ namespace Sample
             var blobClient = blobContainerClient.GetBlobClient(Path.GetFileName(fileToUpload));
             await blobClient.UploadAsync(fileToUpload);
             Console.WriteLine($"File '{fileToUpload}' uploaded to input asset.");
+            return inputAsset;
+        }
+
+        /// <summary>
+        /// Creates a new input Asset from an existing Bob Uri. Note, the storage account must be already attached to the MK.IO account.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="tenantId">The Azure Tenant Id</param>
+        /// <param name="assetName">The asset name.</param>
+        /// <param name="blobUri">The blob Uri.</param>
+        /// <returns>The asset.</returns>
+        private static async Task<AssetSchema> CreateInputAssetFromBlobAsync(MKIOClient client, string tenantId, string assetName, Uri blobUri)
+        {
+            // Get container name from a blob Uri
+            string containerName = blobUri.Segments[1].TrimEnd('/');
+
+            // Get storage name from a blob Uri
+            string storageName = blobUri.Host.Split('.')[0];
+
+            // Get blob name from a Blob Uri
+            string blobName = blobUri.Segments[2].TrimEnd('/');
+
+            // Create an input asset
+            AssetSchema inputAsset;
+
+            try
+            {
+                inputAsset = await client.Assets.CreateOrUpdateAsync(
+                    assetName,
+                    containerName,
+                    storageName,
+                    $"input asset for {blobName}",
+                    AssetContainerDeletionPolicyType.Retain,
+                    null,
+                    new Dictionary<string, string> { { "typeAsset", "source" } }
+                );
+                Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
+
+            }
+            catch (ApiException ex)
+            {
+                if (ex.StatusCode == 409)
+                {
+                    // potentially, if you know the input Asset Name, you can retrieve it here and remove the throw
+                    // inputAsset = await client.Assets.GetAsync("knownassetname");
+                    Console.WriteLine($"Error as an asset already exists on container {containerName}. Error: {ex.Message}");
+                    throw;
+                }
+                else
+                {
+                    Console.WriteLine($"Error creating input asset '{assetName}'. Error: {ex.Message}");
+                    throw;
+                }
+            }
+
             return inputAsset;
         }
 

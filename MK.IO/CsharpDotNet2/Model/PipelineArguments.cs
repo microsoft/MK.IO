@@ -15,9 +15,9 @@ namespace MK.IO.Models
     public class PipelineArguments
     {
         /// <summary>
-        /// Not currently supported. Arguments to each operation in the AI pipeline
+        /// Arguments to each operation in the AI pipeline
         /// </summary>
-        /// <value>Not currently supported. Arguments to each operation in the AI pipeline</value>
+        /// <value>Arguments to each operation in the AI pipeline</value>
         [DataMember(Name = "arguments", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "arguments")]
         public Dictionary<string, Object> Arguments { get; set; }
@@ -51,7 +51,7 @@ namespace MK.IO.Models
         /// <returns>JSON string presentation of the object</returns>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return JsonConvert.SerializeObject(this, ConverterLE.Settings);
         }
 
     }

@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using MK.IO.Management.Models;
-using Newtonsoft.Json;
 #if NET462
 using System.Net.Http;
 #endif
@@ -22,7 +21,7 @@ namespace MK.IO.Management
         private const string _yourProfileProfileApiUrl = "api/v1/user/profile";
         private const string _yourProfileOrganizationsApiUrl = "api/v1/user/organizations";
         private const string _yourProfileTokensApiUrl = "api/v1/user/tokens";
-        private const string _yourProfileTokenApiUrl = _yourProfileTokensApiUrl+ "/{0}";
+        private const string _yourProfileTokenApiUrl = _yourProfileTokensApiUrl + "/{0}";
 
 
         /// <summary>

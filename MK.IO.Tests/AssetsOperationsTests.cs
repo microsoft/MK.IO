@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Moq;
 using MK.IO.Operations;
+using Moq;
 using Newtonsoft.Json;
 
 namespace MK.IO.Tests
@@ -136,8 +136,8 @@ namespace MK.IO.Tests
         }
 
         [Theory]
-        [InlineData(256,33)]
-        [InlineData(257,32)]
+        [InlineData(256, 33)]
+        [InlineData(257, 32)]
         public void Create_AssetErrorInTags(int sizeValue, int numberEntries)
         {
             // Arrange

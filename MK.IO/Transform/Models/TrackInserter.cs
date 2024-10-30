@@ -9,7 +9,7 @@ namespace MK.IO.Models
 
     [JsonConverter(typeof(JsonSubtypes), "@odata.type")]
     [JsonSubtypes.KnownSubType(typeof(TextTrack), "#MediaKind.TextTrack")]
-        
+
     //
     // Summary:
     //     Base class for Transform Output preset configuration. A derived class must be used

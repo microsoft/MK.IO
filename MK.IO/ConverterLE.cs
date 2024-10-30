@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Xml;
 
 namespace MK.IO

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Text;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace MK.IO.Models
 {
@@ -23,7 +23,7 @@ namespace MK.IO.Models
         /// This claim requires that the value of the claim in the token must match the key identifier of the key being requested by the client.
         /// Adding this claim means that the token issued to the client authorizes access to the content key identifier listed in the token.
         /// </summary>
-        public static readonly ContentKeyPolicyTokenClaim ContentKeyIdentifierClaim = new ()
+        public static readonly ContentKeyPolicyTokenClaim ContentKeyIdentifierClaim = new()
         {
             ClaimType = ContentKeyIdentifierClaimType
         };

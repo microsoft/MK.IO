@@ -17,7 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleCore3.1", "SampleCore
 		{D49EB09F-BB45-446F-8CC6-29E1C6E73EFB} = {D49EB09F-BB45-446F-8CC6-29E1C6E73EFB}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MK.IO.Tests", "MK.IO.Tests\MK.IO.Tests.csproj", "{E85C4F8F-03B9-46E3-8E3D-D0AA858200A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MK.IO.Tests", "MK.IO.Tests\MK.IO.Tests.csproj", "{E85C4F8F-03B9-46E3-8E3D-D0AA858200A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5FAA3020-9BC2-47B9-924B-DE690A5B2469}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

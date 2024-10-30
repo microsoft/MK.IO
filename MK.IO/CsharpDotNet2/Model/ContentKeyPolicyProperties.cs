@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Text;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using System.Xml.Linq;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace MK.IO.Models
 {
@@ -81,6 +80,7 @@ namespace MK.IO.Models
             sb.Append("class ContentKeyPolicyProperties {\n");
             sb.Append("  Created: ").Append(Created).Append("\n");
             sb.Append("  Description: ").Append(Description).Append("\n");
+            sb.Append("  FairPlayAmsCompatibility: ").Append(FairPlayAmsCompatibility).Append("\n");
             sb.Append("  LastModified: ").Append(LastModified).Append("\n");
             sb.Append("  Options: ").Append(Options).Append("\n");
             sb.Append("  PolicyId: ").Append(PolicyId).Append("\n");

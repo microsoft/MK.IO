@@ -65,18 +65,19 @@ There is a documented end-to-end sample code available in the SampleNet8.0 proje
 This sample code does the following :
 
 - upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
-- create the output asset
+- create the output encoded asset
 - create/update an encoding transform
 - submit an encoding job
-- create/update a transform for vtt file insertion as text track
-- upload a [WebVTT file](https://github.com/microsoft/MK.IO/blob/main/SampleNet8.0/Ignite.vtt) to a new asset (file was generated separately using [Azure AI Video Indexer](https://vi.microsoft.com))
-- submit a job to generate the text track in the encoded asset
+- create/update a transform to do the transcription of the video
+- submit a job to generate the transcription (vtt)
+- create/update a transform to insert the vtt as a text track
+- submit a job to insert the vtt as a text track in the encoded asset
 - create/update a transform for thumbnails
 - submit a job to generate a thumbnails sprite
 - create a download locator for the thumbnails sprite and thumbnails vtt and list the Urls
 - create a streaming locator for the encoded asset
 - create and start a streaming endpoint if there is none
-- list the streaming urls and test player urls.
+- list the streaming urls and test player urls (within the Bitmovin player, go to the settings and enable subtitles to `English`).
 - clean the created resources if the user accepts
 
 Edit Program.cs file in SampleNet8.0 to uncomment the line `await AdvancedEncodingAndPublishing.RunAsync();`, comment `await SimpleEncodingAndPublishing.RunAsync();`, and run the `SampleNet8.0` project.

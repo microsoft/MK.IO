@@ -12,12 +12,13 @@ namespace Sample
     /// <summary>
     /// Sample code for MK.IO using MK.IO .NET SDK that does the following:
     /// - upload a mp4 file to a new asset using authentication in the browser (you need contribution role on the storage)
-    /// - create the output asset
-    /// - create/update a transform
+    /// - create the output encoded asset
+    /// - create/update a encoding transform
     /// - submit an encoding job
-    /// - create/update a transform for vtt file insertion as text track
-    /// - upload the vtt file to a new asset (file was generated separately using Azure AI Video Indexer https://vi.microsoft.com)
-    /// - submit a job to generate the text track
+    /// - create/update a transform to do the transcription of the video
+    /// - submit a job to generate the transcription (vtt)
+    /// - create/update a transform to insert the vtt as a text track
+    /// - submit a job to insert the vtt as a text track in the encoded asset
     /// - create/update a transform for thumbnails
     /// - submit a job to generate a thumbnails sprite
     /// - create a download locator for the thumbnails sprite and thumbnails vtt and list the Urls
@@ -28,12 +29,12 @@ namespace Sample
     /// </summary>
     public class AdvancedEncodingAndPublishing
     {
-        private const string _transformEncodingName = "H264MultipleBitrate720pTransform";
+        private const string _encodingTransformName = "H264MultipleBitrate720pTransform";
         private const EncoderNamedPreset _encodingPreset = EncoderNamedPreset.H264MultipleBitrate720p;
-        private const string _transformThumbnailName = "ThumbnailTransform";
-        private const string _transformTextTrackName = "TextTrackInserterTransform";
+        private const string _thumbnailTransformName = "ThumbnailTransform";
+        private const string _vodTranscriptionTransformName = "VODTranscriptionTransform";
+        private const string _textTrackInsertionTransformName = "TextTrackInserterTransform";
         private const string _inputMP4FileName = @"Ignite.mp4";
-        private const string _inputVTTFileName = @"Ignite.vtt";
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
 
         public static async Task RunAsync()
@@ -47,7 +48,7 @@ namespace Sample
            }
           */
 
-            Console.WriteLine("Sample for MK.IO that uploads a file in a new asset, does a video encoding to multiple bitrate, inserts a VTT as text track, generates a thumbnails sprite and publishes the output asset for clear streaming.");
+            Console.WriteLine("Sample for MK.IO that uploads a file in a new asset, does a video encoding to multiple bitrate, generates and inserts a VTT as text track, generates a thumbnails sprite and publishes the output asset for clear streaming.");
             Console.WriteLine();
 
             // Load settings from the appsettings.json file and check them
@@ -57,16 +58,17 @@ namespace Sample
             // multiple times without cleaning up.
             string uniqueId = MKIOClient.GenerateUniqueName(string.Empty);
             string inputAssetName = $"input-{uniqueId}";
-            string outputAssetName = $"output-{uniqueId}";
-            string jobName = $"job-{uniqueId}-encoding";
+            string outputEncodedAssetName = $"output-{uniqueId}-encoded";
+            string encodingJobName = $"job-{uniqueId}-encoding";
             string locatorName = $"locator-{uniqueId}";
 
-            string outputThumbnailAssetName = $"{outputAssetName}-thumbnail";
-            string jobThumbnailName = $"job-{uniqueId}-thumbnail";
+            string outputThumbnailAssetName = $"{outputEncodedAssetName}-thumbnail";
+            string thumbnailJobName = $"job-{uniqueId}-thumbnail";
             string locatorThumbnailName = $"{locatorName}-thumbnail";
 
-            string inputVTTAssetName = $"{inputAssetName}-webvtt";
-            string jobNameTextTrack = $"job-{uniqueId}-texttrackinsertion";
+            string outputVTTAssetName = $"{inputAssetName}-transcription";
+            string vodTranscriptionJobName = $"job-{uniqueId}-vodtranscription";
+            string textTrackInsertionJobName = $"job-{uniqueId}-texttrackinsertion";
 
             // MK.IO Client creation
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
@@ -74,57 +76,71 @@ namespace Sample
             // Main video encoding ------------------------------------------------------------------------------------------------------------------------------------------
 
             // Create a new input Asset and upload the specified local video file into it. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputAssetName, _inputMP4FileName);
+            _ = await CreateInputAssetAndUploadFileAsync(client, config["StorageName"]!, config["TenantId"]!, inputAssetName, _inputMP4FileName);
 
             // Output from the encoding Job must be written to an Asset, so let's create one. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {_transformEncodingName} transform");
+            _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputEncodedAssetName, $"encoded asset from {inputAssetName} using {_encodingTransformName} transform");
 
             // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
-            _ = await CreateOrUpdateTransformAsync(client, _transformEncodingName, _encodingPreset);
+            _ = await CreateOrUpdateTransformAsync(client, _encodingTransformName, _encodingPreset);
 
             // Submit a job request to MK.IO to apply the specified Transform to a given input video.
-            _ = await SubmitJobAsync(client, _transformEncodingName, jobName, inputAssetName, outputAssetName, _inputMP4FileName);
+            _ = await SubmitJobAsync(client, _encodingTransformName, encodingJobName, inputAssetName, outputEncodedAssetName, _inputMP4FileName);
 
             // Polls the status of the job and wait for it to finish.
-            var job = await WaitForJobToFinishAsync(client, _transformEncodingName, jobName);
+            var job = await WaitForJobToFinishAsync(client, _encodingTransformName, encodingJobName);
 
             if (job.Properties.State != JobState.Finished)
             {
                 // Alert the user if issue with the encoding job
                 DisplayJobStatusWhenCompleted(job);
-                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName], [(_transformEncodingName, jobName)]);
+                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputEncodedAssetName], [(_encodingTransformName, encodingJobName)]);
             }
             else
             {
+                // VOD AI based transcription -------------------------------------------------------------------------------------------------------------------------------
+                // See https://docs.mk.io/docs/vod-transcription
+
+                // Create a transform for the VOD Transcription
+                _ = await CreateOrUpdateTransformVodTranscriptAsync(client, _vodTranscriptionTransformName);
+
+                // Create a new asset to store the generated VTT file (transcript)
+                _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputVTTAssetName);
+
+                // Submit a job request to MK.IO to apply the specified Transform to a given input video.
+                _ = await SubmitJobAsync(client, _vodTranscriptionTransformName, vodTranscriptionJobName, inputAssetName, outputVTTAssetName, _inputMP4FileName);
+
+                // Polls the status of the job and wait for it to finish.
+                _ = await WaitForJobToFinishAsync(client, _vodTranscriptionTransformName, vodTranscriptionJobName);
+
+
                 // WebVTT file inserted as text track -----------------------------------------------------------------------------------------------------------------------
                 // See https://docs.mk.io/docs/webvtt-subtitle-side-loading
 
-                // Create a new input Asset and upload the specified local VTT file into it. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-                _ = await CreateOrUpdateTransformTextTrackAsync(client, _transformTextTrackName);
-
-                _ = await CreateInputAssetAsync(client, config["StorageName"]!, config["TenantId"]!, inputVTTAssetName, _inputVTTFileName);
+                // Create the transform to insert the VTT file as a text track
+                _ = await CreateOrUpdateTransformTextTrackAsync(client, _textTrackInsertionTransformName);
 
                 // Submit a job request to MK.IO to apply the specified Transform to a given input video.
-                _ = await SubmitJobAsync(client, _transformTextTrackName, jobNameTextTrack, inputVTTAssetName, outputAssetName, _inputVTTFileName);
+                _ = await SubmitJobAsync(client, _textTrackInsertionTransformName, textTrackInsertionJobName, outputVTTAssetName, outputEncodedAssetName, Path.GetFileNameWithoutExtension(_inputMP4FileName) + ".vtt");
 
                 // Polls the status of the job and wait for it to finish.
-                _ = await WaitForJobToFinishAsync(client, _transformTextTrackName, jobNameTextTrack);
+                _ = await WaitForJobToFinishAsync(client, _textTrackInsertionTransformName, textTrackInsertionJobName);
 
 
                 // Thumbnails sprite generation -----------------------------------------------------------------------------------------------------------------------------
                 // See https://docs.mk.io/docs/thumbnails-generation
 
                 // Output asset to host the thumbnail.
-                _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputThumbnailAssetName, $"Thumbnail asset from {outputAssetName} using {_transformThumbnailName} transform");
+                _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputThumbnailAssetName, $"Thumbnail asset from {outputEncodedAssetName} using {_thumbnailTransformName} transform");
 
                 // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
-                _ = await CreateOrUpdateThumbnailTransformAsync(client, _transformThumbnailName);
+                _ = await CreateOrUpdateThumbnailTransformAsync(client, _thumbnailTransformName);
 
                 // Submit a job request to MK.IO to apply the specified Transform to a given input video.
-                _ = await SubmitJobAsync(client, _transformThumbnailName, jobThumbnailName, outputAssetName, outputThumbnailAssetName, Path.GetFileNameWithoutExtension(_inputMP4FileName) + ".ism");
+                _ = await SubmitJobAsync(client, _thumbnailTransformName, thumbnailJobName, outputEncodedAssetName, outputThumbnailAssetName, Path.GetFileNameWithoutExtension(_inputMP4FileName) + ".ism");
 
                 // Polls the status of the job and wait for it to finish.
-                var thumbnailJob = await WaitForJobToFinishAsync(client, _transformThumbnailName, jobThumbnailName);
+                var thumbnailJob = await WaitForJobToFinishAsync(client, _thumbnailTransformName, thumbnailJobName);
 
                 if (thumbnailJob.Properties.State == JobState.Finished)
                 {
@@ -135,10 +151,11 @@ namespace Sample
                     await ListDownloadUrlsAsync(client, locatorThumbnailName);
                 }
 
+
                 // Publishing video asset -----------------------------------------------------------------------------------------------------------------------------------
 
                 // Create a locator for clear streaming
-                _ = await CreateStreamingLocatorAsync(client, outputAssetName, locatorName);
+                _ = await CreateStreamingLocatorAsync(client, outputEncodedAssetName, locatorName);
 
                 // List the streaming endpoint(s) and propose creation if needed
                 var createdEndpoint = await ListStreamingEndpointsAndCreateOneIfNeededAsync(client);
@@ -146,8 +163,12 @@ namespace Sample
                 // Display streaming paths and test player urls
                 await ListStreamingUrlsAsync(client, locatorName);
 
-                // Clean resources
-                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName, outputThumbnailAssetName], [(_transformEncodingName, jobName), (_transformTextTrackName, jobNameTextTrack), (_transformThumbnailName, jobThumbnailName)], createdEndpoint);
+                // Cleanign assets-------------------------------------------------------------------------------------------------------------------------------------------
+
+                await CleanIfUserAcceptsAsync(client,
+                    [inputAssetName, outputEncodedAssetName, outputVTTAssetName, outputThumbnailAssetName],
+                    [(_encodingTransformName, encodingJobName), (_vodTranscriptionTransformName, vodTranscriptionJobName), (_textTrackInsertionTransformName, textTrackInsertionJobName), (_thumbnailTransformName, thumbnailJobName)],
+                    createdEndpoint);
             }
         }
 
@@ -184,19 +205,36 @@ namespace Sample
         /// <param name="assetName">The asset name.</param>
         /// <param name="fileToUpload">The file you want to upload into the asset.</param>
         /// <returns>The asset.</returns>
-        private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName, string fileToUpload)
+        private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName, string? description = null)
         {
             // Create an input asset
             var inputAsset = await client.Assets.CreateOrUpdateAsync(
                 assetName,
                 null,
                 storageName!,
-                $"input asset {fileToUpload}",
+                description,
                 AssetContainerDeletionPolicyType.Delete,
                 null,
                 new Dictionary<string, string> { { "typeAsset", "source" } }
             );
             Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
+
+            return inputAsset;
+        }
+
+        /// <summary>
+        /// Creates a new input Asset and uploads the specified local video file into it.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="storageName">The storage name.</param>
+        /// <param name="tenantId">The Azure Tenant Id</param>
+        /// <param name="assetName">The asset name.</param>
+        /// <param name="fileToUpload">The file you want to upload into the asset.</param>
+        /// <returns>The asset.</returns>
+        private static async Task<AssetSchema> CreateInputAssetAndUploadFileAsync(MKIOClient client, string storageName, string tenantId, string assetName, string fileToUpload)
+        {
+
+            var inputAsset = await CreateInputAssetAsync(client, storageName, tenantId, assetName, $"input asset {fileToUpload}");
 
             // We wait 2 seconds to let time to MK.IO create the container
             await Task.Delay(2000);
@@ -227,7 +265,7 @@ namespace Sample
         /// <param name="assetName">The asset name.</param>
         /// <param name="description">The description of the asset.</param>
         /// <returns>The asset.</returns>
-        private static async Task<AssetSchema> CreateOutputAssetAsync(MKIOClient client, string storageName, string assetName, string description)
+        private static async Task<AssetSchema> CreateOutputAssetAsync(MKIOClient client, string storageName, string assetName, string? description = null)
         {
             // Create an empty output asset
 
@@ -313,6 +351,39 @@ namespace Sample
         }
 
         /// <summary>
+        /// Creates or updates the VOD Transcript Transform.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="transformName">The transform name.</param>
+        /// <returns>The transform.</returns>
+        private static async Task<TransformSchema> CreateOrUpdateTransformVodTranscriptAsync(MKIOClient client, string transformName)
+        {
+            // settings
+            var pipelineArgs = new VodPipelineArguments(
+                new VodArguments(
+                    new List<Transcription> {
+                        new("language", "en-US")
+                    }
+                    ));
+
+            // Create or update a transform
+            var transform = await client.Transforms.CreateOrUpdateAsync(transformName, new TransformProperties
+            {
+                Description = $"VOD Transcript transform",
+                Outputs =
+                [
+                    new() {
+                        Preset = new AIPipelinePreset(pipelineArgs),
+                        RelativePriority = TransformOutputPriorityType.Normal
+                    }
+                ]
+            });
+
+            Console.WriteLine($"Transform '{transform.Name}' created/updated.");
+            return transform;
+        }
+
+        /// <summary>
         /// Creates or updates the Transform for thumbnail creation.
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
@@ -362,7 +433,7 @@ namespace Sample
         /// <param name="outputAssetName">The output asset name.</param>
         /// <param name="fileName">The filename in the input asset name.</param>
         /// <returns>The job.</returns>
-        private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string transformName, string jobName, string inputAssetName, string outputAssetName, string? fileName)
+        private static async Task<JobSchema> SubmitJobAsync(MKIOClient client, string transformName, string jobName, string inputAssetName, string outputAssetName, string? inputFileName)
         {
             // Create the encoding job
             var encodingJob = await client.Jobs.CreateAsync(
@@ -375,7 +446,7 @@ namespace Sample
                     Input = new JobInputAsset(
                        inputAssetName,
                        [
-                           fileName != null ? Path.GetFileName(fileName): ""
+                           inputFileName != null ? Path.GetFileName(inputFileName): ""
                        ]),
                     Outputs =
                     [

@@ -9,7 +9,7 @@ namespace Sample
 {
     /// <summary>
     /// Sample code for MK.IO using MK.IO .NET SDK that does the following
-    /// - create a live event
+    /// - create a live event (change the constant below to enable live transcript)
     /// - create a live output asset
     /// - create a live output
     /// - create a locator
@@ -24,6 +24,9 @@ namespace Sample
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
         private const string _transformName = "CopyAllBitrateInterleavedTransform";
         private const ConverterNamedPreset _transformPreset = ConverterNamedPreset.CopyAllBitrateInterleaved;
+
+        // set it to true to enable live transcript
+        private const bool _enableLiveTranscript = false;
 
         public static async Task RunAsync()
         {
@@ -52,7 +55,7 @@ namespace Sample
             var client = new MKIOClient(config["MKIOSubscriptionName"]!, config["MKIOToken"]!);
 
             // Create a live event
-            _ = await CreateLiveEventAsync(client, liveEventName);
+            _ = await CreateLiveEventAsync(client, liveEventName, _enableLiveTranscript);
 
             // Create a live output asset
             _ = await client.Assets.CreateOrUpdateAsync(outputAssetName, null, config["StorageName"]!, "live output asset", AssetContainerDeletionPolicyType.Delete);
@@ -112,8 +115,9 @@ namespace Sample
         /// </summary>
         /// <param name="client">The MK.IO client.</param>
         /// <param name="liveEventName">The live event name.<param>
+        /// <param name="enableLiveTranscript">Enable or not the live transcript for the event.<param>
         /// <returns>The live event.</returns>
-        private static async Task<LiveEventSchema> CreateLiveEventAsync(MKIOClient client, string liveEventName)
+        private static async Task<LiveEventSchema> CreateLiveEventAsync(MKIOClient client, string liveEventName, bool enableLiveTranscript)
         {
             // Create a live event
             LiveEventSchema liveEvent;
@@ -121,12 +125,35 @@ namespace Sample
 
             if (locationName != null)
             {
-                liveEvent = await client.LiveEvents.CreateAsync(liveEventName, locationName.Name, new LiveEventProperties
+                if (enableLiveTranscript)
                 {
-                    Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
-                    StreamOptions = ["Default"],
-                    Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.PassthroughBasic }
-                });
+                    // to enable live transcript, we need to use an encoding live event
+
+                    var pipelineArgs = new LivePipelineArguments(
+                        new LiveArguments(
+                            new List<Transcription> {
+                        new("language", "en-US")
+                            }
+                            ));
+
+                    liveEvent = await client.LiveEvents.CreateAsync(liveEventName, locationName.Name, new LiveEventProperties
+                    {
+                        Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
+                        StreamOptions = ["Default"],
+                        Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.Standard },
+                        Pipeline = pipelineArgs
+                    });
+                }
+                else
+                {
+                    liveEvent = await client.LiveEvents.CreateAsync(liveEventName, locationName.Name, new LiveEventProperties
+                    {
+                        Input = new LiveEventInput { StreamingProtocol = LiveEventInputProtocol.RTMP },
+                        StreamOptions = ["Default"],
+                        Encoding = new LiveEventEncoding { EncodingType = LiveEventEncodingType.PassthroughBasic }
+                    });
+                }
+
                 Console.WriteLine($"Live Event '{liveEventName}' created.");
             }
             else
@@ -538,13 +565,16 @@ namespace Sample
 
                 foreach (var assetName in assetNames)
                 {
-                    try
+                    if (assetName != null)
                     {
-                        await client.Assets.DeleteAsync(assetName);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error deleting asset '{assetName}'. Error: {ex.Message}");
+                        try
+                        {
+                            await client.Assets.DeleteAsync(assetName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting asset '{assetName}'. Error: {ex.Message}");
+                        }
                     }
                 }
 

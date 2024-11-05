@@ -27,8 +27,19 @@ jobs:
       with:
         dotnet-version: '8.x'
 
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: csharp
+        build-mode: manual
+
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
     - run: dotnet build MK.IO\MK.IO.csproj --configuration Release
+
+    # Perform CodeQL Analysis..
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
 
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - uses: actions/upload-artifact@v4

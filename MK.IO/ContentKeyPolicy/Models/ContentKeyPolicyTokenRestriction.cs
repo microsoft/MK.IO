@@ -11,7 +11,7 @@ namespace MK.IO.Models
     /// </summary>
     public class ContentKeyPolicyTokenRestriction : ContentKeyPolicyRestriction
     {
-        public ContentKeyPolicyTokenRestriction(string issuer, string audience, RestrictionTokenType restrictionTokenType, ContentKeyPolicyVerificationKey primaryVerificationKey,  List<ContentKeyPolicyVerificationKey>? alternateVerificationKeys = null, List<ContentKeyPolicyTokenClaim>? requiredClaims = null, string? openIdConnectDiscoveryDocument = null)
+        public ContentKeyPolicyTokenRestriction(string issuer, string audience, RestrictionTokenType restrictionTokenType, ContentKeyPolicyVerificationKey primaryVerificationKey, List<ContentKeyPolicyVerificationKey>? alternateVerificationKeys = null, List<ContentKeyPolicyTokenClaim>? requiredClaims = null, string? openIdConnectDiscoveryDocument = null)
         {
             Issuer = issuer;
             Audience = audience;

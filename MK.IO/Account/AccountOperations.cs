@@ -40,7 +40,7 @@ namespace MK.IO.Operations
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
         }
-           
+
 
 
         /// <inheritdoc/>

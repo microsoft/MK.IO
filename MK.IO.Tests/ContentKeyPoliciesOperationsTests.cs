@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Moq;
-using MK.IO.Operations;
 using MK.IO.Models;
+using MK.IO.Operations;
+using Moq;
 
 namespace MK.IO.Tests
 {

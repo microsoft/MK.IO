@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Moq;
 using MK.IO.Models;
 using MK.IO.Operations;
+using Moq;
 using Newtonsoft.Json;
-using System.Xml.Linq;
 
 namespace MK.IO.Tests
 {

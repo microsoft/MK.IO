@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Text;
 using Newtonsoft.Json;
 
 namespace MK.IO.Management.Models

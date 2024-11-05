@@ -68,7 +68,7 @@ This sample code does the following :
 - create the output encoded asset
 - create/update an encoding transform
 - submit an encoding job
-- create/update a transform to do the transcription of the video
+- create/update a transform to do the transcription of the video using AI
 - submit a job to generate the transcription (vtt)
 - create/update a transform to insert the vtt as a text track
 - submit a job to insert the vtt as a text track in the encoded asset
@@ -88,7 +88,7 @@ There is a documented end-to-end sample code for live streaming, in file [Simple
 
 What the sample does :
 
-- create a live event
+- create a live event (with an option to enable live transcription)
 - create a live output asset
 - create a live output
 - create a locator

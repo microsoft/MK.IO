@@ -47,7 +47,7 @@ namespace Sample
             // Creating a unique suffix so that we don't have name collisions if you run the sample
             // multiple times without cleaning up.
             string uniqueId = MKIOClient.GenerateUniqueName(string.Empty);
-            string inputAssetName = $"input-{uniqueId}";
+            string inputAssetName = new Uri(_blobUriMP4).Segments[1].TrimEnd('/'); // asset name is container name
             string outputAssetName = $"output-{uniqueId}";
             string jobName = $"job-{uniqueId}";
             string locatorName = $"locator-{uniqueId}";
@@ -218,9 +218,7 @@ namespace Sample
             {
                 if (ex.StatusCode == 409)
                 {
-                    // potentially, if you know the input Asset Name, you can retrieve it here and remove the throw
-                    // inputAsset = await client.Assets.GetAsync("knownassetname");
-                    Console.WriteLine($"Error as an asset already exists on container {containerName}. Error: {ex.Message}");
+                    Console.WriteLine($"Error as an asset with a different name already exists on container {containerName}. Error: {ex.Message}");
                     throw;
                 }
                 else

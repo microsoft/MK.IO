@@ -22,7 +22,7 @@ namespace Sample
     /// </summary>
     public class SimpleEncodingAndPublishing
     {
-        private const string _transformEncodingName = "H264MultipleBitrate720pTransform";
+        private const string _encodingTransformName = "H264MultipleBitrate720pTransform";
         private const EncoderNamedPreset _encodingPreset = EncoderNamedPreset.H264MultipleBitrate720p;
         private const string _blobUriMP4 = "https://amsxpfrstorage.blob.core.windows.net/aaa-input/pen.mp4";
         private const string _bitmovinPlayer = "https://bitmovin.com/demos/stream-test?format={0}&manifest={1}";
@@ -59,22 +59,22 @@ namespace Sample
             _ = await CreateInputAssetFromBlobAsync(client, config["TenantId"]!, inputAssetName, new Uri(_blobUriMP4));
 
             // Output from the encoding Job must be written to an Asset, so let's create one. We use the delete flag to delete the blob and container if we delete the asset in MK.IO
-            _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {_transformEncodingName} transform");
+            _ = await CreateOutputAssetAsync(client, config["StorageName"]!, outputAssetName, $"encoded asset from {inputAssetName} using {_encodingTransformName} transform");
 
             // Ensure that you have the desired encoding Transform. This is really a one time setup operation.
-            _ = await CreateOrUpdateTransformAsync(client, _transformEncodingName, _encodingPreset);
+            _ = await CreateOrUpdateTransformAsync(client, _encodingTransformName, _encodingPreset);
 
             // Submit a job request to MK.IO to apply the specified Transform to a given input video.
-            _ = await SubmitJobAsync(client, _transformEncodingName, jobName, inputAssetName, outputAssetName, new Uri(_blobUriMP4).Segments[2].TrimEnd('/'));
+            _ = await SubmitJobAsync(client, _encodingTransformName, jobName, inputAssetName, outputAssetName, new Uri(_blobUriMP4).Segments[2].TrimEnd('/'));
 
             // Polls the status of the job and wait for it to finish.
-            var job = await WaitForJobToFinishAsync(client, _transformEncodingName, jobName);
+            var job = await WaitForJobToFinishAsync(client, _encodingTransformName, jobName);
 
             if (job.Properties.State != JobState.Finished)
             {
                 // Alert the user if issue with the encoding job
                 DisplayJobStatusWhenCompleted(job);
-                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName], [(_transformEncodingName, jobName)]);
+                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName], [(_encodingTransformName, jobName)]);
             }
             else
             {
@@ -88,7 +88,7 @@ namespace Sample
                 await ListStreamingUrlsAsync(client, locatorName);
 
                 // Clean resources
-                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName], [(_transformEncodingName, jobName)], createdEndpoint);
+                await CleanIfUserAcceptsAsync(client, [inputAssetName, outputAssetName], [(_encodingTransformName, jobName)], createdEndpoint);
             }
         }
 
@@ -125,19 +125,36 @@ namespace Sample
         /// <param name="assetName">The asset name.</param>
         /// <param name="fileToUpload">The file you want to upload into the asset.</param>
         /// <returns>The asset.</returns>
-        private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName, string fileToUpload)
+        private static async Task<AssetSchema> CreateInputAssetAsync(MKIOClient client, string storageName, string tenantId, string assetName, string? description = null)
         {
             // Create an input asset
             var inputAsset = await client.Assets.CreateOrUpdateAsync(
                 assetName,
                 null,
                 storageName!,
-                $"input asset {fileToUpload}",
+                description,
                 AssetContainerDeletionPolicyType.Delete,
                 null,
                 new Dictionary<string, string> { { "typeAsset", "source" } }
             );
             Console.WriteLine($"Input asset '{inputAsset.Name}' created.");
+
+            return inputAsset;
+        }
+
+        /// <summary>
+        /// Creates a new input Asset and uploads the specified local video file into it.
+        /// </summary>
+        /// <param name="client">The MK.IO client.</param>
+        /// <param name="storageName">The storage name.</param>
+        /// <param name="tenantId">The Azure Tenant Id</param>
+        /// <param name="assetName">The asset name.</param>
+        /// <param name="fileToUpload">The file you want to upload into the asset.</param>
+        /// <returns>The asset.</returns>
+        private static async Task<AssetSchema> CreateInputAssetAndUploadFileAsync(MKIOClient client, string storageName, string tenantId, string assetName, string fileToUpload)
+        {
+
+            var inputAsset = await CreateInputAssetAsync(client, storageName, tenantId, assetName, $"input asset {fileToUpload}");
 
             // We wait 2 seconds to let time to MK.IO create the container
             await Task.Delay(2000);
@@ -159,6 +176,7 @@ namespace Sample
             Console.WriteLine($"File '{fileToUpload}' uploaded to input asset.");
             return inputAsset;
         }
+
 
         /// <summary>
         /// Creates a new input Asset from an existing Bob Uri. Note, the storage account must be already attached to the MK.IO account.
